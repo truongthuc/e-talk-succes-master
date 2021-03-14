@@ -1,0 +1,41 @@
+@import '../../../../../styles/variable.scss';
+
+.tc-comment-wrap {
+	border-top: 0;
+	.tc-content {
+		flex-grow: 1;
+	}
+}
+
+.rating-wrap {
+	.rating-stars {
+		position: relative;
+		display: inline-block;
+		.empty-stars {
+			color: #e1e1e1;
+			white-space: nowrap;
+		}
+		.filled-stars {
+			color: $rating-star-color;
+			position: absolute;
+			left: 0;
+			top: 0;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		i {
+			color: inherit;
+		}
+	}
+}
+
+.fb-item {
+	.fb-info .name-rating {
+		margin-bottom: 0;
+	}
+	@media screen and (max-width: 600px) {
+		.fb-avatar {
+			margin-right: 10px;
+		}
+	}
+}

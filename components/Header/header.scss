@@ -1,0 +1,33 @@
+@import '../../styles/variable';
+
+.navbar-right {
+	a {
+		color: $primary-color-dark;
+	}
+}
+
+.content-header .navbar-right .search-link,
+.content-header .navbar-right .search-link,
+.dropdown-message .dropdown-link.new-indicator,
+.dropdown-notification .dropdown-link.new-indicator {
+	color: $primary-color-dark;
+}
+
+.dropdown-message .dropdown-link.new-indicator span,
+.dropdown-notification .dropdown-link.new-indicator span {
+	background-color: darken($secondary-color, 20%);
+}
+
+.dropdown-notification .dropdown-link.new-indicator {
+	span {
+		top: -10px;
+		font-size: 11px;
+		align-items: center;
+	}
+}
+
+@media (min-width: 576px) {
+	.content-header .navbar-right .dropdown {
+		margin-left: 30px;
+	}
+}

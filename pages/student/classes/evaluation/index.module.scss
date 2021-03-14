@@ -1,0 +1,52 @@
+@import '../../../../styles/variable.scss';
+
+.rating-wrap {
+	.rating-stars {
+		position: relative;
+		display: inline-block;
+		.empty-stars {
+			color: #e1e1e1;
+			white-space: nowrap;
+		}
+		.filled-stars {
+			color: $rating-star-color;
+			position: absolute;
+			left: 0;
+			top: 0;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		i {
+			color: inherit;
+		}
+	}
+}
+
+.readmore {
+	display: inline-block;
+	i {
+		padding-left: 0;
+	}
+	&:hover i {
+		animation: wiggle 1s infinite;
+	}
+}
+@keyframes wiggle {
+	0% {
+		padding-left: 0;
+	}
+	50% {
+		padding-left: 5px;
+	}
+	100% {
+		padding-left: 0;
+	}
+}
+
+.fb-summary {
+	.fb-type {
+		i.star {
+			color: $primary-color;
+		}
+	}
+}

@@ -1,0 +1,70 @@
+@import '../../../styles/variable';
+
+.sub-menu {
+	.badge {
+		line-height: 30px;
+		font-size: 14px;
+	}
+	p {
+		&.active {
+			.link {
+				color: $primary-color;
+				box-shadow: 0 2px 0 0 $primary-color;
+			}
+		}
+	}
+}
+.sup {
+	.card-custom {
+		.sub-menu p {
+			padding: 5px 0;
+			&:last-of-type {
+				border-bottom: 1px dashed #e1e1e1;
+				padding-bottom: 15px !important;
+			}
+			a.link {
+				font-weight: normal;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+		}
+	}
+}
+
+.badge-primary-light {
+	background-color: lighten($primary-color, 42%);
+}
+
+.table-custom tr th,
+.table-custom tr td {
+	padding: 15px;
+}
+
+.table-custom.table-borderless tr th {
+	border-bottom: 1px solid #e1e1e1;
+}
+
+.table-custom tbody tr:nth-child(even) {
+	background-color: rgba(255, 222, 193, 0.13);
+}
+
+.badge-number {
+	font-size: 1rem;
+	font-weight: 400;
+	display: inline-flex;
+	width: 35px;
+	color: $primary-color;
+	height: 35px;
+	align-items: center;
+	background-color: rgba($primary-color, 0.05);
+	border-radius: 0.42rem;
+	justify-content: center;
+}
+.m-g-l-20 {
+	margin-left: 20px;
+}
+@media screen and (max-width: 768px) {
+	.w-res-100 {
+		width: 100% !important;
+	}
+}

@@ -1,0 +1,70 @@
+@import '../../../styles/variable.scss';
+
+.cr-item {
+	& > .media {
+		flex-wrap: wrap;
+		.media-body {
+			display: flex;
+			justify-content: space-between;
+			flex-direction: column;
+			padding: 0 !important;
+			.course-actions {
+				flex-wrap: wrap;
+				position: static;
+				justify-content: unset;
+				.action-left {
+					display: flex;
+					flex-wrap: wrap;
+					a:first-child {
+						width: 180px;
+						margin-right: 10px;
+					}
+					a:last-child {
+						width: 180px;
+						margin-right: 10px;
+					}
+				}
+				.action-right {
+					width: 180px;
+					text-align: right;
+				}
+				@media screen and (max-width: 1199px) {
+					.action-left {
+						width: 100%;
+						a {
+							width: 100% !important;
+							margin: 5px 0 !important;
+						}
+					}
+					.action-right {
+						width: 100%;
+						margin: 5px 0;
+						a {
+							width: 100%;
+						}
+					}
+				}
+			}
+		}
+		@media screen and (max-width: 575px) {
+			.teacher-information {
+				width: 100%;
+				.teacher-avatar {
+					margin: 0 auto;
+				}
+			}
+			.media-body {
+				width: 100%;
+				padding-top: 15px;
+				margin-left: 0 !important;
+				h5 {
+					text-align: center;
+				}
+			}
+		}
+	}
+}
+.lesson-info .teacher-avatar .course-teacher {
+	background: transparent;
+	color: #000;
+}

@@ -1,0 +1,88 @@
+.table-explane {
+	tr td[rowspan='2'] {
+		background: #fff;
+	}
+	tr td {
+		padding: 15px;
+	}
+}
+
+@media (max-width: 600px) {
+	table tbody,
+	tr,
+	td,
+	th {
+		display: block;
+	}
+	tbody {
+		margin-bottom: 30px;
+		> tr > td[rowspan='2'] {
+			background: #fa005e;
+			border-color: #fa005e;
+			h5 {
+				color: #fa005e;
+			}
+		}
+		> tr + tr {
+			margin-top: -1px;
+		}
+	}
+	tbody + tbody {
+		border-top: 0;
+	}
+}
+
+.table-card,
+.table-card:before,
+.table-card:after {
+	transition: all 0.5s ease;
+}
+
+.table-card .card .name {
+	transition: all 0.3s ease;
+}
+
+.table-card:hover .card .name {
+	transform: translateX(-50%) translateY(-10px);
+}
+
+.table-card:hover {
+	box-shadow: 0px 0px 30px 0px rgba(82, 63, 105, 0.25);
+	transform: translateY(-10px);
+}
+
+.price-table-wrapper .table-card::before {
+	transform: skewY(-15deg);
+}
+.price-table-wrapper .table-card::after {
+	transform: skewY(15deg);
+}
+
+// .price-table-wrapper .table-card:hover:before {
+// 	transform: skewY(-20deg);
+// }
+// .price-table-wrapper .table-card:hover:after {
+// 	transform: skewY(20deg);
+// }
+
+.price-table-wrapper .table-card {
+	padding: 80px 20px;
+}
+.price-table-wrapper .table-card:before {
+	height: 40%;
+}
+.price-table-wrapper .table-card:after {
+	height: 40%;
+}
+
+.price-table-wrapper .table-card .name {
+	font-size: 1rem;
+	width: 140px;
+	height: 140px;
+	top: -70px;
+}
+
+.price-table-wrapper .table-card .feather {
+	margin-top: 0;
+	margin-bottom: 0;
+}

@@ -1,0 +1,7 @@
+.media-body {
+    .title {
+        @media screen and (max-width: 587px) {
+            justify-content: center;
+        }
+    }
+}

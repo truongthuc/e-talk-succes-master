@@ -1,0 +1,9 @@
+.post-detail-cover {
+	img {
+		height: 350px;
+	}
+}
+
+.content-blog {
+	min-height: calc(var(--app-height) - (85px + 50px + 350px));
+}

@@ -1,0 +1,46 @@
+@import 'variable';
+/*
+$large-w: 1280px;
+$main-w: 1170px;
+$tb-w: 992px;
+$mb-w: 600px;
+ */
+
+@include max-media($tb-w) {
+	#main-menu {
+		position: fixed;
+		width: 275px;
+		top: 0;
+		bottom: 0;
+		background: #fff;
+		left: 0;
+		box-shadow: 2px 0px 12px 0px rgba(0, 0, 0, 0.15);
+		z-index: 9999;
+	}
+
+	#main-menu > a {
+		display: block;
+		padding: 1rem;
+		&:hover a {
+			color: #ffe05d;
+		}
+	}
+
+	#main-menu > span a {
+		color: #fff;
+	}
+
+	#main-menu > span.active-menu a {
+		color: #ffe05d;
+	}
+	#main-menu {
+		transform: translateX(-200%);
+		display: block;
+		&.mobile-open {
+			transform: translateX(0);
+			& ~ .overlay-menu {
+				transform: translateX(0);
+			}
+		}
+	}
+}

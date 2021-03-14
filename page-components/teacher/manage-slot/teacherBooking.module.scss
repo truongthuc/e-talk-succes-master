@@ -1,0 +1,286 @@
+@import '../../../styles/variable.scss';
+#js-book-calendar {
+	position: relative;
+	z-index: 0;
+	.fc-toolbar-title {
+		min-width: 150px;
+		text-align: center;
+	}
+
+	.box-slot {
+		margin-left: 15px;
+		padding: 0 3px;
+		background: #ffff;
+		position: absolute;
+		color: rgba($primary-color, 0.8);
+		bottom: 0;
+		box-shadow: 0px 1px 0px 0px #fff;
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		font-weight: 500;
+		right: 10px;
+		border: 1px solid #e1e1e1;
+		border-bottom: 0;
+	}
+
+	a.fc-col-header-cell-cushion {
+		display: block;
+		position: relative;
+	}
+
+	.date-wrap {
+		padding-right: 30px;
+	}
+	.header-container {
+		padding: 5px 0;
+	}
+}
+.book__container {
+	.card-custom > .card-body {
+		min-height: calc(100vh - 230px);
+		.tab-navigation-wrap {
+			@include media(992px) {
+				flex-direction: column-reverse;
+				.tab-navigation {
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+
+.teacher-custom + .tab-navigation-content {
+	@include media(992px) {
+		#js-book-calendar .date-wrap {
+			line-height: 1;
+			margin-bottom: 5px;
+		}
+		#js-book-calendar .fc-col-header-cell .fc-col-header-cell-cushion {
+			padding-bottom: 0;
+		}
+		#js-book-calendar .header-container {
+			padding: 0;
+		}
+		#js-book-calendar .date-wrap {
+			padding-right: 0;
+		}
+		#js-book-calendar .box-slot {
+			position: static;
+			margin-left: 0;
+			max-width: 50px;
+			margin: 0 auto;
+			font-size: 10px;
+		}
+		#js-book-calendar .fc-col-header-cell {
+			.hd-date {
+				font-size: 14px;
+			}
+			.hd-day {
+				font-size: 12px;
+			}
+		}
+		#js-book-calendar .fc-timegrid-slot-label-cushion {
+			padding: 0 5px;
+			.hot-icon {
+				display: none;
+			}
+		}
+		#js-book-calendar .fc-timegrid-slot-label-frame {
+			padding-right: 5px;
+		}
+	}
+
+	@include media(768px) {
+		#js-book-calendar .fc-timegrid-slot-label-cushion {
+			padding: 0 5px;
+			font-size: 12px;
+		}
+		#js-book-calendar .label-book {
+			font-size: 0.5rem;
+		}
+		#js-book-calendar .booking-name {
+			display: none;
+		}
+		#js-book-calendar {
+			.fix-btn {
+				display: inline-block;
+				bottom: 0;
+				top: 0;
+				left: 0;
+				right: 0;
+				opacity: 0;
+			}
+		}
+	}
+
+	@include media(650px) {
+		.fc-header-toolbar {
+			flex-wrap: wrap;
+			.fc-toolbar-chunk {
+				width: 100%;
+				&:first-child {
+					margin-bottom: 15px;
+				}
+				&:last-child {
+					width: auto;
+				}
+			}
+		}
+	}
+
+	@include media(600px) {
+		.table-schedule-log {
+		}
+	}
+
+	@include media(480px) {
+		#js-book-calendar .fc-header-toolbar .fc-toolbar-chunk .fc-toolbar-title {
+			font-size: 12px;
+			padding: 0.6rem;
+			min-width: auto;
+			flex-grow: 1;
+		}
+		#js-book-calendar .label-book {
+			display: block;
+			font-size: 9px;
+			i.fas {
+				margin-bottom: 3px;
+			}
+		}
+		#js-book-calendar .fc-timegrid-slot {
+			height: 3rem;
+		}
+		#js-book-calendar .fc-event {
+			min-height: calc(3rem - 1px);
+		}
+		.fc-header-toolbar .fc-toolbar-chunk:last-child {
+			width: 100%;
+		}
+		.notice {
+			ul {
+				padding-left: 1rem;
+				li {
+					margin-bottom: 5px;
+				}
+			}
+		}
+		#js-book-calendar .fc-timegrid-slot-label-frame {
+			padding-right: 0;
+		}
+		#js-book-calendar .fc-timegrid-slot-label-cushion {
+			padding: 0;
+			padding-right: 3px;
+			font-size: 10px;
+		}
+		#js-book-calendar .fc-col-header-cell .hd-date {
+			display: block;
+		}
+		#js-book-calendar {
+			.date-wrap {
+				.hd-date {
+					display: block;
+					font-size: 12px;
+				}
+				.hd-day {
+					font-size: 10px;
+				}
+			}
+			.box-slot {
+				padding: 0;
+				font-size: 10px;
+				padding: 0;
+				.mg-x-2 {
+					margin-left: 0;
+					margin-right: 0;
+				}
+			}
+		}
+	}
+
+	.custom-checkbox .custom-control-label::before,
+	.custom-checkbox .custom-control-label::after,
+	.custom-radio .custom-control-label::before,
+	.custom-radio .custom-control-label::after,
+	.custom-switch .custom-control-label::before,
+	.custom-switch .custom-control-label::after {
+		top: 50%;
+	}
+
+	.custom-control {
+		padding-left: 2rem;
+	}
+
+	.custom-control-label {
+		&:before {
+			width: 1.5rem;
+			height: 1.5rem;
+			left: -1.85rem;
+		}
+		&:after {
+			left: -1.85rem;
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+	}
+}
+
+@include media(768px) {
+	.tooltip.show {
+		display: none;
+	}
+}
+
+.modal-backdrop.show {
+	z-index: 1070;
+}
+
+.flatpickr-wrapper {
+	width: 100%;
+}
+
+.calendar-enter {
+	opacity: 0;
+	transform: scale(0.2);
+}
+.calendar-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 0.3s, transform 0.3s;
+}
+.calendar-exit {
+	opacity: 1;
+}
+.calendar-exit-active {
+	opacity: 0;
+	transform: scale(0.2);
+	transition: opacity 0.3s, transform 0.3s;
+}
+
+#quick-calendar {
+	.row {
+		.c-left {
+			@media (min-width: 768px) {
+				flex-basis: 100px;
+				max-width: 100px;
+			}
+			h5 {
+				margin: 0;
+				line-height: 2.5;
+			}
+		}
+		.c-right {
+			@media (min-width: 768px) {
+				flex-grow: 1;
+				max-width: calc(100% - 100px);
+			}
+			.form-group {
+				padding: 5px;
+			}
+		}
+	}
+}
+
+.flatpickr-calendar.noCalendar {
+	max-width: calc(100% - 2px);
+	left: 1px;
+}

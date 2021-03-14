@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>E-talk || Login</title>
+		<meta name="description" content="Login page example" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="js/Slick-Js/slick.css" />
+		<link href="css/reset.css" rel="stylesheet" type="text/css" />
+		<link href="css/style.css" rel="stylesheet" type="text/css" />
+		<link
+			href="css/Font-awesome-4.7.0/css/font-awesome.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+	</head>
+	<body>
+		<header class="header">
+			<div class="main-header">
+				<div class="main-logo">
+					<a href="#">
+						<img src="../public/static/img/logo-white-1.jpg" alt="" />
+					</a>
+				</div>
+				<div class="main-menu">
+					<ul class="main-menu-nav">
+						<li>
+							<a href="#">Trang chủ</a>
+						</li>
+						<li>
+							<a href="#">Đăng nhập</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div class="main">
+			<div class="main-wrapper">
+				<div class="slide-main-wrapper">
+					<div class="item">
+						<div class="box-item">
+							<img src="images/bl1.jpg" alt="" />
+						</div>
+					</div>
+					<div class="item">
+						<div class="box-item">
+							<img src="images/bl2.jpg" alt="" />
+						</div>
+					</div>
+					<div class="item">
+						<div class="box-item">
+							<img src="images/bl3.jpg" alt="" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-form">
+				<div class="box-login">
+					<div class="box-input">
+						<label class="txt-input">Tên tài khoản</label>
+						<input type="text" class="fcontrol f-input" />
+					</div>
+					<div class="box-input">
+						<label class="txt-input">Mật khẩu</label>
+						<input type="password" class="fcontrol f-input" />
+					</div>
+					<div class="box-input d-flex jutifly-streen">
+						<div class="box-checked">
+							<input type="checkbox" id="checked" />
+							<label class="txt-checkbox" for="checked"> Ghi nhớ </label>
+						</div>
+						<div class="box-forgot">
+							<a href="/student/account-user/account-forgot">Quên mật khẩu</a>
+						</div>
+					</div>
+				</div>
+				<a href="#" class="btn btn-login">
+					<i class="fa fa-sign-in" aria-hidden="true"></i> Đăng nhập
+				</a>
+			</div>
+		</div>
+		<footer class="footer">
+			<div class="table-footer">
+				<div class="columns">
+					<div class="colum">
+						<div class="content">
+							<div class="box-img">
+								<img src="../public/static/img/logo-white.png" alt="" />
+							</div>
+							<div class="box-info-ft">
+								<p class="desc">
+									Tại E-Talk chúng ta sẽ học tiếng Anh với 100% giáo viên nước
+									ngoài, tương tác hai chiều qua các lớp học trực tuyến. Chúng
+									tôi tin tưởng rằng bạn sẽ sử dụng tiếng Anh thành thạo nhanh
+									chóng với chi phí thấp nhất.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="colum">
+						<div class="content">
+							<ul class="list-nav-ft">
+								<li>
+									<a href="#">Về chúng tôi</a>
+								</li>
+								<li>
+									<a href="#">Tutor</a>
+								</li>
+								<li>
+									<a href="#">FAQs</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="colum">
+						<div class="content">
+							<ul class="list-nav-ft">
+								<li>
+									<a href="#">Đăng kí học thử miễn phí</a>
+								</li>
+								<li>
+									<a href="#">Theo dõi chúng tôi</a>
+								</li>
+								<li>
+									<div class="box-social">
+										<a href="#" class="icon bg-fb">
+											<i class="fa fa-facebook" aria-hidden="true"></i>
+										</a>
+										<a href="#" class="icon bg-yt">
+											<i class="fa fa-youtube" aria-hidden="true"></i>
+										</a>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="colum">
+						<div class="content">
+							<ul class="list-nav-ft">
+								<li>
+									<a href="#">Liên hệ</a>
+								</li>
+								<li>
+									<a href="tel:0903329682"
+										><i class="fa fa-phone-square" aria-hidden="true"></i
+										>0903.329.682</a
+									>
+								</li>
+								<li>
+									<a href="mailto:hocngoainguquaskype@gmail.com"
+										><i class="fa fa-envelope" aria-hidden="true"></i
+										>hocngoainguquaskype@gmail.com</a
+									>
+								</li>
+								<li>
+									<a href="#"
+										><i class="fa fa-home" aria-hidden="true"></i>197 Purok 2
+										Rimando Road Baguio City, Philippines</a
+									>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="copy-right">Copyright © 2016 E-Talk.vn</div>
+		</footer>
+	</body>
+	<script src="js/jquery-3.4.1.min.js"></script>
+	<script src="js/Slick-Js/slick.min.js"></script>
+	<script>
+		$('.slide-main-wrapper').slick({
+			dots: false,
+			arrows: false,
+			infinite: true,
+			speed: 700,
+			autoplay: true,
+			autoplaySpeed: 5000,
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			responsive: [
+				{
+					breakpoint: 1024,
+					settings: {
+						slidesToShow: 1,
+						slidesToScroll: 1,
+						infinite: true,
+						dots: true,
+					},
+				},
+				{
+					breakpoint: 768,
+					settings: {
+						slidesToShow: 2,
+						slidesToScroll: 1,
+					},
+				},
+				{
+					breakpoint: 499,
+					settings: {
+						slidesToShow: 1,
+						slidesToScroll: 1,
+					},
+				},
+			],
+		});
+	</script>
+</html>

@@ -1,0 +1,35 @@
+.cr-item {
+  .media {
+    flex-wrap: wrap;
+    .media-body {
+      .course-information {
+        .tx-medium {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 547px) {
+    .media {
+      .teacher-information {
+        width: 100%;
+        .teacher-avatar {
+          margin: 0 auto;
+        }
+      }
+      .media-body {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 15px;
+        h5 {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+.lesson-info .teacher-avatar .course-teacher {
+  background: transparent;
+  color: #000;
+}

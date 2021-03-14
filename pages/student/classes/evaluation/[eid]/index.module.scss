@@ -1,0 +1,30 @@
+@import '../../../../../styles/variable.scss';
+
+.rating-stars {
+	position: relative;
+	display: inline-block;
+	.empty-stars {
+		color: #e1e1e1;
+		white-space: nowrap;
+	}
+	.filled-stars {
+		color: $rating-star-color;
+		position: absolute;
+		left: 0;
+		top: 0;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	i {
+		color: inherit;
+	}
+}
+
+.review__wrap {
+	img {
+		height: auto;
+	}
+	iframe {
+		max-width: 100%;
+	}
+}

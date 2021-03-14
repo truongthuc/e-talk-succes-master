@@ -1,0 +1,110 @@
+@charset "utf-8";
+//
+//VARIABLE :: BEGIN
+//
+$large-w: 1920px;
+$main-w: 1280px;
+$tb-w: 992px;
+$mb-w: 600px;
+
+$primary-color: #fa005e;
+$primary-darken: #bd0149;
+$primary-lighten: #ff2075;
+$secondary-color: #d9ecf2;
+$secondary-darken: #91b8c3;
+$secondary-lighten: #effbff;
+$primary-color-dark: #1b2e4b;
+$primary-txt-color: #001737;
+$primary-hover-color: $primary-lighten;
+$sidenav-active-box-shadow: 3px 3px 20px 0 rgba(38, 198, 218, 0.4) !important;
+$border-color: rgba(72, 94, 144, 0.16);
+$rating-star-color: #ffcb8e;
+
+//Bootstrap 4
+$red: #ff414d;
+$green: #28b454;
+$yellow: #ffcb8e;
+$primary: $primary-color;
+$secondary: $secondary-color;
+$border-radius: 0.125rem;
+
+@mixin box-shadow($shadow...) {
+	-webkit-box-shadow: $shadow; // iOS <4.3 & Android <4.1
+	box-shadow: $shadow;
+}
+
+@mixin coverbg($url) {
+	background: url($url) no-repeat center center;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	-ms-background-size: cover;
+	background-size: cover;
+}
+
+@mixin transition($s) {
+	-webkit-transition: all $s ease-in-out;
+	-moz-transition: all $s ease-in-out;
+	-o-transition: all $s ease-in-out;
+	-ms-transition: all $s ease-in-out;
+	transition: all $s ease-in-out;
+}
+
+@mixin media($point) {
+	@media screen and (max-width: $point) {
+		@content;
+	}
+}
+
+@mixin max-media($point) {
+	@media screen and (max-width: $point) {
+		@content;
+	}
+}
+
+@mixin min-media($point) {
+	@media screen and (min-width: $point) {
+		@content;
+	}
+}
+
+%clear {
+	&:after {
+		content: '';
+		display: table;
+		clear: both;
+	}
+
+	&:before {
+		display: table;
+		content: ' ';
+	}
+}
+
+@mixin scrollbars(
+	$size,
+	$foreground-color,
+	$background-color: mix($foreground-color, white, 50%)
+) {
+	&::-webkit-scrollbar {
+		width: $size;
+		height: $size;
+		border-radius: 10px;
+	}
+	&::-webkit-scrollbar-thumb {
+		background: $foreground-color;
+		border-radius: 10px;
+	}
+	&::-webkit-scrollbar-track {
+		background: $background-color;
+		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+	}
+	&::-webkit-scrollbar-thumb:hover {
+		background: darken($foreground-color, 10%);
+	}
+	// For Internet Explorer
+	& {
+		scrollbar-face-color: $foreground-color;
+		scrollbar-track-color: $background-color;
+	}
+}

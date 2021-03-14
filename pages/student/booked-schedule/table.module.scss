@@ -1,0 +1,20 @@
+@import '../../../styles/variable.scss';
+
+@include max-media(768px) {
+	.table.responsive-table {
+		td {
+			display: flex;
+			align-items: center;
+			border-bottom: 1px solid #e1e1e1;
+			min-height: 3.55rem;
+		}
+		th {
+			background: #ebebeb;
+			border-bottom: 1px solid #e1e1e1;
+		}
+		tbody {
+			overflow: hidden;
+			position: relative;
+		}
+	}
+}

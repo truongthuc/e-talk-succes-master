@@ -1,0 +1,524 @@
+{
+    "LvCurrent": [{
+        "ID": "3",
+	    "Name": "hy ne"
+    }],
+    "LvNow": [{
+        "ID": "8",
+	    "Name": "hy ne"
+    }],
+    "StartDay": [{
+        "ID": "28-10-2020",
+	    "Name": "hy ne"
+    }],
+    "EndDay": [{
+        "ID": "30-11-2020",
+	    "Name": "hy ne"
+    }],
+    "ClassComplete": [{
+        "ID": "2",
+	    "Name": "hy ne"
+    }],
+    "ClassCanceled": [{
+        "ID": "0",
+	    "Name": "hy ne"
+    }],
+    "ClassRest": [{
+        "ID": "5",
+	    "Name": "hy ne"
+    }],
+    "MainTitle": [{
+        "ID": "5",
+	    "Name": "Tăng tốc 1 tháng"
+    }],
+    "ClassPlace": [{
+        "ID": "5",
+	    "Name": "Tăng tốc 1 tháng"
+    }],
+    "TeacherList": [{
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"15 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris nè",
+        "Country": "Philippins",
+        "Exp":"115 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"5 Năm"
+    },
+    {
+        "ID":"1",
+        "Job": "Teacher",
+        "Name": "Teacher Cris",
+        "Country": "Philippins",
+        "Exp":"115 Năm"
+        }
+    ],
+    "PackageList": [{
+        "PlanName": "Starter Immediately",
+		"TotalLesson": "30",
+		"BookedLesson": "15",
+		"StartDate": "10/06/2020 10:30 - 20:30",
+		"EndDate": "10/12/2020 10:30 - 20:30",
+		"Status": "1"
+    }],
+    "Overview": [{
+        "ID": "5",
+	    "Avarage": "Nhận xét của giáo viên"
+    }],
+    "Question": [{
+        "title": "Những lợi ích khi bạn học trên hệ thống E-talk ",
+	    "Avarage": "Nhận xét của giáo viên"
+    }],
+    "dataTable": [{
+        "BookingID": "1",
+        "Name": "Phan Tấn Trung",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "BookingID": "1",
+        "Name": "Phan Tấn Trung",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "BookingID": "1",
+        "Name": "Phan Tấn Trung",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    }
+    ],
+    "Upcomming": [{
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    }],
+    "TicketSupport": [
+        {
+            "SupportTitle": "Ticker Hỗ trợ học Tiếng Anh"
+        },
+        {
+            "SupportTitle": "Ticker Hỗ trợ học Tiếng Mỹ"
+        },
+        {
+            "SupportTitle": "Ticker Hỗ trợ học Tiếng Pháp"
+        },
+        {
+            "SupportTitle": "Ticker Hỗ trợ học Tiếng Nhật"
+        },
+        {
+            "SupportTitle": "Ticker Hỗ trợ học Tiếng Hàn"
+        }
+    ],
+    "allClass": [{
+        "classID": "1",
+        "classLesson": "Lession 4",
+        "DocumentName":"Khóa học Tiếng Anh cơ bản",
+        "classStudent": "Kha Lê",
+        "classSchedule": "SOLUTION 6 - Grade 6",
+        "classStatus": "SOLUTION 6 - Grade 6",
+        "classAction": "SOLUTION 6 - Grade 6",
+        "ScheduleTimeVN":"29/07/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "29/07/2020 10:00 - 14:25"
+    },
+    {
+        "classID": "2",
+        "classLesson": "Lession 6",
+        "DocumentName":"Khóa học Tiếng Anh xuất ngoại",
+        "classStudent": "An nguyễn",
+        "classSchedule": "SOLUTION 6 - Grade 6",
+        "classStatus": "SOLUTION 6 - Grade 6",
+        "classAction": "SOLUTION 6 - Grade 6",
+        "ScheduleTimeVN":"29/07/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "29/07/2020 10:00 - 14:25"
+    },
+    {
+        "classID": "3",
+        "classLesson": "Lession 8",
+        "DocumentName":"Khóa học Tiếng Anh cho người bản xứ",
+        "classStudent": "Tứ Hỷ",
+        "classSchedule": "SOLUTION 6 - Grade 6",
+        "classStatus": "SOLUTION 6 - Grade 6",
+        "classAction": "SOLUTION 6 - Grade 6",
+        "ScheduleTimeVN":"29/07/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "29/07/2020 10:00 - 14:25"
+    }
+    ],
+    "InfoModalStudent": [{
+        "stImageUrl": "/static/img/avatar.jpg",
+        "stPhone": "0866757124",
+        "stEmail": "tuhy02031995@gmail.com",
+        "stSkypeId": "641861625",
+        "stName": "Tứ Hỷ",
+        "stSex": "Nam",
+        "stCourseLearning": "Khóa học Tiếng Anh",
+        "stLastLesson": "Lession 8",
+        "stLanguage": "English",
+        "stTimeZone": "08:00",
+        "stDescription": "Rèn luyện bản thân"
+    }],
+    "UpcommingClass": [
+        {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Tứ Hỷ",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Kha Lê",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "An Nguyễn",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    }
+    ],
+    "evaluationClass": [
+        {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Tứ Hỷ",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Kha Lê",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "An Nguyễn",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Nhựt Anh",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Dũng Phùng",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    }
+    ],
+    "MissingEvaluationClasses": [{
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "EvaluationStatus":"Feedbacked",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "EvaluationStatus":"Feedbacked",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "EvaluationStatus":"Feedbacked",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "EvaluationStatus":"Feedbacked",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    },
+    {
+        "ScheduleTimeVN": "26/06/2020 14:00 - 14:25",
+        "ScheduleTimeUTC": "26/06/2020 10:00 - 14:25",
+        "LessionName": "Lession 4",
+        "StudentName": "Trương Văn Lam",
+        "EvaluationStatus":"Feedbacked",
+        "DocumentName": "SOLUTION 6 - Grade 6"
+    }
+],
+    "AttendanceRecord": [{
+        "TeacherName": "Tứ Hỷ",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "TeacherName": "Kha Lê",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "TeacherName": "An Nguyễn",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "TeacherName": "Nhựt Anh",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    },
+    {
+        "TeacherName": "Đạt Speed",
+        "Package": "English cơ bản",
+        "Course": "English cơ bản",
+        "Date": "10 ngày",
+        "Time": "30 phút",
+        "Remark": "Có tiến bộ",
+        "Homework": "3 Bài",
+        "Action": "Ngoại Khóa"
+    }
+    ],
+    "EndOfStudentPackage": [
+        {
+            "StudentCode": "#00954845",
+            "StudentName": "Tứ Hỷ",
+            "TotalNumberOfClass": "32 classes",
+            "ClassesWereBooked": "15 classes",
+            "FurthestClass":"I dont know what it mean...",
+            "EndDateOfPackage": "25/10/2020"
+        },
+        {
+            "StudentCode": "#0095466",
+            "StudentName": "Kha Lê",
+            "TotalNumberOfClass": "32 classes",
+            "ClassesWereBooked": "15 classes",
+            "FurthestClass":"I dont know what it mean...",
+            "EndDateOfPackage": "25/10/2020"
+        },
+        {
+            "StudentCode": "#009548877",
+            "StudentName": "An Nguyễn",
+            "TotalNumberOfClass": "32 classes",
+            "ClassesWereBooked": "15 classes",
+            "FurthestClass":"I dont know what it mean...",
+            "EndDateOfPackage": "25/10/2020"
+        },
+        {
+            "StudentCode": "#00954335",
+            "StudentName": "Nhựt Anh",
+            "TotalNumberOfClass": "32 classes",
+            "ClassesWereBooked": "15 classes",
+            "FurthestClass":"I dont know what it mean...",
+            "EndDateOfPackage": "25/10/2020"
+        },
+        {
+            "StudentCode": "#00954656",
+            "StudentName": "Đạt Speed",
+            "TotalNumberOfClass": "32 classes",
+            "ClassesWereBooked": "15 classes",
+            "FurthestClass":"I dont know what it mean...",
+            "EndDateOfPackage": "25/10/2020"
+        }
+    ],
+    "ScheduleLog": [
+        {
+            "OparationTime": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeOfTeacher": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeLocal": "26/06/2020 10:00 - 14:25",
+            "CreatedBy": "Lession 4",
+            "UpdatedAction": "Ngoại Khóa"
+        },
+        {
+            "OparationTime": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeOfTeacher": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeLocal": "26/06/2020 10:00 - 14:25",
+            "CreatedBy": "Lession 4",
+            "UpdatedAction": "Ngoại Khóa"
+        },
+        {
+            "OparationTime": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeOfTeacher": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeLocal": "26/06/2020 10:00 - 14:25",
+            "CreatedBy": "Lession 4",
+            "UpdatedAction": "Nội Khóa"
+        },
+        {
+            "OparationTime": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeOfTeacher": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeLocal": "26/06/2020 10:00 - 14:25",
+            "CreatedBy": "Lession 4",
+            "UpdatedAction": "Nội Khóa"
+        },
+        {
+            "OparationTime": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeOfTeacher": "26/06/2020 14:00 - 14:25",
+            "ScheduleTimeLocal": "26/06/2020 10:00 - 14:25",
+            "CreatedBy": "Lession 4",
+            "UpdatedAction": "Ngoại Khóa"
+        }
+    ],
+    "EvaluationDetail": [
+        {
+            "DocumentName": "GÓI HỌC REGULAR",
+            "Material": "Ep",
+            "Lesson":"*Phát âm chuyên sâu,*Tiếng Anh theo yêu cầu",
+            "ScheduleDate": "19/01/2021",
+            "finishedType": "Hoàn thành",
+            "UpdatedAction": "Ngoại Khóa",
+            "StudentName": "Trần Lê Phương Quyên",
+            "StudentNote": "",
+            "rating":"1"
+        } 
+    ],
+    "EvaluateClass": [
+        {
+            "DocumentName": "GÓI HỌC REGULAR",
+            "Material": "Ep",
+            "Lesson":"*Phát âm chuyên sâu,*Tiếng Anh theo yêu cầu",
+            "ScheduleDate": "19/01/2021",
+            "finishedType": "Hoàn thành",
+            "UpdatedAction": "Ngoại Khóa",
+            "StudentName": "Trần Lê Phương Quyên",
+            "StudentNote": "",
+            "rating":"1"
+        } 
+    ],
+    "StudentFeedback": [
+        {
+            "id":"randomId()",
+            "stName": "Tứ Hỷ",
+            "stAvatar": "https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg",
+            "stFeedback": "Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh...xứng đáng 1 sao",
+            "lessonTime": "26/06/2020 10:00 - 14:25",
+            "lessonName":"Lesson 6: ReactJS application",
+            "rating":"1"
+        },
+        {
+            "id":"randomId()",
+            "stName": "Kha Lê",
+            "stAvatar": "https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg",
+            "stFeedback": "Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh",
+            "lessonTime": "26/06/2020 10:00 - 14:25",
+            "lessonName":"Lesson 6: ReactJS application",
+            "rating":"3"
+        },
+        {
+            "id":"randomId()",
+            "stName": "An Nguyễn",
+            "stAvatar": "https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg",
+            "stFeedback": "Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh",
+            "lessonTime": "26/06/2020 10:00 - 14:25",
+            "lessonName":"Lesson 6: ReactJS application",
+            "rating":"2"
+        },
+        {
+            "id":"randomId()",
+            "stName": "Nhựt Anh",
+            "stAvatar": "https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg",
+            "stFeedback": "Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh",
+            "lessonTime": "26/06/2020 10:00 - 14:25",
+            "lessonName":"Lesson 6: ReactJS application",
+            "rating":"4"
+        },
+        {
+            "id":"randomId()",
+            "stName": "Cao Thăng",
+            "stAvatar": "https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg",
+            "stFeedback": "Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh",
+            "lessonTime": "26/06/2020 10:00 - 14:25",
+            "lessonName":"Lesson 6: ReactJS application",
+            "rating":"1"
+        }
+    ]
+}

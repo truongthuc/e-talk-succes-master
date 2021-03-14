@@ -1,0 +1,133 @@
+@import '../../../styles/variable';
+
+.sidebar-profile {
+	list-style: none;
+
+	li {
+		position: relative;
+		transition: all 0.3s ease;
+	}
+
+	li a {
+		padding: 1rem;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+
+	li .icon {
+		width: 25px;
+		display: inline-block;
+	}
+
+	li + li a {
+		border-top: 1px solid #e1e1e1;
+	}
+
+	li:hover {
+		background: lighten($primary-color, 42%);
+	}
+
+	li:hover a {
+		border-color: lighten($primary-color, 42%);
+	}
+
+	li:hover a > span {
+		transition: all 0.3s ease;
+	}
+
+	li:hover a > span:last-child {
+		margin-left: 15px;
+	}
+
+	li:hover + li a {
+		border-color: lighten($primary-color, 42%);
+	}
+
+	li.active a {
+		color: $primary-color;
+	}
+}
+
+.teacher__detail {
+	border-radius: 0.42rem;
+}
+
+.card-visual {
+	margin-left: auto;
+	margin-right: auto;
+	box-shadow: 0px 14px 28px 0px rgba(0, 0, 0, 0.15);
+	border-radius: 100px;
+
+	.visual-name {
+		position: absolute;
+		bottom: 60px;
+		left: 30px;
+		font-size: 20px;
+		color: rgba(159, 203, 255, 0.45);
+		font-weight: bold;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+		text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	.visual-number {
+		position: absolute;
+		bottom: 30px;
+		left: 30px;
+		font-size: 20px;
+		color: rgba(159, 203, 255, 0.45);
+		text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
+		font-weight: bold;
+		letter-spacing: 1.5px;
+		text-transform: uppercase;
+	}
+
+	.visual-bank {
+		position: absolute;
+		top: 25px;
+		right: 30px;
+		font-size: 16px;
+		color: #ffffff;
+		font-weight: bold;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
+	}
+}
+
+@include media(580px) {
+	.card-visual {
+		.visual-name {
+			bottom: 40px;
+			left: 20px;
+			font-size: 14px;
+		}
+
+		.visual-number {
+			bottom: 20px;
+			left: 20px;
+			font-size: 14px;
+		}
+
+		.visual-bank {
+			font-size: 12px;
+			top: 15px;
+			right: 18px;
+		}
+	}
+}
+
+@media (min-width: 1200px) {
+	.tab-navigation {
+		.tab-item {
+			.tab-link {
+				padding: 1rem 1.5rem;
+			}
+		}
+	}
+}
+
+#react-teacher-form .teacher__detail .teacher-body {
+	margin-top: 0;
+}

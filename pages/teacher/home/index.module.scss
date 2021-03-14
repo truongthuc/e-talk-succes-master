@@ -1,0 +1,44 @@
+.shadow-base {
+	box-shadow: 0 0 15px rgba(28, 39, 60, 0.06);
+}
+
+.circle-value {
+	background: #fafafa;
+	border-radius: 50%;
+	width: 90px;
+	height: 90px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.profile-info-list svg {
+	color: #aaaaa9;
+}
+
+.svg-icon > svg {
+	color: #cec1b4;
+}
+
+@media (max-width: 768px) {
+	.lg-valign-middle {
+		display: inline-flex !important;
+		align-items: center;
+	}
+}
+
+@media (min-width: 1200px) {
+	.wd-xl-325-f {
+		width: 325px !important;
+	}
+}
+.card-custom > .card-body-thin {
+	padding: 1rem 1.25rem;
+}
+@media (max-width: 768px) {
+	.gv-notice {
+		.lg-valign-middle {
+			width: 100%;
+		}
+	}
+}

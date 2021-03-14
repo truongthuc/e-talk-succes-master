@@ -1,0 +1,51 @@
+@import '../../../styles/variable.scss';
+
+.pay-border {
+	padding: 15px 15px 0;
+	border: 1px solid #e1e1e1;
+	border-radius: 0.25rem;
+	.pay-syn-money {
+		font-weight: 500;
+		color: $primary-color;
+		font-size: 16px;
+	}
+}
+
+.pay-syn-title {
+	font-weight: 500;
+	color: $secondary-darken;
+	font-size: 1.25rem;
+	padding-right: 10px;
+	& + .pay-syn-money {
+		font-size: 1.25rem;
+		color: $secondary-darken;
+	}
+}
+.pay-syn-text {
+	color: #97a3b9;
+	& + .pay-syn-text {
+		font-weight: 500;
+		color: #252525;
+	}
+}
+
+.pay .pay-title .pay-pending {
+	font-size: 20px;
+}
+
+.v-divider {
+	height: 28px;
+	width: 1px;
+	background-color: #e1e1e1;
+	margin: 0 15px;
+}
+
+.btn-collapse {
+	padding: 5px 10px;
+	border-radius: 50%;
+	font-size: 24px;
+	background: #ebebeb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

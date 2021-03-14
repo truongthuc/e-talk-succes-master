@@ -1,0 +1,23 @@
+{
+	"dashboard": "Dashboard",
+	"package": "My Packages",
+	"schedule": "Schedule",
+	"booking-schedule": "Booking Schedule",
+	"booked-schedule": "Booked Schedule",
+	"calendar-view": "Calendar View",
+	"table-view": "Table View",
+	"lesson-feedback": "Feedback Of Lessons",
+	"lesson-history": "Lesson History",
+	"course-discount": "Promotion",
+	"day-off": "Holidays",
+	"other": "Other",
+	"referral": "Referral / Invite",
+	"f&a": "Frequently Asked Questions",
+	"payment-history": "Payment History",
+	"classes": "Classes",
+	"tuition-others": "Tuition & Others",
+	"teacher-list": "Teachers",
+	"profile-teacher": "Profile Teacher",
+	"scholarship-feedback":"Scholarship Feedback",
+	"course-duration":"Course Duration"
+}

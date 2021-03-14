@@ -1,0 +1,267 @@
+@import '../../../styles/variable.scss';
+@import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
+@import '../../../node_modules/swiper/swiper-bundle.min.css';
+.rating-stars {
+	position: relative;
+	display: inline-block;
+	margin-right: 10px;
+	.empty-stars {
+		color: #e1e1e1;
+		white-space: nowrap;
+	}
+	.filled-stars {
+		color: $rating-star-color;
+		position: absolute;
+		left: 0;
+		top: 0;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+}
+
+.filter-group-wrap {
+	.search-btn-group {
+		position: relative;
+		.overlay {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			z-index: 999;
+		}
+	}
+}
+body {
+	position: relative;
+	.overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.2);
+		z-index: 999;
+	}
+}
+
+.lds-ellipsis {
+	display: block !important;
+	position: relative;
+	width: 80px;
+	height: 100% !important;
+	margin: 0 auto;
+	div {
+		position: absolute;
+		top: 50% !important;
+		width: 13px;
+		height: 13px;
+		border-radius: 50%;
+		background: #fff;
+		animation-timing-function: cubic-bezier(0, 1, 1, 0);
+		&:nth-child(1) {
+			left: 8px;
+			animation: lds-ellipsis1 0.6s infinite;
+		}
+		&:nth-child(2) {
+			left: 8px;
+			animation: lds-ellipsis2 0.6s infinite;
+		}
+		&:nth-child(3) {
+			left: 32px;
+			animation: lds-ellipsis2 0.6s infinite;
+		}
+		&:nth-child(4) {
+			left: 56px;
+			animation: lds-ellipsis3 0.6s infinite;
+		}
+	}
+}
+
+@keyframes lds-ellipsis1 {
+	0% {
+		transform: scale(0);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+@keyframes lds-ellipsis3 {
+	0% {
+		transform: scale(1);
+	}
+	100% {
+		transform: scale(0);
+	}
+}
+@keyframes lds-ellipsis2 {
+	0% {
+		transform: translate(0, 0);
+	}
+	100% {
+		transform: translate(24px, 0);
+	}
+}
+
+.flatpickr-wrapper {
+	width: 100%;
+}
+
+.list-tutors .tutor {
+	@media screen and (max-width: 600px) {
+		width: 50% !important;
+	}
+	@media screen and (max-width: 500px) {
+		width: 100% !important;
+		max-width: 300px;
+		margin: 0 auto;
+	}
+}
+
+#div-nationality {
+	.national-checkbox {
+		@media screen and (max-width: 768px) {
+			width: auto;
+			margin-right: 10px;
+		}
+	}
+}
+
+.day-block {
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.flatpickr-calendar {
+	width: 100%;
+}
+.tutor-avatar {
+	img {
+		height: 200px;
+		object-fit: cover;
+	}
+}
+
+.search-tab {
+	text-align: center;
+	padding: 0;
+	list-style: none;
+}
+
+.search-tab li {
+	display: inline-flex;
+	flex-grow: 1;
+}
+
+.search-nav li.nav-item {
+	flex-grow: 1;
+	font-weight: 600;
+	font-size: 17px;
+}
+
+.search-nav li.nav-item .nav-link {
+	height: 50px;
+}
+
+.search-nav li.nav-item .nav-link.active {
+	border-bottom: 5px solid #76bdff;
+}
+
+.date-week {
+	padding-top: 15px;
+	display: flex;
+}
+
+.date-week label {
+	font-weight: 600;
+	font-size: 16px;
+	flex-grow: 1;
+	background-color: #ddd;
+	color: #6d6d6d;
+}
+
+.date-week label:hover {
+	background-color: #e6e1e1;
+	color: #6d6d6d;
+}
+
+.date-week label:not(:last-child) {
+	margin-right: 5px;
+}
+
+.date-week label p {
+	margin: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.date-week label.checked:hover {
+	background-color: #e6e1e1;
+	color: #fd7e14;
+}
+
+.date-week label.checked {
+	color: #fd7e14;
+}
+
+.input-search-date {
+	position: absolute;
+	visibility: hidden;
+}
+
+.filter-row .left h5 {
+	margin: 0;
+	line-height: 2.5;
+}
+
+.filter-row .right .item {
+	padding: 5px;
+}
+
+.national-checkbox {
+	width: 25%;
+}
+
+.nationality.checked:after {
+	font-family: 'Font Awesome 5 Free';
+	color: #2477c6;
+	content: '\f058';
+	margin-left: 50px;
+}
+
+.totor-detail {
+	background-color: #fff;
+}
+
+.ul-schedule {
+	list-style: none;
+	padding: 0;
+	height: 300px;
+	overflow: auto;
+}
+
+.ul-schedule li {
+	display: flex;
+	align-items: center;
+	background: #f6f6f6;
+	align-items: center;
+	vertical-align: middle;
+	padding: 5px 10px;
+	justify-content: space-between;
+}
+
+.ul-schedule li + li {
+	border-top: 1px solid #e1e1e1;
+}
+
+.ul-schedule li span.status {
+	display: inline-block;
+}
+
+.ul-schedule li span.status button {
+	color: #fff;
+	background-color: #43adff;
+	border: none;
+	width: 100%;
+	border-radius: 3px;
+}

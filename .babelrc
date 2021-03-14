@@ -1,0 +1,28 @@
+{
+	"presets": [["next/babel"]],
+	"plugins": [
+		[
+			"babel-plugin-root-import",
+			{
+				"rootPathPrefix": "~",
+				"rootPathSuffix": "./"
+			}
+		]
+	],
+	"overrides": [
+		{
+			"include": [
+				"./node_modules",
+				"../../node_modules" // only needed for fullcalendar's weird monorepo setup. delete in your own project
+			],
+			"plugins": [
+				[
+					"babel-plugin-transform-require-ignore",
+					{
+						"extensions": [".css"]
+					}
+				]
+			]
+		}
+	]
+}

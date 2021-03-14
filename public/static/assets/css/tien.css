@@ -1,0 +1,106 @@
+.img-round{
+    
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    margin: 0 auto;
+    
+}
+.time-accout{
+    
+   background-color: #ddd;
+    
+    
+    
+}
+
+
+
+.teaching{
+    position: relative;
+    width:100%;
+    background: #fff;
+}
+.notices{
+    background-color: #fff;
+}
+
+.item-teaching{
+    border: 1px solid #999;
+    border-top: 2px solid #fd7e14;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 20px 0;
+    
+    width: 100%;
+   
+}
+.list-button{
+    background: #fff;  
+}
+
+
+
+.header-foundations{
+    color:#fd7e14;
+    float:left
+}
+.more-btn{
+ 
+    
+}
+.foundations{
+    width: 100%;
+    background: #fff;
+    margin: 0;
+    position: relative;
+}
+.item-foundations{
+    width: 100%;
+    
+}
+.img-100{
+    
+    width: 100%;
+    
+}
+.bannerAndSlide{
+   
+  
+}
+.img-banner{
+  
+   object-fit: cover;
+}
+.smalltext-item-foundation{
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.foundations .swiper-slide h5 > a{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.icon-question{
+    margin: 5px;
+    color: #fd7e14;
+    font-size: 20px;
+}
+
+.banner .banner-slide{
+    height:100%;
+    background: #fff;
+}
+.swiper-slide{
+    position: relative;
+}
+.new-img{
+    position:absolute;
+    top:0;
+    left: 0;
+    width: 60px;
+}
+
+  

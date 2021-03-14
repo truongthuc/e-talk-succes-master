@@ -1,0 +1,200 @@
+@import '../../../styles/variable.scss';
+
+.overall__summary {
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+	label {
+		margin: 0;
+	}
+}
+
+.overall__summary-info {
+	position: relative;
+	//&::after {
+	//  content: "";
+	//  position: absolute;
+	//  height: 1px;
+	//  background-color: #b5b5c3;
+	//  top: 100%;
+	//  left: 0;
+	//  width: 100%;
+	//}
+
+	.course-img {
+		width: 80px;
+		height: 80px;
+		@include media(500px) {
+			margin: 0 auto;
+		}
+		img {
+			width: 100%;
+			height: 100%;
+			border-radius: 10px;
+		}
+	}
+	.course-info {
+		width: 100%;
+		@include media(500px) {
+			margin-top: 10px;
+			padding-left: 0 !important;
+		}
+		.course-name {
+			font-size: 18px;
+			white-space: unset;
+		}
+		ul {
+			list-style-type: none;
+			padding: 0;
+			color: #b5b5c3 !important;
+			li {
+				display: inline-block;
+				margin-right: 10px;
+			}
+		}
+		.course-progress {
+			/*     label{
+        margin-bottom:5px;
+        font-weight:normal;
+      }
+      .label-tag{
+        font-weight:500;
+      } */
+			.progress-wrap {
+				@include media(500px) {
+					width: 100%;
+				}
+			}
+			.progress-course-bar {
+				width: 100%;
+				.date,
+				.level {
+					.start-date,
+					.end-date,
+					.start-level,
+					.end-level {
+						span {
+							font-size: 12px;
+						}
+					}
+					.end-date {
+						text-align: right;
+					}
+				}
+				.progress-bar-wrap {
+					position: relative;
+					width: 100%;
+					height: 20px;
+					border-radius: 16px;
+					overflow: hidden;
+					background: #e6e6e6;
+					margin: 0.5rem 0 0;
+					.progress-bar-wrap-fill {
+						position: absolute;
+						height: 100%;
+						border-top-right-radius: 16px;
+						border-bottom-right-radius: 16px;
+						top: 0;
+						left: 0;
+						width: 1%;
+						background-image: linear-gradient(
+							to right,
+							$primary-color,
+							lighten($primary-color, 20%)
+						);
+						//&::after {
+						//  position: absolute;
+						//  content: "";
+						//  top: 50%;
+						//  transform: translateY(-50%);
+						//  right: -10px;
+						//  width: 20px;
+						//  height: 20px;
+						//  background-image: linear-gradient(to right,  $primary-color ,lighten( $primary-color, 30%));
+						//  border-radius: 50%;
+						//}
+					}
+				}
+			}
+			/*  & > * {
+        margin-bottom: 10px;
+      } */
+			.progress-number {
+				position: absolute;
+				top: 17px;
+				left: calc(100% + 10px);
+			}
+		}
+		.date {
+			font-size: 12px;
+			color: #707070;
+			font-weight: 200;
+		}
+		.label {
+			color: #969696;
+		}
+	}
+}
+
+.overall__summary-summary {
+	.right {
+		img {
+			position: relative;
+			cursor: pointer;
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			border: 2px solid #fff;
+			&:not(:first-child) {
+				margin-left: -7px;
+			}
+			&:hover {
+				z-index: 999;
+			}
+		}
+	}
+	.summary-item {
+		padding: 0 10px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		width: auto;
+		flex: 1;
+		.count {
+			font-size: 20px;
+		}
+		.other-person {
+			position: relative;
+			cursor: pointer;
+			width: 30px;
+			height: 30px;
+			color: #7e8299;
+			font-weight: 500;
+			display: inline-block;
+			border-radius: 50%;
+			background-color: #e1e1e1;
+			text-align: center;
+			line-height: 30px;
+			margin-left: -7px;
+		}
+		.title {
+			width: calc(100% - 40px);
+		}
+		@media screen and (max-width: 768px) {
+			flex-basis: 50%;
+			margin-bottom: 0.75rem;
+		}
+	}
+}
+
+.student-summary-item {
+	.label {
+		color: #000;
+		font-weight: 200;
+	}
+}
+
+.course-horizental .list-wrap .cr-item {
+	background: #fff;
+}
