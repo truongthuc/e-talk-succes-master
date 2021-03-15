@@ -210,7 +210,12 @@ export const AuthProvider = ({ children, history }) => {
 						router.push('/teacher');
 					}
 				} else {
-					let url = history[history.length - 2];
+					let url = null;
+					if (history.length == 1) {
+						url = history[0];
+					} else {
+						url = history[history.length - 2];
+					}
 
 					if (res.Data.RoleID == 5) {
 						if (checkStudent(url)) {

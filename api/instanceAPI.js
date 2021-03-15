@@ -28,6 +28,22 @@ const instance = axios.create({
 // Intercept all request
 instance.interceptors.request.use(
 	(config) => {
+		// /Api/ElearnStudentApi/
+		// /Api/ElearnTeacherApi/
+		if (
+			config.url.includes('/Api/ElearnStudentApi/') ||
+			config.url.includes('/Api/ElearnTeacherApi/')
+		) {
+			try {
+				config.method.toUpperCase() === 'GET' &&
+					(config.params = {
+						...config.params,
+						Token: localStorage.getItem('token'),
+					});
+			} catch (error) {
+				console.log('Overwrite GET params with error: ', error);
+			}
+		}
 		console.log(
 			`%c ${config.method.toUpperCase()} - ${getUrl(config)}:`,
 			'color: #0086b3; font-weight: bold',

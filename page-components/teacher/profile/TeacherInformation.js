@@ -8,26 +8,19 @@ import React, {
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers';
 import { useForm, Controller } from 'react-hook-form';
+import { CardMedia } from '@material-ui/core';
 import { appSettings } from '~/config';
 import Select from 'react-select';
-import { randomId } from '~/utils';
 import {
 	getTeacherInfoProfile,
 	updateTeacherInfoProfile,
 } from '~/api/teacherAPI';
 import { toast } from 'react-toastify';
 import { Context as ProfileContext } from '~/context/ProfileContext';
-import {
-	UploadFilePost,
-	getEnglishProficiencyOptions,
-	getLevelOfEducationOptions,
-	getLocationOptions,
-	getStateOptions,
-	getTimeZone,
-	getListLevelPurpose,
-} from '~/api/optionAPI';
+import { UploadFilePost } from '~/api/optionAPI';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { i18n, withTranslation } from '~/i18n';
+
 const Schema = Yup.object().shape({
 	fullName: Yup.string().required('Full name is required'),
 	skypeId: Yup.string().required('Skype id is required'),
@@ -83,6 +76,89 @@ const reducer = (prevState, { type, payload }) => {
 			break;
 	}
 };
+const ProfileVideo = React.forwardRef((props, ref) => {
+	const [isLoading, setIsLoading] = useState(false);
+	// const [myAvatar, setAvatar] = useState();
+
+	const inputFileRef = useRef(true);
+	const handleUploadImage = async () => {
+		setIsLoading(true);
+		try {
+			const input = inputFileRef.current;
+			if (input.files && input.files[0]) {
+				const res = await UploadFilePost(input.files);
+				if (!!res && res?.rs) {
+					props.updateVideo('linkVideoIntroduce', res?.g ?? '');
+				}
+			}
+		} catch (error) {
+			console.log(error?.message ?? 'Lỗi gọi api');
+		}
+		setIsLoading(false);
+	};
+	const checkValidURL = () => {
+		try {
+			const urltmp = props?.getValues('linkVideoIntroduce');
+			if (!!urltmp) {
+				return urltmp.toString().trim().replace(/\//g, '').length > 0;
+			} else {
+				return false;
+			}
+		} catch (error) {
+			console.log('checkValidURL error:', error);
+		}
+		return false;
+	};
+	return (
+		<div className="uploadvideo-wrap">
+			<div
+				className={`teacher-video ${
+					isLoading ? 'loading-style' : ''
+				} mg-x-auto`}
+			>
+				<div className="upload-container ">
+					<div className="lds-ellipsis">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+					<label
+						className={`upload-avatar ${checkValidURL() ? 'renewVideo' : ''} `}
+					>
+						<input
+							ref={inputFileRef}
+							type="file"
+							accept="video/*"
+							className="upload-box hidden d-none upload-file"
+							onChange={handleUploadImage}
+						/>
+						{checkValidURL() && <span className="btn">Upload video khác</span>}
+						{!checkValidURL() && (
+							<span className="calltoupload">
+								Chưa có video giới thiệu bấm vào đây để upload video
+							</span>
+						)}
+					</label>
+					{checkValidURL() && (
+						<CardMedia
+							component="iframe"
+							height="320"
+							image={
+								checkValidURL() ? props?.getValues('linkVideoIntroduce') : ''
+							}
+							src={
+								checkValidURL() ? props?.getValues('linkVideoIntroduce') : ''
+							}
+							title="linkVideoIntroduce"
+							autoPlay={false}
+						/>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+});
 const ProfileAvatar = React.forwardRef((props, ref) => {
 	const [isLoading, setIsLoading] = useState(false);
 	// const [myAvatar, setAvatar] = useState();
@@ -94,8 +170,8 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 			const input = inputFileRef.current;
 			if (input.files && input.files[0]) {
 				const res = await UploadFilePost(input.files);
-				if (res.Code === 200 && res.Data.length > 0) {
-					props.updateAvatar('avatar', res.Data[0].UrlIMG);
+				if (!!res && res?.rs) {
+					props.updateAvatar('avatar', res?.g ?? '');
 				}
 			}
 		} catch (error) {
@@ -103,7 +179,14 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 		}
 		setIsLoading(false);
 	};
-
+	const checkValidURL = () => {
+		const urltmp = props?.getValues('avatar');
+		if (!!urltmp) {
+			return urltmp.toString().trim().replace(/\//g, '').length > 0;
+		} else {
+			return false;
+		}
+	};
 	return (
 		<>
 			<div
@@ -128,7 +211,7 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 						/>
 						<img
 							src={
-								!!props?.getValues('avatar')
+								checkValidURL()
 									? props?.getValues('avatar')
 									: '/static/assets/img/default-avatar.png'
 							}
@@ -173,7 +256,6 @@ function TeacherInformation({ t }) {
 			setValue(property, dataObj[property]);
 		}
 	};
-
 	const loadTeacherInfo = async () => {
 		setIsLoading(true);
 		try {
@@ -183,22 +265,44 @@ function TeacherInformation({ t }) {
 				console.log('loadTeacherInfo res.Data', res.Data);
 				const obj = {
 					avatar: res.Data?.TeacherIMG ?? '',
+					linkVideoIntroduce: res.Data?.LinkVideoIntroduce ?? '',
 					fullName: res.Data?.TeacherName ?? '',
 					skypeId: res.Data?.SkypeID ?? '',
 					phoneNumber: res.Data.PhoneNumber.toString() || '',
 					email: res.Data?.Email ?? '',
-					timeZone: res.Data?.TeacherTimeZone ?? null,
+					timeZone:
+						res.Data?.TimezoneList.find(
+							(option, index) =>
+								option.ID === parseInt(res.Data?.TeacherTimeZone),
+						) ?? null,
 					schoolName: res.Data?.TeacherSchool ?? '',
 					major: res.Data?.Course ?? '',
 					// englishProficien:
 					// 	[...state.englishProficienOptions].find(
 					// 		(option, index) => option.ID === res.Data?.EnglishProficiency,
 					// 	) ?? null,
-					location: res.Data?.TeacherNational ?? null,
+					location:
+						res.Data?.NationList.find(
+							(option, index) =>
+								option.ID === parseInt(res.Data?.TeacherNational),
+						) ?? null,
+					birthday:
+						(() => {
+							try {
+								let arrr = res.Data.BirthDay.split('/');
+								return `${arrr[2]}-${arrr[1]}-${arrr[0]}`;
+							} catch (error) {}
+							return false;
+						})() ?? '',
+					experience: res.Data?.Experience ?? '',
+					description: res.Data?.Description ?? '',
+					biography: res.Data?.Biography ?? '',
 				};
+
 				console.log('loadTeacherInfo', obj);
 				updateUserInfo({ ...res.Data, Avatar: res.Data?.TeacherIMG ?? '' });
-				updateState('timeZoneOptions', res.Data.TimezoneList ?? []);
+				updateState('timeZoneOptions', res.Data?.TimezoneList ?? []);
+				updateState('locationOptions', res.Data?.NationList ?? []);
 				// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
 				// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
 				// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
@@ -213,32 +317,32 @@ function TeacherInformation({ t }) {
 		setIsLoading(false);
 	};
 
-	const loadSelectOptionAPI = async () => {
-		// try {
-		// 	const [
-		// 		proficienRes,
-		// 		educationRes,
-		// 		purposeRes,
-		// 		timezoneRes,
-		// 		locationRes,
-		// 	] = await Promise.all([
-		// 		getEnglishProficiencyOptions(),
-		// 		getLevelOfEducationOptions(),
-		// 		getListLevelPurpose(),
-		// 		getTimeZone(),
-		// 		getLocationOptions(),
-		// 	]);
-		// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
-		// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
-		// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
-		// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
-		// 	updateState('locationOptions', locationRes.Data ?? []);
-		// } catch (err) {
-		// 	console.log(
-		// 		err?.message ?? 'Call Promise all failed, check params again...',
-		// 	);
-		// }
-	};
+	// const loadSelectOptionAPI = async () => {
+	// try {
+	// 	const [
+	// 		proficienRes,
+	// 		educationRes,
+	// 		purposeRes,
+	// 		timezoneRes,
+	// 		locationRes,
+	// 	] = await Promise.all([
+	// 		getEnglishProficiencyOptions(),
+	// 		getLevelOfEducationOptions(),
+	// 		getListLevelPurpose(),
+	// 		getTimeZone(),
+	// 		getLocationOptions(),
+	// 	]);
+	// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
+	// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
+	// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
+	// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
+	// 	updateState('locationOptions', locationRes.Data ?? []);
+	// } catch (err) {
+	// 	console.log(
+	// 		err?.message ?? 'Call Promise all failed, check params again...',
+	// 	);
+	// }
+	// };
 
 	// const loadStateOptions = async (LocationID) => {
 	// 	try {
@@ -264,37 +368,42 @@ function TeacherInformation({ t }) {
 		console.log(data);
 		try {
 			const res = await updateTeacherInfoProfile({
-				FullName: data?.fullName ?? '', // str
+				TeacherName: data?.fullName ?? '', // str
 				SkypeID: data?.skypeId ?? '', // str
-				Phone: data?.phoneNumber.toString() ?? '', // str
+				Email: data?.email ?? '',
+				PhoneNumber: data?.phoneNumber.toString() ?? '', // str
+				BirthDay:
+					(() => {
+						try {
+							let arrr = data?.birthday.split('-');
+							return `${arrr[2]}/${arrr[1]}/${arrr[0]}`;
+						} catch (error) {}
+						return false;
+					})() ?? '',
 				TimeZoneID: parseInt(data.timeZone?.ID ?? 0), // int
-				// LevelPurpose: JSON.stringify(
-				// 	!!data.levelOfPurpose && !!data.levelOfPurpose.length > 0
-				// 		? data.levelOfPurpose.map((ce) => ce.ID)
-				// 		: [],
-				// ), // str arr
-				// LevelOfEdacation: parseInt(data?.levelOfEducation.ID) ?? 0, // int
-				SchoolName: data?.schoolName ?? '', // str
-				Major: data?.major ?? '', // str
-				// Proficiency: data?.englishProficien?.ID ?? 0, // int
-				// EnglishProficiency: data?.englishProficien?.ID ?? 0, // int
-				Avatar: data?.avatar ?? '', // str
-				Location: data?.location?.ID ?? 0,
-				// State: data?.state?.ID ?? 0,
+				Experience: data?.experience ?? '',
+				TeacherNational: data?.location?.ID.toString() ?? '',
+				TeacherTimeZone: data?.location?.TimeZone.toString() ?? '',
+				Course: data?.major ?? '',
+				Description: data?.description ?? '',
+				Biography: data?.biography ?? '',
+				TeacherIMG: data?.avatar ?? '',
+				LinkVideoIntroduce: data?.linkVideoIntroduce ?? '',
+				TeacherSchool: data?.schoolName ?? '', // str
 			});
-			res.Code === 1 &&
+			res.Code === 200 &&
 				toast.success('Information updated successfully !!', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
-			res.Code === 1 &&
-				updateUserInfo({
-					...profileState,
-					FullName: data?.fullName ?? '',
-					Phone: data?.phoneNumber.toString() ?? '',
-					Avatar: data?.avatar ?? '', // str
-				});
-			res.Code !== 1 &&
+			// res.Code === 200 &&
+			// 	updateUserInfo({
+			// 		...profileState,
+			// 		FullName: data?.fullName ?? '',
+			// 		Phone: data?.phoneNumber.toString() ?? '',
+			// 		Avatar: data?.avatar ?? '', // str
+			// 	});
+			res.Code !== 200 &&
 				toast.error('Update information failed !!', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
@@ -361,27 +470,7 @@ function TeacherInformation({ t }) {
 									</span>
 								)}
 							</div>
-							<div className="form-group col-12 col-sm-6">
-								<div className="input-float">
-									<input
-										type="text"
-										className={`form-control ${
-											!!errors && errors.skypeId ? 'error-form' : ''
-										}`}
-										placeholder="Skype ID *"
-										name="skypeId"
-										ref={register}
-										required
-										id="skype-id"
-									/>
-									<label htmlFor="skype-id">Skype ID *</label>
-								</div>
-								{!!errors && !!errors.skypeId && (
-									<span className="tx-danger mg-t-5 d-block">
-										{errors.skypeId?.message}
-									</span>
-								)}
-							</div>
+
 							<div className="form-group col-12 col-sm-6">
 								<div className="input-float">
 									<input
@@ -420,17 +509,59 @@ function TeacherInformation({ t }) {
 									<label htmlFor="email">Email</label>
 								</div>
 							</div>
+							<div className="form-group col-12 col-sm-3">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.skypeId ? 'error-form' : ''
+										}`}
+										placeholder="Skype ID *"
+										name="skypeId"
+										ref={register}
+										required
+										id="skype-id"
+									/>
+									<label htmlFor="skype-id">Skype ID *</label>
+								</div>
+								{!!errors && !!errors.skypeId && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.skypeId?.message}
+									</span>
+								)}
+							</div>
+							<div className="form-group col-12 col-sm-3">
+								<div className="input-float">
+									<input
+										type="date"
+										className={`form-control ${
+											!!errors && errors.birthday ? 'error-form' : ''
+										}`}
+										placeholder="BirthDay *"
+										name="birthday"
+										ref={register}
+										required
+										id="birthday"
+									/>
+									<label htmlFor="birthday">BirthDay *</label>
+								</div>
+								{!!errors && !!errors.skypeId && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.skypeId?.message}
+									</span>
+								)}
+							</div>
 							<div className="form-group col-12 col-sm-12 col-lg-6">
 								<div className="input-float">
 									<Controller
 										as={
 											<Select
-												key={(option) => `${option.id}`}
+												key={(option) => `${option.ID}-${option.Nation}`}
 												isSearchable={true}
 												isLoading={isLoading}
 												loadingMessage={`Loading...`}
 												options={state.locationOptions}
-												getOptionLabel={(option) => `${option.LocationName}`}
+												getOptionLabel={(option) => `${option.Nation}`}
 												getOptionValue={(option) => `${option.ID}`}
 												styles={appSettings.selectStyle}
 												placeholder="Select location..."
@@ -597,8 +728,22 @@ function TeacherInformation({ t }) {
 										ref={register}
 										id="marjor"
 									/>
-
-									<label htmlFor="major">Major/Specialization *</label>
+									<label htmlFor="major">Course *</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.experience ? 'error-form' : ''
+										}`}
+										placeholder="Experience"
+										name="experience"
+										ref={register}
+										id="experience"
+									/>
+									<label htmlFor="experience">Experience</label>
 								</div>
 							</div>
 							{/* <div className="form-group col-12 col-sm-6">
@@ -638,6 +783,58 @@ function TeacherInformation({ t }) {
 									</span>
 								)}
 							</div> */}
+						</div>
+						<hr className="mg-b-30 mg-t-0" style={{ borderStyle: 'dashed' }} />
+						<h5 className="mg-b-20">
+							<FontAwesomeIcon
+								icon="info-circle"
+								className="fas fa-circle mg-r-5"
+							/>
+							{t('introduce-attainment')}
+						</h5>
+						<div className="row group-float-label">
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.biography ? 'error-form' : ''
+										}`}
+										placeholder="Biography"
+										name="biography"
+										ref={register}
+										id="biography"
+									/>
+									<label htmlFor="biography">Biography</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.description ? 'error-form' : ''
+										}`}
+										placeholder="Description"
+										name="description"
+										ref={register}
+										id="description"
+									/>
+									<label htmlFor="description">Description</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<Controller
+									as={
+										<ProfileVideo
+											getValues={getValues}
+											updateVideo={setValue}
+										/>
+									}
+									control={control}
+									name="linkVideoIntroduce"
+								/>
+							</div>
 						</div>
 					</div>
 

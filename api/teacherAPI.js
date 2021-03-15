@@ -553,12 +553,18 @@ export const getTeacherInfoProfile = async (params = {}) => {
 };
 
 export const updateTeacherInfoProfile = async (params = {}) => {
+	console.log('updateTeacherInfoProfile', params);
 	let result;
 	try {
-		let res = await instance.get(path + '/UpdateInfo', {
+		let fData = new FormData();
+		Object.keys(params).map((key) => {
+			fData.append(key, params[key]);
+		});
+		fData.append('Token', localStorage.getItem('token'));
+		let res = await instance.post(path + '/teacherUpdateInfo', fData, {
 			params: {
-				...params,
-				UID: appSettings.UID,
+				// ...params,
+				// UID: appSettings.UID,
 			},
 		});
 		result = res.data;

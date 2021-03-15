@@ -21,8 +21,7 @@ const ProfileInfor = ({ t }) => {
 						<div className="tab-navigation">
 							<ul className="list-tab" id="js-list-tab">
 								<li className="tab-item">
-									<a
-										href={true}
+									<button
 										className={`tab-link ${
 											activePage === 'profile' && 'active'
 										}`}
@@ -33,11 +32,10 @@ const ProfileInfor = ({ t }) => {
 											className="far fa-id-card"
 										/>{' '}
 										{t('basic-information')}
-									</a>
+									</button>
 								</li>
-								<li className="tab-item">
-									<a
-										href={true}
+								{/* <li className="tab-item">
+									<button
 										className={`tab-link ${
 											activePage === 'introduce' && 'active'
 										}`}
@@ -48,11 +46,10 @@ const ProfileInfor = ({ t }) => {
 											className="fab fa-youtube"
 										/>{' '}
 										{t('introduce-video')}
-									</a>
-								</li>
-								<li className="tab-item">
-									<a
-										href={true}
+									</button>
+								</li> */}
+								{/* <li className="tab-item">
+									<button
 										className={`tab-link ${
 											activePage === 'experience' && 'active'
 										}`}
@@ -63,8 +60,8 @@ const ProfileInfor = ({ t }) => {
 											className="fas fa-certificate"
 										/>{' '}
 										{t('experience-certificate')}
-									</a>
-								</li>
+									</button>
+								</li> */}
 							</ul>
 						</div>
 					</div>
@@ -78,12 +75,12 @@ const ProfileInfor = ({ t }) => {
 									<Tab.Pane eventKey="profile">
 										<TeacherInformation />
 									</Tab.Pane>
-									<Tab.Pane eventKey="introduce">
+									{/* <Tab.Pane eventKey="introduce">
 										<TeacherIntroduce />
-									</Tab.Pane>
-									<Tab.Pane eventKey="experience">
+									</Tab.Pane> */}
+									{/* <Tab.Pane eventKey="experience">
 										<TeacherExperience />
-									</Tab.Pane>
+									</Tab.Pane> */}
 								</Tab.Content>
 								{/* <TeacherInformation />
                                 <TeacherIntroduce />

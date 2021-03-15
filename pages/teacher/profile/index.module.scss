@@ -48,7 +48,11 @@
 		color: $primary-color;
 	}
 }
-
+.tab-link{
+	-webkit-appearance: none;
+	background-color: transparent;
+	border: none;
+}
 .teacher__detail {
 	border-radius: 0.42rem;
 }
@@ -130,4 +134,64 @@
 
 #react-teacher-form .teacher__detail .teacher-body {
 	margin-top: 0;
+}
+
+textarea.form-control + label{
+	padding: 2px 5px;
+	top: 0;
+	transform: translate(0,- 50%);
+	background-color: #fff;
+}
+textarea.form-control:focus + label{
+	padding: 5px;
+}
+
+.uploadvideo-wrap{
+	min-height: 250px;
+	position: relative;
+}
+
+.upload-container .MuiCardMedia-media{
+	border: solid 1px #e1e1e1;
+	border-radius: 4px;display: block;
+}
+
+.teacher-video {
+	// border: solid 1px #e1e1e1;
+	border-radius: 4px;;
+}
+.teacher-video .upload-avatar{
+	margin: 0;
+	display: block;
+	padding-bottom: 35%;
+	border: solid 1px #e1e1e1;
+	border-radius: 4px;
+	
+}
+.teacher-video.loading-style .upload-avatar{
+	width: 100%;
+}
+.teacher-video .upload-avatar.renewVideo{
+	padding: 0;
+	display: inline-block;
+}
+.teacher-video .upload-avatar:before{
+	border-radius: 4px;;
+}
+.teacher-video .calltoupload{
+	display: block;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.uploadvideo-wrap .loading-style {
+	position: static;
+}
+.uploadvideo-wrap .loading-style .lds-ellipsis{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
 }
