@@ -2,70 +2,31 @@ import React, { useEffect } from 'react';
 import styles from './LessonUpcomingCard.module.scss';
 import Link from 'next/link';
 const LessonUpcomingCard = ({
+	Avatar,
 	BookingID,
-	avatar = null,
-	TeacherUID,
+	CourseName,
+	EndTime,
+	StartTime,
+	Status,
+	StudentName,
+	TeacherID,
 	TeacherName,
-	LessionName,
-	LessionMaterial,
-	SpecialRequest = null,
-	start,
-	end,
-	date,
-	DocumentName = null,
-	SkypeID,
-	onHandleCancelBooking,
-	onHandleRequireLesson,
-	lock = {
-		id: '',
-		lock: false,
-	},
-	cancelable = false,
+	TeacherSkype,
+	TimeStudy,
 }) => {
-	const handleRequireLesson = (
-		BookingID,
-		avatar,
-		TeacherUID,
-		TeacherName,
-		LessionMaterial,
-		LessionName,
-		SpecialRequest,
-		date,
-		start,
-		end,
-		DocumentName,
-		SkypeID,
-	) => {
-		onHandleRequireLesson(
-			BookingID,
-			avatar,
-			TeacherUID,
-			TeacherName,
-			LessionMaterial,
-			LessionName,
-			SpecialRequest,
-			CourseName,
-			date,
-			start,
-			end,
-			DocumentName,
-			SkypeID,
-		);
-	};
+	// const handleCancelBooking = (e, BookingID, LessionName, date, start, end) => {
+	// 	e.preventDefault();
+	// 	onHandleCancelBooking(BookingID, LessionName, date, start, end);
+	// };
 
-	const handleCancelBooking = (e, BookingID, LessionName, date, start, end) => {
-		e.preventDefault();
-		onHandleCancelBooking(BookingID, LessionName, date, start, end);
-	};
-
-	useEffect(() => {
-		feather.replace();
-	}, []);
+	// useEffect(() => {
+	// 	feather.replace();
+	// }, []);
 
 	return (
 		<li className="cr-item upcoming-lesson lesson-info position-relative">
 			<div
-				className={`${lock.id === BookingID && lock.lock ? '' : 'd-none'}`}
+				// className={`${lock.id === BookingID && lock.lock ? '' : 'd-none'}`}
 				style={{
 					zIndex: '99',
 					position: 'absolute',
@@ -79,11 +40,11 @@ const LessonUpcomingCard = ({
 				<div className="teacher-information">
 					<Link
 						href={`/student/teacher-profile/[tid]`}
-						as={`/student/teacher-profile/${TeacherUID}`}
+						as={`/student/teacher-profile/${TeacherID}`}
 					>
 						<a href={true} className="teacher-avatar">
 							<img
-								src={avatar === null ? `/static/assets/img/${avatar}` : avatar}
+								src={Avatar === null ? `/static/assets/img/${Avatar}` : Avatar}
 								className="teacher-image"
 								alt="Avatar"
 								onError={(e) => {
@@ -106,24 +67,24 @@ const LessonUpcomingCard = ({
 						<div className="course-information tx-14">
 							<span className="mg-r-15 tx-gray-500 d-inline-block">
 								<i className="feather-16 mg-r-5" data-feather="calendar"></i>
-								{date}
+								{TimeStudy}
 							</span>
 							<span className="mg-r-15 tx-gray-500 d-inline-block">
 								<i className="feather-16 mg-r-5" data-feather="clock"></i>
-								{`Bắt đầu: ${start}`}
+								{`Bắt đầu: ${StartTime}`}
 							</span>
 							<span className="mg-r-15 tx-gray-500 d-inline-block">
 								<i className="feather-16 mg-r-5" data-feather="clock"></i>
-								{`Kết thúc: ${end}`}
+								{`Kết thúc: ${EndTime}`}
 							</span>
 						</div>
-						{SpecialRequest && (
+						{/* {SpecialRequest && (
 							<div className="course-note mg-t-15">
 								<h6 className="mg-b-3 tx-bold">Ghi chú cho giáo viên:</h6>
 								<p className="tx-14 mg-b-0 word-break">{SpecialRequest}</p>
 							</div>
-						)}
-						{!!DocumentName && (
+						)} */}
+						{/* {!!DocumentName && (
 							<div className="course-docs mg-t-15">
 								<h6 className="mg-b-3 tx-bold">Tài liệu:</h6>
 								<div>
@@ -138,45 +99,47 @@ const LessonUpcomingCard = ({
 									</a>
 								</div>
 							</div>
-						)}
+						)} */}
 					</div>
 					<div className="course-actions mg-t-15">
 						<div className="action-left">
 							<a
-								href={`skype:${SkypeID}?chat`}
+								href={`skype:${TeacherSkype}?chat`}
 								className="btn btn-sm btn-info d-flex justify-content-center align-items-center tx-medium"
 								rel="noopener"
+								style={{ cursor: 'pointer' }}
 							>
 								<div>
 									<i className="fab fa-skype mg-r-5"></i>VÀO HỌC
 								</div>
 							</a>
 							<a
+								style={{ cursor: 'pointer' }}
 								href={true}
 								className="btn btn-sm btn-success tx-medium"
 								data-toggle="modal"
 								data-target="#js-md-required"
-								onClick={() =>
-									handleRequireLesson(
-										BookingID,
-										avatar,
-										TeacherUID,
-										TeacherName,
-										LessionMaterial,
-										LessionName,
-										SpecialRequest,
-										date,
-										start,
-										end,
-										DocumentName,
-										SkypeID,
-									)
-								}
+								// onClick={() =>
+								// 	handleRequireLesson(
+								// 		BookingID,
+								// 		avatar,
+								// 		TeacherUID,
+								// 		TeacherName,
+								// 		LessionMaterial,
+								// 		LessionName,
+								// 		SpecialRequest,
+								// 		date,
+								// 		start,
+								// 		end,
+								// 		DocumentName,
+								// 		SkypeID,
+								// 	)
+								// }
 							>
 								<i className="fas fa-edit mg-r-5"></i>GHI CHÚ
 							</a>
 						</div>
-						<div className="action-right">
+						{/* <div className="action-right">
 							{cancelable ? (
 								<a
 									href={true}
@@ -184,16 +147,16 @@ const LessonUpcomingCard = ({
 									rel="noopener"
 									data-toggle="tooltip"
 									title="Bạn chỉ có thể hủy lớp 30 phút trước khi vào học !!"
-									onClick={(e) =>
-										handleCancelBooking(
-											e,
-											BookingID,
-											LessionName,
-											date,
-											start,
-											end,
-										)
-									}
+									// onClick={(e) =>
+									// 	handleCancelBooking(
+									// 		e,
+									// 		BookingID,
+									// 		LessionName,
+									// 		date,
+									// 		start,
+									// 		end,
+									// 	)
+									// }
 									data-toggle="modal"
 									data-target="#md-cancel-schedule"
 									data-placement="top"
@@ -213,7 +176,7 @@ const LessonUpcomingCard = ({
 									<i className="fas fa-times-circle"></i> HỦY LỚP
 								</button>
 							)}
-						</div>
+						</div> */}
 					</div>
 				</div>
 			</div>

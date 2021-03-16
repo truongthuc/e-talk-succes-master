@@ -13,6 +13,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { i18n, withTranslation } from '~/i18n';
 import { I18nContext } from 'next-i18next';
 import Select, { components } from 'react-select';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const LangOptions = [
 	{
@@ -48,12 +50,21 @@ const useStyles = makeStyles((theme) => ({
 			width: '100%',
 		},
 	},
+	wrapBtn: {
+		position: 'relative',
+	},
 	formLogin: {
 		width: '60%',
 		margin: 'auto',
 		[theme.breakpoints.down('sm')]: {
 			width: '90%',
 		},
+	},
+	styleLoadingLogin: {
+		width: '23px!important',
+		height: '23px!important',
+		marginRight: '15px',
+		color: 'white',
 	},
 	boxBtn: {
 		textAlign: 'center',
@@ -81,6 +92,11 @@ const useStyles = makeStyles((theme) => ({
 		animation: `$show 500ms ${theme.transitions.easing.easeInOut}`,
 		display: 'flex',
 	},
+	wrapLoading: {
+		width: '25%',
+		margin: 'auto',
+		marginTop: '70px',
+	},
 	'@keyframes show': {
 		'0%': {
 			opacity: 0,
@@ -103,7 +119,9 @@ const useStyles = makeStyles((theme) => ({
 			},
 		},
 	},
-
+	colorSke: {
+		backgroundColor: '#d400501c',
+	},
 	boxError: {
 		marginTop: '15px',
 		textAlign: 'center',
@@ -161,6 +179,7 @@ const SimpleSlider = () => {
 const Signin = ({ t, isStudent }) => {
 	const { i18n } = useContext(I18nContext);
 	const [lang, setLang] = useState(LangOptions[0]);
+	const [loadLogin, setLoadLogin] = useState(false);
 
 	const _handleChangeSelect = (selected) => {
 		setLang(selected);
@@ -207,6 +226,8 @@ const Signin = ({ t, isStudent }) => {
 					pathname: '/student',
 				});
 			}
+		} else {
+			setLoadLogin(true);
 		}
 	}, []);
 	const router = useRouter();
@@ -305,220 +326,240 @@ const Signin = ({ t, isStudent }) => {
 
 	const classes = useStyles();
 	return (
-		<div
-			className="d-flex flex-column align-items-center justify-content-center"
-			style={{
-				height: 'var(--app-height)',
-				background:
-					'url(http://mypage.e-talk.vn/Content/form/images/bl1.jpg) no-repeat center center ',
-				backgroundSize: 'cover',
-			}}
-		>
-			{/* <Slider>
-				<div>111111111111111111111111111111111111111111111111111111</div>
-				<div>222222222222222222222222222222222222222222222222222222222</div>
-				<div>4444444444444444444444444444444444444444444444444444444</div>
-			</Slider> */}
-			<div className="headerLogin">
-				<div className="mainLogo">
-					<a href="#">
-						<img src="/static/img/logo.png" alt="" />
-					</a>
+		<>
+			{!loadLogin ? (
+				<div className={classes.wrapLoading}>
+					<Skeleton className={classes.colorSke} />
+					<Skeleton className={classes.colorSke} animation={false} />
+					<Skeleton className={classes.colorSke} animation="wave" />
 				</div>
-				<div className="headerRight">
-					<ul className="listMenu">
-						{/* <li>
-							<a href="#">{t('home-page')}</a>
-						</li>
-						<li>
-							<a href="#">{t('log-in')}</a>
-						</li> */}
-						<li>
-							<Select
-								isSearchable={false}
-								options={LangOptions}
-								formatOptionLabel={(context) => (
-									<div className="d-flex align-items-center">
-										<span
-											className={`flag-icon flag-icon-${context.flag}`}
-										></span>
-										<span className="mg-l-10">{context.label}</span>
-									</div>
-								)}
-								components={{
-									Option: FlatOption,
-									IndicatorSeparator: () => null,
-								}}
-								value={lang}
-								onChange={_handleChangeSelect}
-								className="wd-150 mg-l-15"
-								styles={{
-									control: (oldStyle, state) => {
-										return {
-											...oldStyle,
-											border: 0,
-											outline: 0,
-											boxShadow: 'none',
-											borderRadius: 0,
-											backgroundColor: '#efefef',
-										};
-									},
-								}}
-							/>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div className="loginWrap">
-				<div className="container">
-					<h2 className="titleForm">{t('LOGIN')}</h2>
-					{/* {loginSuccess.status ? (
-						<h3 className={classes.textSuccses}>{loginSuccess.message}</h3>
-					) : (
-						
-					)} */}
-
-					<div className="boxForm">
-						<form
-							onSubmit={handleClick_login}
-							className="formLogin"
-							noValidate
-							autoComplete="off"
-						>
-							<TextField
-								id="standard-basic"
-								label="Username"
-								name="username"
-								className="styleInput"
-								onChange={handleChange}
-							/>
-							<TextField
-								type="password"
-								id="standard-basic"
-								label="Password"
-								name="password"
-								className="styleInput"
-								onChange={handleChange}
-							/>
-							<br />
-							<div className="boxRemember">
-								<div className="remember-item">
-									<label className="boxLabel">
-										<input type="checkbox" />
-										{t('remember')}
-										<span class="checkmark"></span>
-									</label>
-								</div>
-								<div className="forgotPass">
-									<a href="#" onClick={handleClick_moveToForget}>
-										{t('forgot-password')}
-									</a>
-								</div>
-							</div>
-							{resultError.status && (
-								<div className={classes.boxError}>
-									<span className={classes.textError}>
-										{resultError.message}
-									</span>
-								</div>
-							)}
-
-							<div className="boxBtn">
-								<Button
-									type="submit"
-									variant="contained"
-									value={loading ? 'Loading...' : 'Đăng nhập'}
-									// disabled={loading}
-									color="primary"
-									className="btnLogin"
-								>
-									<FontAwesomeIcon
-										icon="sign-in-alt"
-										className="fas fa-sign-in-alt"
-									/>{' '}
-									{t('log-in')}
-								</Button>
-							</div>
-						</form>
+			) : (
+				<div
+					className="d-flex flex-column align-items-center justify-content-center"
+					style={{
+						background:
+							'url(http://mypage.e-talk.vn/Content/form/images/bl1.jpg) no-repeat center center ',
+						backgroundSize: 'cover',
+					}}
+				>
+					<div className="headerLogin">
+						<div className="mainLogo">
+							<a href="#">
+								<img src="/static/img/logo.png" alt="" />
+							</a>
+						</div>
+						<div className="headerRight">
+							<ul className="listMenu">
+								{/* <li>
+								<a href="#">{t('home-page')}</a>
+							</li>
+							<li>
+								<a href="#">{t('log-in')}</a>
+							</li> */}
+								<li>
+									<Select
+										isSearchable={false}
+										options={LangOptions}
+										formatOptionLabel={(context) => (
+											<div className="d-flex align-items-center">
+												<span
+													className={`flag-icon flag-icon-${context.flag}`}
+												></span>
+												<span className="mg-l-10">{context.label}</span>
+											</div>
+										)}
+										components={{
+											Option: FlatOption,
+											IndicatorSeparator: () => null,
+										}}
+										value={lang}
+										onChange={_handleChangeSelect}
+										className="wd-150 mg-l-15"
+										styles={{
+											control: (oldStyle, state) => {
+												return {
+													...oldStyle,
+													border: 0,
+													outline: 0,
+													boxShadow: 'none',
+													borderRadius: 0,
+													backgroundColor: '#efefef',
+												};
+											},
+										}}
+									/>
+								</li>
+							</ul>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div className="footerLogin">
-				<div className="container">
-					<div className="tableFooter">
-						<div className="columns">
-							<div className="colum">
-								<div className="boxLogoFooter">
-									<a href="#">
-										<img src="/static/img/logo-white.png" alt="" />
-									</a>
-								</div>
-								<div className="contentFt">
-									<p>{t('lg-1')}</p>
-								</div>
-							</div>
-							<div className="colum">
-								<ul className="listFt padding-left">
-									<li>
-										<a href="#">{t('about-us')}</a>
-									</li>
-									<li>
-										<a href="#">Tutor</a>
-									</li>
-									<li>
-										<a href="#">FAQs</a>
-									</li>
-								</ul>
-							</div>
-							<div className="colum">
-								<ul className="listFt">
-									<li>
-										<a href="#">{t('sign-up-for-a-free-trial')}</a>
-									</li>
-									<li>
-										<a href="#">{t('follow-us')}</a>
-									</li>
-								</ul>
-							</div>
-							<div className="colum">
-								<ul className="listFt">
-									<li>
-										<a href="#">{t('contact')}</a>
-									</li>
-									<li>
-										<a href="#">
-											<FontAwesomeIcon
-												icon="phone-square-alt"
-												className="fas fa-phone-square-alt"
-											/>{' '}
-											0903.329.682
-										</a>
-									</li>
-									<li>
-										<a href="#">
-											<FontAwesomeIcon
-												icon="envelope"
-												className="fas fa-envelope"
-											/>{' '}
-											hocngoainguquaskype@gmail.com
-										</a>
-									</li>
-									<li>
-										<a href="#">
-											<FontAwesomeIcon icon="home" className="fas fa-home" />{' '}
-											197 Purok 2 Rimando Road Baguio City, Philippines
-										</a>
-									</li>
-								</ul>
+					<div className="loginWrap">
+						<div className="container">
+							<h2 className="titleForm">{t('LOGIN')}</h2>
+							{/* {loginSuccess.status ? (
+							<h3 className={classes.textSuccses}>{loginSuccess.message}</h3>
+						) : (
+							
+						)} */}
+
+							<div className="boxForm">
+								<form
+									onSubmit={handleClick_login}
+									className="formLogin"
+									noValidate
+									autoComplete="off"
+								>
+									<TextField
+										id="standard-basic"
+										label="Username"
+										name="username"
+										className="styleInput"
+										onChange={handleChange}
+										disabled={loading && true}
+									/>
+									<TextField
+										type="password"
+										id="standard-basic"
+										label="Password"
+										name="password"
+										className="styleInput"
+										onChange={handleChange}
+										disabled={loading && true}
+									/>
+									<br />
+									<div
+										className="boxRemember"
+										style={{ justifyContent: 'flex-end' }}
+									>
+										{/* <div className="remember-item">
+										<label className="boxLabel">
+											<input type="checkbox" />
+											{t('remember')}
+											<span class="checkmark"></span>
+										</label>
+									</div> */}
+										<div className="forgotPass">
+											<a href="#" onClick={handleClick_moveToForget}>
+												{t('forgot-password')}
+											</a>
+										</div>
+									</div>
+									{resultError.status && (
+										<div className={classes.boxError}>
+											<span className={classes.textError}>
+												{resultError.message}
+											</span>
+										</div>
+									)}
+
+									<div className={`boxBtn ${classes.wrapBtn} `}>
+										<Button
+											type="submit"
+											variant="contained"
+											value={loading ? 'Loading...' : 'Đăng nhập'}
+											// disabled={loading}
+											color="primary"
+											className="btnLogin"
+										>
+											{loading && (
+												<CircularProgress
+													color="secondary"
+													className={classes.styleLoadingLogin}
+												/>
+											)}
+											{!loading && (
+												<FontAwesomeIcon
+													icon="sign-in-alt"
+													className="fas fa-sign-in-alt"
+												/>
+											)}{' '}
+											{t('log-in')}
+										</Button>
+									</div>
+								</form>
 							</div>
 						</div>
 					</div>
+					<div className="footerLogin">
+						<div className="container">
+							<div className="tableFooter">
+								<div className="columns">
+									<div className="colum">
+										<div className="boxLogoFooter">
+											<a href="#">
+												<img src="/static/img/logo-white.png" alt="" />
+											</a>
+										</div>
+										<div className="contentFt">
+											<p>{t('lg-1')}</p>
+										</div>
+									</div>
+									<div className="colum">
+										<ul className="listFt padding-left">
+											<li>
+												<a href="#">{t('about-us')}</a>
+											</li>
+											<li>
+												<a href="#">Tutor</a>
+											</li>
+											<li>
+												<a href="#">FAQs</a>
+											</li>
+										</ul>
+									</div>
+									<div className="colum">
+										<ul className="listFt">
+											<li>
+												<a href="#">{t('sign-up-for-a-free-trial')}</a>
+											</li>
+											<li>
+												<a href="#">{t('follow-us')}</a>
+											</li>
+										</ul>
+									</div>
+									<div className="colum">
+										<ul className="listFt">
+											<li>
+												<a href="#">{t('contact')}</a>
+											</li>
+											<li>
+												<a href="#">
+													<FontAwesomeIcon
+														icon="phone-square-alt"
+														className="fas fa-phone-square-alt"
+													/>{' '}
+													0903.329.682
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<FontAwesomeIcon
+														icon="envelope"
+														className="fas fa-envelope"
+													/>{' '}
+													hocngoainguquaskype@gmail.com
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<FontAwesomeIcon
+														icon="home"
+														className="fas fa-home"
+													/>{' '}
+													197 Purok 2 Rimando Road Baguio City, Philippines
+												</a>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="copyRight">
+							<p>Copyright © 2016 E-Talk.vn</p>
+						</div>
+					</div>
 				</div>
-				<div className="copyRight">
-					<p>Copyright © 2016 E-Talk.vn</p>
-				</div>
-			</div>
-		</div>
+			)}
+		</>
 	);
 };
 

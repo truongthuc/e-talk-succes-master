@@ -1201,7 +1201,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 	useEffect(() => {
 		if (localStorage.getItem('isLogin')) {
 			let UID = localStorage.getItem('UID');
-			let token = localStorage.getItem('Token');
+			let token = localStorage.getItem('token');
 			setDataUser({
 				UID: UID,
 				token: token,

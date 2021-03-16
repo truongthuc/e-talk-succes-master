@@ -1,0 +1,79 @@
+@import '../../../../styles/variable';
+
+.table-classrooms {
+	tr td {
+		&:last-child {
+			width: 300px;
+			text-align: center;
+		}
+	}
+	tr th:last-child {
+		text-align: center !important;
+	}
+}
+
+.clr-lesson,
+.clr-finishType,
+.clr-student {
+	min-width: 6.6rem;
+}
+.clr-time {
+	min-width: 7.5rem;
+}
+.clr-feedbackStatus {
+	min-width: 13rem;
+}
+.clr-actions {
+	width: 16.6rem;
+	.btn-detail {
+		width: 110px;
+	}
+}
+.clr-student,
+.clr-status,
+.clr-finishType,
+.clr-id {
+	text-align: center;
+}
+
+.table {
+	thead {
+		tr th {
+			vertical-align: middle;
+		}
+	}
+	tbody {
+		font-size: 13px;
+		tr td {
+			vertical-align: middle;
+		}
+	}
+}
+// .text-left {
+// 	text-align: left;
+// }
+@media (max-width: 768px) {
+	.table-classrooms.responsive-table {
+		thead th {
+			min-height: 3.5rem;
+		}
+		tbody tr {
+			td {
+				border-left: 0;
+				padding: 5px 10px;
+				&.clr-actions {
+					padding-top: 10px;
+					width: auto;
+					text-align: left;
+				}
+				&.clr-student,
+				&.clr-status,
+				&.clr-feedbackStatus,
+				.clr-id {
+					display: flex;
+					align-items: center;
+				}
+			}
+		}
+	}
+}

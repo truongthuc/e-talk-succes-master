@@ -42,10 +42,18 @@ const DayOff = ({ t }) => {
 			}
 		}
 
+		// ----- GET UID and Token
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			UID: '',
+			UID: UID,
 			Page: 1,
-			Token: '',
+			Token: Token,
 		});
 	}, []);
 	return (

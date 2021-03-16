@@ -1,19 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GetAttendanceRecord } from '~/api/studentAPI';
+import { studentGetDetailAttendanceRecord } from '~/api/studentAPI';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
 import Pagination from 'react-js-pagination';
 import Select from 'react-select';
 import { appSettings } from '~/config';
 import { getStudentLayout } from '~/components/Layout';
 import Skeleton from 'react-loading-skeleton';
-import './index.module.scss';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
-import dayjs from 'dayjs';
 
 const DateTimeFormat = new Intl.DateTimeFormat('vi-VN', {
 	month: '2-digit',
@@ -60,6 +57,7 @@ const AllClassRow = ({ data, showStudentModal }) => {
 		BookingID = '',
 		LessionName = '',
 		SkypeID,
+		TeacherName = '',
 		ID = '',
 		StudentUID,
 		DocumentName = '',
@@ -78,31 +76,38 @@ const AllClassRow = ({ data, showStudentModal }) => {
 
 	return (
 		<tr>
-			<td>{data.Name}</td>
-			<td>{data.Package}</td>
-			<td>{data.Course}</td>
+			<td>{data.TeacherName}</td>
+			<td>{data.PackageName}</td>
+			<td>{data.CourseName}</td>
 			<td>{data.Date}</td>
 			<td>{data.Time}</td>
 			<td>{data.Remark}</td>
-			<td>{data.Homework}</td>
-			<td className="clr-actions tx-center">
-				<Link
-					href={`/teacher/evaluation/detail/[eid]`}
-					as={`/teacher/evaluation/detail/${data.EvaluationID}`}
-				>
-					<a
-						href={true}
-						className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
-					>
-						<FontAwesomeIcon
-							icon="vote-yea"
-							className="fas fa-vote-yea mg-r-5"
-						/>{' '}
-						Detail
-					</a>
-				</Link>
-			</td>
+			<td>{data.HomeWork}</td>
 		</tr>
+	);
+};
+
+const SearchBox = ({ submitSearch }) => {
+	const [state, setState] = useState('');
+	const _handleSubmit = () => {
+		submitSearch(state);
+	};
+	return (
+		<>
+			<input
+				type="search"
+				className="form-control"
+				placeholder="Enter student code..."
+				onChange={(e) => setState(e.target.value)}
+			/>
+			<button
+				className="btn pd-x-15-f bg-primary text-white"
+				type="button"
+				onClick={_handleSubmit}
+			>
+				<FontAwesomeIcon icon="search" />
+			</button>
+		</>
 	);
 };
 
@@ -113,15 +118,12 @@ const AttendanceRecord = ({ t }) => {
 	);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [data, setData] = useState([]);
-	const [fromDate, setFromDate] = useState('');
-	const [toDate, setToDate] = useState('');
+	const [fromDate, setFromDate] = useState(null);
+	const [toDate, setToDate] = useState(null);
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
-	const [showAll, setShowAll] = useState(false);
-
-	const [statusSearch, setStatusSearch] = useState(false);
 
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
@@ -137,36 +139,61 @@ const AttendanceRecord = ({ t }) => {
 
 	const _onFilterDate = (e) => {
 		e.preventDefault();
-		// loadAllClassesData();
-		let fromDate2 = dayjs(fromDate).format('DD/MM/YYYY');
-		let toDate2 = dayjs(toDate).format('DD/MM/YYYY');
-		setStatusSearch(true);
+		loadAllClassesData();
 	};
 
 	const _changeFilterStatusAllClass = (event) => {
 		setFilterStatusAllClass(event.target.value);
 	};
 
-	const showAllData = () => {
-		setFromDate('');
-		setToDate('');
-		let getNum = showAll;
-		getNum++;
-		setShowAll(true);
-	};
-
-	const loadAllClassesData = async (params) => {
+	const getAPI = async (params) => {
 		setIsLoading(true);
+		const res = await studentGetDetailAttendanceRecord(params);
+		console.log(res);
+		if (res.Code === 200) {
+			setData(res.Data);
+			setPageSize(res.PageSize);
+			setTotalResult(res.TotalResult);
+		} else {
+			setData({});
+		}
+		setIsLoading(false);
+	};
+	useEffect(() => {
+		// --- Get ID ---
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+		let BookingID = parseInt(link[link.length - 2]);
 
-		console.log('hello----------------------------------', fromDate);
+		console.log('GET BOOKING ID: ', BookingID);
+
+		// let postID = parseInt(linkClone);
+
+		// --------------
+		console.log(UID);
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+		getAPI({
+			BookingID: BookingID,
+			UID: UID,
+			Token: Token,
+		});
+	}, []);
+	const loadAllClassesData = async () => {
+		setIsLoading(true);
+		console.log(fromDate);
 		try {
-			const res = await GetAttendanceRecord(params, {
+			const res = await GetAttendanceRecord({
 				Page: parseInt(pageNumber),
 				Status: parseInt(filterStatusAllClass.value),
-				fromDate: dayjs(fromDate).format('DD/MM/YYYY'),
-				toDate: dayjs(toDate).format('DD/MM/YYYY'),
+				fromDate: fromDate ? DateTimeFormat.format(new Date(fromDate)) : '',
+				toDate: toDate ? DateTimeFormat.format(new Date(toDate)) : '',
 			});
-
 			if (res?.Code && res.Code === 200) {
 				setData(res.Data);
 				setPageSize(res.PageSize);
@@ -182,122 +209,12 @@ const AttendanceRecord = ({ t }) => {
 	}, [filterStatusAllClass]);
 
 	useEffect(() => {
-		let UID = null;
-		let Token = null;
-		if (localStorage.getItem('UID')) {
-			UID = localStorage.getItem('UID');
-			Token = localStorage.getItem('token');
-		}
-		if (statusSearch) {
-			loadAllClassesData({
-				fromdate: dayjs(fromDate).format('DD/MM/YYYY'),
-				todate: dayjs(toDate).format('DD/MM/YYYY'),
-				UID: UID,
-				Token: Token,
-				Page: 1,
-			});
-			setStatusSearch(false);
-		}
-	}, [statusSearch]);
-
-	useEffect(() => {
-		let UID = null;
-		let Token = null;
-		if (localStorage.getItem('UID')) {
-			UID = localStorage.getItem('UID');
-			Token = localStorage.getItem('token');
-		}
-		if (showAll) {
-			loadAllClassesData({
-				fromdate: fromDate,
-				todate: toDate,
-				UID: UID,
-				Token: Token,
-				Page: 1,
-			});
-			setShowAll(false);
-		}
-	}, [showAll]);
-
-	useEffect(() => {
-		let UID = null;
-		let Token = null;
-		if (localStorage.getItem('UID')) {
-			UID = localStorage.getItem('UID');
-			Token = localStorage.getItem('token');
-		}
-		loadAllClassesData({
-			fromdate: fromDate,
-			todate: toDate,
-			UID: UID,
-			Token: Token,
-			Page: 1,
-		});
-		setStatusSearch(false);
-
-		if (statusSearch) {
-			setStatusSearch(false);
-		}
+		loadAllClassesData();
 	}, [pageNumber, filterStatusAllClass]);
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('attendance-record')}</h1>
-			<div className="d-flex align-items-center justify-content-between mg-b-15 flex-wrap">
-				<div
-					className="d-flex from-to-group wd-100p flex-md-nowrap flex-wrap wd-md-500"
-					id="filter-time"
-				>
-					<div className="form-row flex-grow-1 mg-sm-r-5">
-						<div className="col">
-							<DatePicker
-								dateFormat="dd/MM/yyyy"
-								className="form-control"
-								placeholderText={`From date`}
-								selected={fromDate}
-								onChange={(date) => setFromDate(date)}
-								selectsStart
-								isClearable={!!fromDate ? true : false}
-								startDate={fromDate}
-								endDate={toDate}
-							/>
-							{/* <input type="text" name="start-day " onChange={(value) =>  setFromDate(value)} className="form-control datetimepicker from-date" placeholder="From date" /> */}
-						</div>
-						<div className="col">
-							<DatePicker
-								dateFormat="dd/MM/yyyy"
-								className="form-control"
-								placeholderText={`To date`}
-								selected={toDate}
-								onChange={(date) => setToDate(date)}
-								selectsEnd
-								isClearable={!!toDate ? true : false}
-								startDate={fromDate}
-								endDate={toDate}
-								minDate={fromDate}
-							/>
-						</div>
-					</div>
-					<div className="flex-grow-0 tx-right flex-shrink-0 mg-t-30 mg-xs-t-0">
-						<button
-							type="button"
-							className="btn btn-primary"
-							onClick={_onFilterDate}
-						>
-							<FontAwesomeIcon icon="search" className="fa fa-search" /> Search
-						</button>
-
-						<button
-							type="button"
-							className="btn btn-primary"
-							onClick={showAllData}
-							style={{ marginLeft: '10px' }}
-						>
-							Show all
-						</button>
-					</div>
-				</div>
-			</div>
+			<h1 className="main-title-page">Attendance Record Detail</h1>
 
 			<div className="card mg-b-30">
 				<div className="card-body">
@@ -311,8 +228,7 @@ const AttendanceRecord = ({ t }) => {
 									<th className="clr-time text-left">{t('date')}</th>
 									<th className="clr-status text-left">{t('time')}</th>
 									<th className="clr-status text-left">{t('remark')}</th>
-									<th className="clr-status text-left">{t('homework')}</th>
-									<th className="clr-status text-left"></th>
+									<th className="clr-status text-center">{t('homework')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -397,35 +313,8 @@ const AttendanceRecord = ({ t }) => {
 											</td>
 										</tr>
 									</>
-								) : !!data && !!data.length > 0 ? (
-									data.map((item) => (
-										<tr>
-											<td>{item.TeacherName}</td>
-											<td>{item.PackageName}</td>
-											<td>{item.CourseName}</td>
-											<td>{item.Date}</td>
-											<td>{item.TimeCourse}</td>
-											<td>{item.Remark}</td>
-											<td>{item.HomeWork}</td>
-											<td className="">
-												<Link
-													href={`/student/classes/attendance-record/[edit]${item.ID}`}
-													as={`/student/classes/attendance-record/${item.ID}`}
-												>
-													<a
-														href={true}
-														className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
-													>
-														<FontAwesomeIcon
-															icon="vote-yea"
-															className="fas fa-vote-yea mg-r-5"
-														/>{' '}
-														Detail
-													</a>
-												</Link>
-											</td>
-										</tr>
-									))
+								) : data ? (
+									<AllClassRow data={data} />
 								) : (
 									<tr>
 										<td colSpan={8}>

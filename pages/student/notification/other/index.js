@@ -97,16 +97,7 @@ const BlogItem = ({
 			)}
 
 			<div className="card-body tx-13">
-				<h5>
-					<Link
-						href="/student/notification/detail/[pid]"
-						as={`/student/notification/detail/${NotificationID}`}
-					>
-						<a href={true} className="tx-16">
-							{isLoading ? <Skeleton /> : NotificationTitle}
-						</a>
-					</Link>
-				</h5>
+				<h5>{isLoading ? <Skeleton /> : NotificationTitle}</h5>
 				<p className="meta mg-t-5">
 					{isLoading ? (
 						<Skeleton width={100} />
@@ -177,8 +168,19 @@ const Discount = ({ t }) => {
 			}
 		}
 
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			page,
+			UID: UID,
+			Token: Token,
+			Page: 1,
 		});
 	}, []);
 
@@ -210,7 +212,7 @@ const Discount = ({ t }) => {
 								key={item.NotificationID}
 							>
 								<BlogItem
-									NotificationID={item.NotificationID}
+									NotificationID={item.ID}
 									NotificationTitle={item.TitlePost}
 									NotificationIMG={item.PostIMG}
 									CreatedBy={item.CreatedBy}

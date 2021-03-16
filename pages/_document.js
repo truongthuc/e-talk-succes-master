@@ -30,7 +30,7 @@ class MyDocument extends Document {
 					<script src="/static/lib/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
 				</Head>
 				<body>
-					<Main />
+					<Main className="main-body" />
 					<NextScript />
 				</body>
 			</html>

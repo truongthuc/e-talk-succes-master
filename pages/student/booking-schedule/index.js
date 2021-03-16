@@ -115,13 +115,14 @@ const BookingLesson = ({ t }) => {
 	const [totalResult, setTotalResult] = useState(0);
 	const router = useRouter();
 
+
 	const errorToast = () =>
 		toast.error('Đã có lỗi xảy ra, xin vui lòng thử lại', toastInit);
 
 	const getAPI = async (params) => {
 		setLoading(true);
 		const res = await GetListTeacher(params);
-		if (res.Code === 1) {
+		if (res.Code === 200) {
 			setTeacherList(res.Data);
 			setPageSize(res.PageSize);
 			setTotalResult(res.TotalResult);
@@ -424,16 +425,19 @@ const BookingLesson = ({ t }) => {
 		//initCalendar();
 		fetchListLevelPurpose();
 
-		/*    $('#display-schedule').on('change', function () {
-      if ($('#display-schedule').prop('checked') === true) {
-        $('.tutor-schedule').slideDown();
-      } else {
-        $('.tutor-schedule').slideUp();
-      }
-    }); */
+		let UID = null;
+		let Token = null;
 
-		// $(document).on('click', '.day-block', handleChangeDate.bind(this));
-		// $('#js-select-today').on('click', handleChangeDate.bind(this));
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		getAPI({
+			UID: UID,
+			Token: Token,
+		});
 	}, []);
 
 	return (
@@ -499,7 +503,7 @@ const BookingLesson = ({ t }) => {
 									</div>
 								</div>
 							)}
-							{!!teachersList && teachersList.length > 0 ? (
+							{teachersList?.length > 0 ? (
 								<div className="table-tutor">
 									<ul className="list-tutors">
 										{teachersList.map((item) => (

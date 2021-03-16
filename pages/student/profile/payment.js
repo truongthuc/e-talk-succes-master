@@ -82,6 +82,23 @@ const PaymentHistory = ({ t }) => {
 		}
 	};
 
+	const [showAll, setShowAll] = useState(false);
+	const [statusSearch, setStatusSearch] = useState(false);
+
+	const _onFilterDate = (e) => {
+		e.preventDefault();
+		// loadAllClassesData();
+		let fromDate2 = dayjs(fromDate).format('DD/MM/YYYY');
+		let toDate2 = dayjs(toDate).format('DD/MM/YYYY');
+		setStatusSearch(true);
+	};
+
+	const showAllData = () => {
+		setFromDate('');
+		setToDate('');
+		setShowAll(true);
+	};
+
 	const getAPI = async (params) => {
 		setLoading(true);
 		const res = await GetPaymentHistory(params);
@@ -94,16 +111,66 @@ const PaymentHistory = ({ t }) => {
 		}
 		setLoading(false);
 	};
+
 	useEffect(() => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		if (showAll) {
+			getAPI({
+				UID: UID,
+				Page: 1,
+				Token: Token,
+				fromdate: dayjs(fromDate).format('DD/MM/YYYY'),
+				todate: dayjs(toDate).format('DD/MM/YYYY'),
+			});
+
+			setShowAll(false);
+		}
+	}, [showAll]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		if (statusSearch) {
+			getAPI({
+				UID: UID,
+				Page: 1,
+				Token: Token,
+				fromdate: dayjs(fromDate).format('DD/MM/YYYY'),
+				todate: dayjs(toDate).format('DD/MM/YYYY'),
+			});
+
+			setStatusSearch(false);
+		}
+	}, [statusSearch]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			UID: 61215,
+			UID: UID,
 			Page: 1,
-			Token: '',
+			Token: Token,
 			fromdate: '',
 			todate: '',
 		});
 	}, []);
-	const _onFilterDate = () => {};
+
 	const renderRow = () => {
 		return (
 			<>
@@ -123,8 +190,8 @@ const PaymentHistory = ({ t }) => {
 							<td>{item.Reason}</td>
 							<td>
 								<Link
-									href="/student/profile/deposit-confirmation"
-									as="/student/profile/deposit-confirmation"
+									href={`/student/profile/deposit-confirmation?id-${item.ID}`}
+									as={`/student/profile/deposit-confirmation?id-${item.ID}`}
 								>
 									<a href={true} className="">
 										<FontAwesomeIcon icon="search" className="fas fa-search" />{' '}
@@ -137,7 +204,7 @@ const PaymentHistory = ({ t }) => {
 					<tr className="bg-transparent">
 						<td colSpan="11">
 							<span className="d-block tx-danger tx-medium">
-								Đã có lỗi xảy ra, xin vui lòng thử lại
+								Không tìm thấy
 							</span>
 							<img
 								src="/static/assets/img/error.svg"
@@ -163,11 +230,6 @@ const PaymentHistory = ({ t }) => {
 			</>
 		);
 	};
-	useEffect(() => {
-		getAPI({
-			Page: 1,
-		});
-	}, []);
 
 	return (
 		<>
@@ -222,6 +284,14 @@ const PaymentHistory = ({ t }) => {
 							>
 								<FontAwesomeIcon icon="search" className="fa fa-search" />{' '}
 								{t('search')}
+							</button>
+							<button
+								type="button"
+								className="btn btn-primary"
+								onClick={showAllData}
+								style={{ marginLeft: '10px' }}
+							>
+								Show all
 							</button>
 						</div>
 					</div>

@@ -18,9 +18,9 @@ const Footer = () => {
 					</a>
 				</div>
 			</footer>
-			<a href={true} id="scroll-to-top">
+			{/* <a href={true} id="scroll-to-top">
 				<FontAwesomeIcon icon="chevron-up" className="fas fa-chevron-up" />
-			</a>
+			</a> */}
 		</>
 	);
 };

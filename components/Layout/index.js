@@ -28,7 +28,7 @@ const Layout = ({
 				<script src="/static/js/custom.js"></script>
 			</Head>
 			<Menu isStudent={isStudent} />
-			<main className="content ht-100vh pd-0-f">
+			<main className="content ht-100vh pd-0-f testthu">
 				<Header isStudent={isStudent} />
 				<div className="content-body" id="body-content">
 					{children}

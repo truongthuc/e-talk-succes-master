@@ -95,16 +95,7 @@ const BlogItem = ({
 			)}
 
 			<div className="card-body tx-13">
-				<h5>
-					<Link
-						href="/student/notification/detail/[pid]"
-						as={`/student/notification/detail/${NotificationID}`}
-					>
-						<a href={true} className="tx-16">
-							{isLoading ? <Skeleton /> : NotificationTitle}
-						</a>
-					</Link>
-				</h5>
+				<h5>{isLoading ? <Skeleton /> : NotificationTitle}</h5>
 				<p className="meta mg-t-5">
 					{isLoading ? (
 						<Skeleton width={100} />
@@ -152,12 +143,7 @@ const Discount = ({ t }) => {
 
 	const getAPI = async (params) => {
 		setLoading(true);
-		let UID = null;
-		let Token = null;
-		if (localStorage.getItem('UID')) {
-			UID = localStorage.getItem('UID');
-			Token = localStorage.getItem('token');
-		}
+
 		const res = await GetNotifications(params);
 		if (res.Code === 200) {
 			setState(res.Data);
@@ -168,6 +154,13 @@ const Discount = ({ t }) => {
 	};
 
 	useEffect(() => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		if (!localStorage.getItem('isLogin')) {
 			router.push({
 				pathname: '/',
@@ -183,7 +176,9 @@ const Discount = ({ t }) => {
 		}
 
 		getAPI({
-			page,
+			UID: UID,
+			Token: Token,
+			Page: 1,
 		});
 	}, []);
 

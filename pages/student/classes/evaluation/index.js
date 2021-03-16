@@ -157,12 +157,12 @@ const Feedback = ({ t }) => {
 		});
 	};
 
-	useEffect(() => {
-		_GetListEvaluationAPI({
-			Rate: parseInt(filterOption?.value) ?? 0,
-			Page: 1,
-		});
-	}, [filterOption]);
+	// useEffect(() => {
+	// 	_GetListEvaluationAPI({
+	// 		Rate: parseInt(filterOption?.value) ?? 0,
+	// 		Page: 1,
+	// 	});
+	// }, [filterOption]);
 
 	useEffect(() => {
 		if (!localStorage.getItem('isLogin')) {
@@ -178,7 +178,20 @@ const Feedback = ({ t }) => {
 				});
 			}
 		}
-		getOverViewAPI();
+
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		_GetListEvaluationAPI({
+			UID: UID,
+			token: Token,
+		});
 	}, []);
 
 	return (
@@ -186,7 +199,7 @@ const Feedback = ({ t }) => {
 			{!loading && (
 				<>
 					<div className="d-sm-flex align-items-center justify-content-between mg-b-30">
-						<h1 className="main-title-page mg-b-0-f">{t('teacher-comment')}</h1>
+						<h1 className="main-title-page mg-b-0-f">{t('Teacher-comment')}</h1>
 						{overview && Object.keys(overview).length > 0 && (
 							<div className="form-group d-inline-block wd-200 w-full mg-b-0-f mg-t-15 mg-sm-t-0-f">
 								<Select
@@ -299,7 +312,8 @@ const Feedback = ({ t }) => {
 									Note={item.Note}
 									CreatedDate={item.CreatedDate}
 									Rate={item.Rate}
-									LinkDetail={item.LinkDetail}
+									LinkDetail={item.EvaluationID}
+									CoursesName={item.CoursesName}
 								/>
 							))
 						) : (

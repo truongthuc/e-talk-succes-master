@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getAllClass, addScheduleLog } from '~/api/teacherAPI';
+import { GetAttendanceRecord } from '~/api/studentAPI';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
 import Pagination from 'react-js-pagination';
 import Select from 'react-select';
 import { appSettings } from '~/config';
 import { getStudentLayout } from '~/components/Layout';
 import Skeleton from 'react-loading-skeleton';
+import './index.module.scss';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Router, { useRouter } from 'next/router';
+import dataHy from '../../../../data/data.json';
+import { i18n, withTranslation } from '~/i18n';
+import dayjs from 'dayjs';
 
 const DateTimeFormat = new Intl.DateTimeFormat('vi-VN', {
 	month: '2-digit',
@@ -57,6 +60,7 @@ const AllClassRow = ({ data, showStudentModal }) => {
 		BookingID = '',
 		LessionName = '',
 		SkypeID,
+		ID = '',
 		StudentUID,
 		DocumentName = '',
 		GenderID,
@@ -65,7 +69,7 @@ const AllClassRow = ({ data, showStudentModal }) => {
 	const handleEnterClass = async (e) => {
 		e.preventDefault();
 		try {
-			const res = addScheduleLog({ BookingID });
+			const res = GetAttendanceRecord;
 		} catch (error) {
 			console.log(error?.message ?? `Can't add schedule log !!`);
 		}
@@ -74,63 +78,54 @@ const AllClassRow = ({ data, showStudentModal }) => {
 
 	return (
 		<tr>
-			<td>Huỳnh Thị Phương Loan</td>
-			<td>Profressional</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td>{data.Name}</td>
+			<td>{data.Package}</td>
+			<td>{data.Course}</td>
+			<td>{data.Date}</td>
+			<td>{data.Time}</td>
+			<td>{data.Remark}</td>
+			<td>{data.Homework}</td>
+			<td className="clr-actions tx-center">
+				<Link
+					href={`/teacher/evaluation/detail/[eid]`}
+					as={`/teacher/evaluation/detail/${data.EvaluationID}`}
+				>
+					<a
+						href={true}
+						className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
+					>
+						<FontAwesomeIcon
+							icon="vote-yea"
+							className="fas fa-vote-yea mg-r-5"
+						/>{' '}
+						Detail
+					</a>
+				</Link>
+			</td>
 		</tr>
 	);
 };
 
-const SearchBox = ({ submitSearch }) => {
-	const [state, setState] = useState('');
-	const _handleSubmit = () => {
-		submitSearch(state);
-	};
-	return (
-		<>
-			<input
-				type="search"
-				className="form-control"
-				placeholder="Enter student code..."
-				onChange={(e) => setState(e.target.value)}
-			/>
-			<button
-				className="btn pd-x-15-f bg-primary text-white"
-				type="button"
-				onClick={_handleSubmit}
-			>
-				<FontAwesomeIcon icon="search" />
-			</button>
-		</>
-	);
-};
-
-const AttendanceRecord = () => {
-	const router = useRouter();
-
+const AttendanceRecord = ({ t }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [filterStatusAllClass, setFilterStatusAllClass] = useState(
 		statusOptions[0],
 	);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [data, setData] = useState([]);
-	const [fromDate, setFromDate] = useState(null);
-	const [toDate, setToDate] = useState(null);
+	const [fromDate, setFromDate] = useState('');
+	const [toDate, setToDate] = useState('');
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
 
+	const [statusSearch, setStatusSearch] = useState(false);
+
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
 		$(mdStudentInfo.current).modal('show');
 	};
-
 	const unMountComponents = () => {
 		mdStudentInfo.current = false;
 	};
@@ -141,68 +136,92 @@ const AttendanceRecord = () => {
 
 	const _onFilterDate = (e) => {
 		e.preventDefault();
-		loadAllClassesData();
+		// loadAllClassesData();
+		let fromDate2 = dayjs(fromDate).format('DD/MM/YYYY');
+		let toDate2 = dayjs(toDate).format('DD/MM/YYYY');
+
+		console.log('TESTT: ', fromDate2);
+
+		// setFromDate(fromDate2);
+		// setToDate(toDate2);
+
+		setStatusSearch(true);
 	};
 
 	const _changeFilterStatusAllClass = (event) => {
 		setFilterStatusAllClass(event.target.value);
 	};
 
-	const loadAllClassesData = async () => {
+	const loadAllClassesData = async (params) => {
 		setIsLoading(true);
-		console.log(fromDate);
+
+		console.log('hello----------------------------------', fromDate);
 		try {
-			const res = await getAllClass({
+			const res = await GetAttendanceRecord(params, {
 				Page: parseInt(pageNumber),
 				Status: parseInt(filterStatusAllClass.value),
-				fromDate: fromDate ? DateTimeFormat.format(new Date(fromDate)) : '',
-				toDate: toDate ? DateTimeFormat.format(new Date(toDate)) : '',
+				fromDate: dayjs(fromDate).format('DD/MM/YYYY'),
+				toDate: dayjs(toDate).format('DD/MM/YYYY'),
 			});
-			if (res?.Code && res.Code === 1) {
+
+			if (res?.Code && res.Code === 200) {
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
 			} else {
 				console.log('Code response khác 1');
 			}
-		} catch (error) {
-			console.log(error);
-		}
+		} catch (error) {}
 		setIsLoading(false);
 	};
-	useEffect(() => {
-		console.log(filterStatusAllClass);
-	}, [filterStatusAllClass]);
+	// useEffect(() => {
+	// 	console.log(filterStatusAllClass);
+	// }, [filterStatusAllClass]);
+
+	// useEffect(() => {
+	// 	let UID = null;
+	// 	let Token = null;
+	// 	if (localStorage.getItem('UID')) {
+	// 		UID = localStorage.getItem('UID');
+	// 		Token = localStorage.getItem('token');
+	// 	}
+	// 	if (statusSearch) {
+	// 		loadAllClassesData({
+	// 			fromdate: dayjs(fromDate).format('DD/MM/YYYY'),
+	// 			todate: dayjs(toDate).format('DD/MM/YYYY'),
+	// 			UID: UID,
+	// 			Token: Token,
+	// 			Page: 1,
+	// 		});
+	// 		setStatusSearch(false);
+	// 	}
+	// }, [statusSearch]);
 
 	useEffect(() => {
-		loadAllClassesData();
-	}, [pageNumber, filterStatusAllClass]);
-
-	useEffect(() => {
-		if (!localStorage.getItem('isLogin')) {
-			router.push({
-				pathname: '/',
-			});
-		} else {
-			let RoleID = parseInt(localStorage.getItem('RoleID'));
-			if (RoleID !== 5) {
-				localStorage.clear();
-				router.push({
-					pathname: '/',
-				});
-			}
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
 		}
-	}, []);
+		loadAllClassesData({
+			fromdate: fromDate,
+			todate: toDate,
+			UID: UID,
+			Token: Token,
+			Page: 1,
+		});
+		setStatusSearch(false);
+
+		if (statusSearch) {
+			setStatusSearch(false);
+		}
+	}, [pageNumber, filterStatusAllClass]);
 
 	return (
 		<>
-			<h1 className="main-title-page">Attendance record</h1>
+			<h1 className="main-title-page">{t('attendance-record')}</h1>
 			<div className="d-flex align-items-center justify-content-between mg-b-15 flex-wrap">
-				{/* <div className="wd-sm-250 mg-b-15 mg-md-b-0">
-					<div className="search-form">
-						<SearchBox />
-					</div>
-				</div> */}
 				<div
 					className="d-flex from-to-group wd-100p flex-md-nowrap flex-wrap wd-md-500"
 					id="filter-time"
@@ -240,7 +259,7 @@ const AttendanceRecord = () => {
 					<div className="flex-grow-0 tx-right flex-shrink-0 mg-t-30 mg-xs-t-0">
 						<button
 							type="button"
-							className="btn btn-primary "
+							className="btn btn-primary"
 							onClick={_onFilterDate}
 						>
 							<FontAwesomeIcon icon="search" className="fa fa-search" /> Search
@@ -255,14 +274,14 @@ const AttendanceRecord = () => {
 						<table className="table table-classrooms table-borderless responsive-table table-hover">
 							<thead>
 								<tr>
-									<th className="clr-id">Teacher name</th>
-									<th className="clr-lesson">Package</th>
-									<th className="clr-student">Course</th>
-									<th className="clr-time">Date</th>
-									<th className="clr-status">Time</th>
-									<th className="clr-status">Remark</th>
-									<th className="clr-status">Homework</th>
-									<th className="clr-actions">Actions</th>
+									<th className="clr-id text-left">{t('teacher-name')}</th>
+									<th className="clr-lesson text-left">{t('package')}</th>
+									<th className="clr-student text-left">{t('course')}</th>
+									<th className="clr-time text-left">{t('date')}</th>
+									<th className="clr-status text-left">{t('time')}</th>
+									<th className="clr-status text-left">{t('remark')}</th>
+									<th className="clr-status text-left">{t('homework')}</th>
+									<th className="clr-status text-left"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -349,11 +368,32 @@ const AttendanceRecord = () => {
 									</>
 								) : !!data && !!data.length > 0 ? (
 									data.map((item) => (
-										<AllClassRow
-											key={`${item.BookingID}`}
-											data={item}
-											showStudentModal={showStudentModal}
-										/>
+										<tr>
+											<td>{item.TeacherName}</td>
+											<td>{item.PackageName}</td>
+											<td>{item.CourseName}</td>
+											<td>{item.Date}</td>
+											<td>{item.TimeCourse}</td>
+											<td>{item.Remark}</td>
+											<td>{item.HomeWork}</td>
+											<td className="">
+												<Link
+													href={`/student/classes/attendance-record/[edit]`}
+													as={`/student/classes/attendance-record/[edit]${item.ID}`}
+												>
+													<a
+														href={true}
+														className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
+													>
+														<FontAwesomeIcon
+															icon="vote-yea"
+															className="fas fa-vote-yea mg-r-5"
+														/>{' '}
+														Detail
+													</a>
+												</Link>
+											</td>
+										</tr>
 									))
 								) : (
 									<tr>
@@ -389,6 +429,12 @@ const AttendanceRecord = () => {
 	);
 };
 
-AttendanceRecord.getLayout = getStudentLayout;
+// AttendanceRecord.getLayout = getStudentLayout;
 
-export default AttendanceRecord;
+// export default AttendanceRecord;
+AttendanceRecord.getLayout = getStudentLayout;
+AttendanceRecord.getInitialProps = async () => ({
+	namespacesRequired: ['common'],
+});
+
+export default withTranslation('common')(AttendanceRecord);

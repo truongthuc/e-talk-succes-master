@@ -69,14 +69,33 @@ const LessonDetail = ({ t }) => {
 	};
 
 	useEffect(() => {
+		// --- Get ID ---
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+		let EvaluationID = parseInt(link[link.length - 2]);
+
+		// let postID = parseInt(linkClone);
+
+		// --------------
+		console.log(UID);
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			UID: 61215,
+			Token: Token,
+			UID: UID,
+			EvaluationID: EvaluationID,
 		});
 	}, []);
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('evaluate-the-lesson')}</h1>
+			<h1 className="main-title-page">{t('Evaluate-the-lesson')}</h1>
 			{loading ? (
 				<SkeletonLessonDetail />
 			) : (
@@ -94,7 +113,7 @@ const LessonDetail = ({ t }) => {
 												<span className="tx-black tx-normal">
 													{t('package')}:{' '}
 												</span>
-												<span>GÓI HỌC Thử</span>
+												<span>{state?.PackageName}</span>
 											</p>
 										</div>
 
@@ -102,14 +121,14 @@ const LessonDetail = ({ t }) => {
 											<p className="st-teacher-text">
 												<i className="fas fa-chalkboard-teacher st-icon wd-20 mg-r-5"></i>
 												<span>{t('teacher')}:</span>{' '}
-												<span className="st-tengv">Cris Teacher</span>
+												<span className="st-tengv">{state?.TeacherName}</span>
 											</p>
 										</div>
 										<div className="st-time">
 											<p className="st-teacher-text">
 												<i className="fa fa-book-open st-icon wd-20 mg-r-5"></i>
 												<span>
-													{t('material')}: <span></span>
+													{t('material')}: <span>{state.Material}</span>
 												</span>
 											</p>
 										</div>
@@ -121,6 +140,9 @@ const LessonDetail = ({ t }) => {
 								{/* <!--thang danh gia--> */}
 								<div className="st-thangdanhgia">
 									<h5 className="main-title">{t('notes')}</h5>
+									<div className="wrapNote">
+										<p>{state?.Note}</p>
+									</div>
 									{/* {(state.Rate === 0 || state.Rate) && (
 										<div className="d-block mg-b-15 st-rating">
 											<div className="cell text-left">
@@ -188,11 +210,11 @@ const LessonDetail = ({ t }) => {
 							</div>
 						</div>
 						<div className="review__wrap mg-t-15 sec">
-							<h5 className="main-title">{t('remark')}</h5>
-							{/* <!--/Đánh giá ngữ pháp-->*/}
+							{/* <h5 className="main-title">{t('remark')}</h5>
+					
 							<div className="st-title-danhgia mg-b-15">
-								{/* <h5 className="pd-b-10 bd-b">{state.ContentRate}</h5> */}
-							</div>
+								<h5 className="pd-b-10 bd-b">{state.ContentRate}</h5>
+							</div> */}
 							{/* <div className="st-danhgianguphap mg-b-30">
 								<div className="st-title-danhgia mg-b-15">
 									<h5 className="pd-b-10 bd-b">{t('grammar')}</h5>

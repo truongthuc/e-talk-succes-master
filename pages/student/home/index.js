@@ -17,7 +17,12 @@ import SkeletonLessonCard from '~/page-components/student/home/SkeletonLessonCar
 import { NOT_DATA_FOUND } from '~/components/common/Constant/message';
 
 import { convertDateFromTo, checkCancelTime } from '~/utils.js';
-import { LessionHistory, getCoursesInfoAPI } from '~/api/studentAPI';
+import {
+	LessionHistory,
+	getCoursesInfoAPI,
+	getUpcomingLessons,
+	StudyProcess,
+} from '~/api/studentAPI';
 import { ToastContainer } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
@@ -102,6 +107,12 @@ const Home = ({ t }) => {
 
 	const [courseInfo, setCourseInfo] = useState(null);
 	const [loadingCourseInfo, setLoadingCourseInfo] = useState(false);
+
+	const [dataHis, setDataHis] = useState();
+
+	const [process, setProcess] = useState();
+
+	console.log('Process: ', process);
 
 	const cancelToastFail = () => toast.error(FETCH_ERROR, toastInit);
 
@@ -228,6 +239,7 @@ const Home = ({ t }) => {
 			setLoading(false);
 			if (res.Code === 200) {
 				setState(res.Data);
+				setDataHis(res.Data);
 			}
 			setState(data);
 		} catch (error) {
@@ -235,14 +247,18 @@ const Home = ({ t }) => {
 		}
 	};
 
-	const _getCoursesInfoAPI = async () => {
+	const [dataComing, setDataComing] = useState();
+
+	const _getCoursesInfoAPI = async (params) => {
 		setLoadingCourseInfo(true);
-		const res = await getCoursesInfoAPI();
+		const res = await getUpcomingLessons(params);
 		if (res.Code === 200) {
-			setCourseInfo({
-				...res.Data,
-				Message: '',
-			});
+			console.log('DATA coming up: ', res.Data);
+			// setCourseInfo({
+			// 	...res.Data,
+			// 	Message: '',
+			// });
+			setDataComing(res.Data);
 		} else {
 			setCourseInfo({
 				Message: res.Message,
@@ -282,143 +298,24 @@ const Home = ({ t }) => {
 			UID: UID,
 			Token: Token,
 		});
-		_getCoursesInfoAPI();
+		_getCoursesInfoAPI({
+			UID: UID,
+			Token: Token,
+		});
+
+		// Get process
+		(async () => {
+			try {
+				const res = await StudyProcess({ UID, Token });
+				res.Code === 200 && setProcess(res.Data);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
 	}, []);
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('title')}</h1>{' '}
-			<div className="overall__summary pd-15 pd-30">
-				{' '}
-				{
-					<div className="overall__summary-info d-flex flex-wrap">
-						<div className="course-info">
-							<div className="d-flex align-items-center mg-b-30 mg-b-0">
-								<div className={`course-image mg-r-15`}>
-									<img
-										src={`/static/assets/img/course.svg`}
-										className={`wd-60 ht-60 round-circle`}
-										alt={`course`}
-									/>
-								</div>
-								<div className={`flex-grow-1`}>
-									<a href={true} className="tx-bold d-block mg-b-5 tx-primary">
-										<span className="course-name">
-											{data.MainTitle[0].Name}
-										</span>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				}
-				<div className="overall__summary-summary pd-t-15 d-flex flex-wrap justify-content-between">
-					<div className="left d-flex flex-wrap flex-grow-1 w-80">
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('current-level')}</label>
-								<label className="d-block bold count">
-									{data.LvCurrent[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('target-level')}</label>
-								<label className="d-block bold count">{data.LvNow[0].ID}</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('lesson-completed')}</label>
-								<label className="d-block bold count">
-									{data.ClassComplete[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('no-show-lessons')}</label>
-								<label className="d-block bold count">
-									{data.ClassCanceled[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('start-day')}</label>
-								<label className="d-block bold count">
-									{data.StartDay[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">{t('end-day')}</label>
-								<label className="d-block bold count">
-									{data.EndDay[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">
-									{t('lessons-cancelled')}
-								</label>
-								<label className="d-block bold count">
-									{data.ClassCanceled[0].ID}
-								</label>
-							</div>
-						</div>
-						<div className="summary-item student-summary-item w-25">
-							<div className="mg-l-10 title">
-								<label className="d-block label">
-									{t('remaining-lessons')}
-								</label>
-								<label className="d-block bold count">
-									{data.ClassRest[0].ID}
-								</label>
-							</div>
-						</div>
-					</div>
-					<div className="course-progress w-20">
-						<div className="progress-wrap">
-							<div className="progress-course-bar position-relative circularprogressbar">
-								<CircularProgressbarWithChildren value={66}>
-									<div style={{ fontSize: 14, marginTop: -5 }}>
-										<strong style={{ display: 'block', fontSize: '24px' }}>
-											20
-										</strong>{' '}
-										{t('day-left')}
-									</div>
-								</CircularProgressbarWithChildren>
-							</div>
-						</div>
-					</div>
-					{/*  <div className="right">
-                  <div className="summary-item">
-                    <div>
-                      <img src="https://images.unsplash.com/photo-1595534005229-688989c4bf82?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" />
-                      <img src="https://images.unsplash.com/photo-1595534005229-688989c4bf82?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" />
-                      <img src="https://images.unsplash.com/photo-1595534005229-688989c4bf82?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" />
-                      <img src="https://images.unsplash.com/photo-1595534005229-688989c4bf82?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" />
-                      <img src="https://images.unsplash.com/photo-1595534005229-688989c4bf82?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" />
-                      <span className="other-person bold">5+</span>
-                    </div>
-                  </div>
-                </div> */}
-				</div>
-				<div className="tx-center pd-y-30 dispaly-none">
-					<img
-						src={`/static/assets/img/course.svg`}
-						className={`wd-200 mg-b-15 round-circle`}
-						alt={`course`}
-					/>
-					<span className="d-block tx-center tx-danger tx-medium">
-						{courseInfo && courseInfo.Message}
-					</span>
-				</div>
-			</div>{' '}
 			{!state ? (
 				<NOT_DATA_FOUND />
 			) : (
@@ -426,7 +323,7 @@ const Home = ({ t }) => {
 					<div className="lesson mg-t-45 animated fadeInUp am-animation-delay-1">
 						<div className="d-xl-flex align-items-center justify-content-between">
 							<h4 className="title-section">{t('upcoming-lessons')}</h4>
-							<Link href={'/student/upcoming-classes'}>
+							{/* <Link href={'/student/upcoming-classes'}>
 								<a
 									href={true}
 									className="link d-flex align-items-center tx-info"
@@ -434,7 +331,7 @@ const Home = ({ t }) => {
 									{t('see-all')}
 									<i className="fas fa-chevron-right mg-l-5"></i>
 								</a>
-							</Link>
+							</Link> */}
 						</div>
 
 						<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
@@ -443,53 +340,50 @@ const Home = ({ t }) => {
 								alt="no-data"
 								className="wd-200 mg-b-15"
 							/>
-							<p className=" tx-danger tx-medium">
-								{t('you-have-no-upcoming-lessons')}
-							</p>
-							<a href="/student/booking-schedule" className="btn btn-primary">
-								Đặt lịch học
+							{dataComing?.length === 0 ? (
+								<p className=" tx-danger tx-medium">
+									{t('You-have-no-upcoming-lessons')}
+								</p>
+							) : (
+								<p className=" tx-danger tx-medium">
+									{t(`You have ${dataComing?.length} lesson`)}
+								</p>
+							)}
+							<a href="/student/profile-teacher" className="btn btn-primary">
+								Book a class schedule
 							</a>
 						</div>
 
-						<div className="course-horizental mg-t-15">
+						{/* <div className="course-horizental mg-t-15">
 							<ul className="list-wrap">
 								{loading ? (
 									<SkeletonLessonCard />
 								) : (
-									!!data.UpcomingLessions &&
-									data.UpcomingLessions.length > 0 &&
-									data.UpcomingLessions.map((item, index) => (
+									dataComing?.length > 0 &&
+									dataComing.map((item, index) => (
 										<LessonUpcomingCard
-											key={`${item.BookingID}-${index}`}
+										
+											Avatar={item.Avatar}
 											BookingID={item.BookingID}
-											TeacherUID={item.TeacherUID}
-											avatar={item.Avatar}
-											TeacherName={item.TeacherName}
-											LessionName={item.LessionName}
 											CourseName={item.CourseName}
-											LessionMaterial={item.Material}
-											SpecialRequest={item.SpecialRequest}
-											start={convertDateFromTo(item.ScheduleTimeVN).fromTime}
-											end={convertDateFromTo(item.ScheduleTimeVN).endTime}
-											date={convertDateFromTo(item.ScheduleTimeVN).date}
-											DocumentName={item.DocumentName}
-											SkypeID={item.SkypeID}
-											onHandleCancelBooking={handleCancelBooking}
-											onHandleRequireLesson={handleRequireLesson}
-											lock={lock}
-											cancelable={checkCancelTime(
-												convertDateFromTo(item.ScheduleTimeVN).dateObject,
-											)}
+											EndTime={item.EndTime}
+											StartTime={item.StartTime}
+											Status={item.Status}
+											StudentName={item.StudentName}
+											TeacherID={item.TeacherID}
+											TeacherName={item.TeacherName}
+											TeacherSkype={item.TeacherSkype}
+											TimeStudy={item.TimeStudy}
 										/>
 									))
 								)}
 							</ul>
-						</div>
+						</div> */}
 					</div>{' '}
 					<div className="lesson mg-t-45 animated fadeInUp am-animation-delay-2">
 						<div className="d-xl-flex align-items-center justify-content-between ">
 							<h4 className="title-section">{t('completed-lessons')}</h4>
-							<Link href={'/student/class-history'}>
+							{/* <Link href={'/student/class-history'}>
 								<a
 									href={true}
 									className="link d-flex align-items-center tx-info"
@@ -497,7 +391,7 @@ const Home = ({ t }) => {
 									{t('see-all')}
 									<i className="fas fa-chevron-right mg-l-5"></i>
 								</a>
-							</Link>
+							</Link> */}
 						</div>{' '}
 						<div className="course-horizental mg-t-15">
 							<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
@@ -506,9 +400,15 @@ const Home = ({ t }) => {
 									alt="no-data"
 									className="wd-200 mg-b-15"
 								/>
-								<p className=" tx-danger tx-medium">{t('no-class-yet')}.</p>
+								{dataHis?.length > 0 ? (
+									<p className=" tx-danger tx-medium">
+										{t(`You have ${dataHis.length} lessons`)}.
+									</p>
+								) : (
+									<p className=" tx-danger tx-medium">{t('no-class-yet')}.</p>
+								)}
 							</div>
-							<ul className="list-wrap">
+							{/* <ul className="list-wrap">
 								{loading ? (
 									<SkeletonLessonCard />
 								) : (
@@ -538,7 +438,7 @@ const Home = ({ t }) => {
 										/>
 									))
 								)}
-							</ul>{' '}
+							</ul>{' '} */}
 						</div>{' '}
 					</div>{' '}
 				</>

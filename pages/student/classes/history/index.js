@@ -191,10 +191,20 @@ const EvaluationLists = ({ t }) => {
 				});
 			}
 		}
+
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			UID: '',
+			UID: UID,
 			Page: 1,
-			Token: '',
+			Token: Token,
 			fromdate: '',
 			todate: '',
 		});
@@ -203,7 +213,7 @@ const EvaluationLists = ({ t }) => {
 		console.log('render'),
 		(
 			<>
-				<h1 className="main-title-page">{t('study-history')}</h1>
+				<h1 className="main-title-page">{t('Study-history')}</h1>
 				<div className="card">
 					<div className="card-body">
 						{/* <form

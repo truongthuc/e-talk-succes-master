@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import Select from 'react-select';
 import ListSchedule from '~/page-components/student/booking-schedule/ListSchedule';
-import { GetListTeacher } from '~/api/studentAPI';
-import Pagination from 'react-js-pagination';
+import { GetListTeacherPage } from '~/api/studentAPI';
+// import Pagination from 'react-js-pagination';
+import Pagination from '@material-ui/lab/Pagination';
+
 import Router, { useRouter } from 'next/router';
 import BookingLessonModal from '~/components/common/Modal/BookingLessonModal';
 // import ListNationModal from '~components/common/Modal/ListNationModal';
+import Box from '@material-ui/core/Box';
 
 import { toast } from 'react-toastify';
 import 'react-toastify/scss/main.scss';
@@ -54,17 +57,17 @@ const nationArr = [
 	},
 ];
 
-const initialState = {
-	nation: [],
-	gender: genderArr[0],
-	levelPurpose: [],
-	selectedLevelPurpose: [],
-	date: dayjs(new Date()).format('DD/MM/YYYY'),
-	startTime: new Date('01/01/2020 00:00'),
-	endTime: new Date('01/01/2020 23:00'),
-	searchText: '',
-	nation: nationArr[0],
-};
+// const initialState = {
+// 	nation: [],
+// 	gender: genderArr[0],
+// 	levelPurpose: [],
+// 	selectedLevelPurpose: [],
+// 	date: dayjs(new Date()).format('DD/MM/YYYY'),
+// 	startTime: new Date('01/01/2020 00:00'),
+// 	endTime: new Date('01/01/2020 23:00'),
+// 	searchText: '',
+// 	nation: nationArr[0],
+// };
 
 const initialBookLesson = {
 	StudyTimeID: '',
@@ -85,25 +88,53 @@ const initialOnBookState = {
 	date: '',
 };
 
-const reducer = (prevState, { type, payload }) => {
-	switch (type) {
-		case 'STATE_CHANGE': {
-			return {
-				...prevState,
-				[payload.key]: payload.value,
-			};
-		}
-		default:
-			return prevState;
-			break;
-	}
-};
+// const reducer = (prevState, { type, payload }) => {
+// 	switch (type) {
+// 		case 'STATE_CHANGE': {
+// 			return {
+// 				...prevState,
+// 				[payload.key]: payload.value,
+// 			};
+// 		}
+// 		default:
+// 			return prevState;
+// 			break;
+// 	}
+// };
 
 const pad = (n) => ('' + n >= 10 ? n : '0' + n);
 
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
 const ProfileTeacher = ({ t }) => {
 	const router = useRouter();
-	const [state, dispatch] = useReducer(reducer, initialState);
+	// const [state, dispatch] = useReducer(reducer, initialState);
 	const [teachersList, setTeacherList] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [onBookState, setOnBookState] = useState(initialOnBookState);
@@ -114,12 +145,16 @@ const ProfileTeacher = ({ t }) => {
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 
+	const [state, dispatch] = useReducer(reducer, initialState);
+
 	const errorToast = () =>
 		toast.error('Đã có lỗi xảy ra, xin vui lòng thử lại', toastInit);
+
 	const getAPI = async (params) => {
 		setLoading(true);
-		const res = await GetListTeacher(params);
+		const res = await GetListTeacherPage(params);
 		if (res.Code === 200) {
+			dispatch({ type: 'ADD_PAGE', res });
 			setTeacherList(res.Data);
 			setPageSize(res.PageSize);
 			setTotalResult(res.TotalResult);
@@ -413,14 +448,14 @@ const ProfileTeacher = ({ t }) => {
 			UID = localStorage.getItem('UID');
 			Token = localStorage.getItem('token');
 		}
-		console.log(UID);
+
 		getAPI({
 			Search: '',
 			UID: UID,
-			Token: '',
-			Page: 1,
+			Token: Token,
+			Page: state.page,
 		});
-	}, []);
+	}, [state.page]);
 
 	function handlePageClick({ selected: selectedPage }) {
 		setCurrentPage(selectedPage);
@@ -428,7 +463,7 @@ const ProfileTeacher = ({ t }) => {
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('profile-teacher')}</h1>
+			<h1 className="main-title-page">{t('Profile-teacher')}</h1>
 			<div className="media-body-wrap pd-15 shadow">
 				{/* <div
 					className="form-row"
@@ -519,7 +554,7 @@ const ProfileTeacher = ({ t }) => {
 													<div className="infomation-bottom">
 														<div className="tutor-rating-star">
 															{/* <span className="number-start">1</span> */}
-															<div className="rating-stars">
+															{/* <div className="rating-stars">
 																<span className="empty-stars">
 																	<i className="far fa-star"></i>
 																	<i className="far fa-star"></i>
@@ -537,7 +572,7 @@ const ProfileTeacher = ({ t }) => {
 																	<i className="star fa fa-star"></i>
 																	<i className="star fa fa-star"></i>
 																</span>
-															</div>
+															</div> */}
 														</div>
 														<a
 															href="/student/booked-schedule/calendar"
@@ -556,16 +591,45 @@ const ProfileTeacher = ({ t }) => {
 											</li>
 										))}
 									</ul>
-									<Pagination
+									{/* <Pagination
 										innerClass="pagination justify-content-center"
 										activePage={page}
 										itemsCountPerPage={pageSize}
-										totalItemsCount={2}
+										totalItemsCount={Math.ceil(
+												state?.TotalResult / (state?.PageSize / 2),
+											)}
 										pageRangeDisplayed={3}
 										itemClass="page-item"
 										linkClass="page-link"
-										onChange={handlePageChange.bind(this)}
-									/>
+											onChange={(obj, page) =>
+												dispatch({ type: 'SELECT_PAGE', page })
+											}
+									/> */}
+									<Box display={`flex`} justifyContent={`center`} mt={4}>
+										<Pagination
+											count={Math.ceil(state?.TotalResult / state?.PageSize)}
+											color="secondary"
+											onChange={(obj, page) =>
+												dispatch({ type: 'SELECT_PAGE', page })
+											}
+											c
+										/>
+
+										{/* <ReactPaginate
+													previousLabel={'←'}
+													nextLabel={'→'}
+													pageCount={pageCount}
+													onPageChange={handlePageClick}
+													containerClassName={'paginate-wrap'}
+													subContainerClassName={'paginate-inner'}
+													pageClassName={'paginate-li'}
+													pageLinkClassName={'paginate-a'}
+													activeClassName={'paginate-active'}
+													nextLinkClassName={'paginate-next-a'}
+													previousLinkClassName={'paginate-prev-a'}
+													breakLinkClassName={'paginate-break-a'}
+												/> */}
+									</Box>
 								</div>
 							) : (
 								<div className="pd-y-30 tx-center dispaly-none">

@@ -39,6 +39,14 @@ const StudentCommentItem = ({
 						''
 					)}
 				</div>
+				<div className="wrapCourse">
+					<p style={{ marginBottom: '0' }}>
+						<b>Course Name:</b>{' '}
+						<span style={{ color: '#fa005e', fontWeight: 'bold' }}>
+							{CoursesName}
+						</span>
+					</p>
+				</div>
 				<div className="metas">
 					{CreatedDate ? (
 						<div className="meta">
@@ -66,8 +74,8 @@ const StudentCommentItem = ({
 				<div className="actions">
 					{LinkDetail && (
 						<Link
-							href="/student/classes/evaluation/detail/LinkDetail"
-							as={LinkDetail}
+							href="/student/classes/evaluation/22"
+							as={`/student/classes/evaluation/${LinkDetail}`}
 						>
 							<a href={true} className="btn btn-sm btn-success mg-r-10">
 								<FontAwesomeIcon

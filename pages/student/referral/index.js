@@ -126,7 +126,7 @@ const Referral = ({ t }) => {
 								<li>{t('p-16')}</li>
 							</ul>
 						</div>
-						<div className="col-12 mg-t-30">
+						{/* <div className="col-12 mg-t-30">
 							<h5 className="mg-b-15">Danh sách đã mời</h5>
 							<div className="table-responsive ">
 								<table className="table table-500">
@@ -166,7 +166,7 @@ const Referral = ({ t }) => {
 									</tbody>
 								</table>
 							</div>
-						</div>
+						</div> */}
 					</div>
 				</div>
 			</div>

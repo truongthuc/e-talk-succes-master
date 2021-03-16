@@ -20,10 +20,11 @@ export const getLessons = async () => {
 export const getUpcomingLessons = async (params) => {
 	let result;
 	try {
-		let res = await instance.get(path + '/GetUpcomingLessions', {
+		let res = await instance.get(path + '/UpcomingLessions', {
 			params: {
-				UID: appSettings.UID,
-				Page: params.Page,
+				UID: params.UID,
+				Token: params.Token,
+				Page: 1,
 			},
 		});
 		result = res.data;
@@ -52,13 +53,15 @@ export const getUpcomingLessons = async (params) => {
 // };
 
 export const GetEvaluationDetail = async (params) => {
+	console.log('Params Eva ID: ', params);
+
 	let result;
 	try {
 		let res = await instance.get(path + '/GetEvaluationDetail', {
 			params: {
-				UID: 61215,
-				EvaluationID: 7,
-				token: '',
+				UID: params.UID,
+				EvaluationID: params.EvaluationID,
+				token: params.Token,
 			},
 		});
 		result = res.data;
@@ -88,12 +91,10 @@ export const getProfile = async () => {
 // 	try {
 // 		let res = await instance.get(path + '/GetListTeacher', {
 // 			params: {
-// 				UID: appSettings.UID,
-// 				Nation: params.Nation,
+// 				UID: params.UID,
 // 				Search: params.Search,
 // 				Token: params.Token,
 // 				Page: params.Page,
-// 				LevelPurpose: params.LevelPurpose,
 // 			},
 // 		});
 // 		result = res.data;
@@ -102,6 +103,7 @@ export const getProfile = async () => {
 // 	}
 // 	return result;
 // };
+
 export const GetTeacherProfile = async (params) => {
 	let result;
 	try {
@@ -123,8 +125,9 @@ export const GetNotifications = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetNotifications', {
 			params: {
-				UID: appSettings.UID,
-				page: params.page,
+				UID: params.UID,
+				Token: params.Token,
+				page: params.Page,
 			},
 		});
 		result = res.data;
@@ -154,7 +157,7 @@ export const GetHolidays = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetHolidays', {
 			params: {
-				UID: appSettings.UID,
+				UID: params.UID,
 				Token: params.Token,
 				Page: params.Page,
 			},
@@ -188,11 +191,11 @@ export const GetBookingScheduleForStudent = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetBookingScheduleForStudent', {
 			params: {
-				UID: appSettings.UID,
+				UID: params.UID,
 				fromdate: params.fromdate,
 				todate: params.todate,
 				Token: params.Token,
-				Page: params.page,
+				Page: params.Page,
 			},
 		});
 		result = res.data;
@@ -409,29 +412,29 @@ export const getFaqAPI = async () => {
 	return result;
 };
 
-export const updateProfileAPI = async (params) => {
+export const UpdateProfile = async (params, ...ars) => {
+	console.log('UpdateProfile', params);
 	let result;
 	try {
-		let res = await instance.get(path + '/UpdateProfile', {
-			params: {
-				UID: appSettings.UID,
-				FullName: params.FullName,
-				Phone: params.Phone,
-				Email: params.Email,
-				BirthDay: params.BirthDay,
-				Gender: params.Gender,
-				Language: params.Language,
-				Address: params.Address,
-				Target: params.Target,
-				SkypeID: params.SkypeID,
-				TimezoneID: params.TimeZoneID,
-				PersonalPreference: params.PersonalPreference,
-				RequestWithTeacher: params.RequestWithTeacher,
-				Avatar: params.Avatar,
-			},
-		});
+		const formdata = new FormData();
+		formdata.append('UID', params.UID);
+		formdata.append('BirthDay', params.BirthDay);
+		formdata.append('Introduce', params.Introduce);
+		formdata.append('Country', params.Country);
+		formdata.append('Timezone', params.Timezone);
+		formdata.append('Token', params.Token);
+		formdata.append('BankName', params.BankName);
+		formdata.append('CardHolder', params.CardHolder);
+		formdata.append('AccountNumber', params.AccountNumber);
+		formdata.append('Branch', params.Branch);
+		formdata.append('BankAddress', params.BankAddress);
+		formdata.append('Avatar', params.Avatar);
+		formdata.append('Token', params.Token);
+		console.log('form data', formdata);
+		let res = await instance.post(path + '/UpdateProfile', formdata, {});
 		result = res.data;
 	} catch (error) {
+		console.log('Error: ', error);
 		return error.message ? error.message : (result = '');
 	}
 	return result;
@@ -474,9 +477,9 @@ export const GetListFeedback = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetListFeedback', {
 			params: {
-				UID: 61215,
-				Token: '',
-				Page: params.Page,
+				UID: params.UID,
+				Token: params.Token,
+				Page: 1,
 			},
 		});
 		result = res.data;
@@ -491,7 +494,7 @@ export const GetPaymentHistory = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetPaymentHistory', {
 			params: {
-				UID: appSettings.UID,
+				UID: params.UID,
 				Page: params.Page,
 				fromdate: params.fromdate,
 				todate: params.todate,
@@ -509,7 +512,7 @@ export const GetTimeLimiteCourses = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetTimeLimiteCourses', {
 			params: {
-				UID: appSettings.UID,
+				UID: params.UID,
 				Page: params.Page,
 				Token: params.Token,
 			},
@@ -538,13 +541,15 @@ export const GetPackageHistory = async (params) => {
 	return result;
 };
 export const GetAttendanceRecord = async (params) => {
+	console.log('params nè', params);
+	// console.log('params todate', params);
 	let result;
 	try {
 		let res = await instance.get(path + '/GetAttendanceRecord', {
 			params: {
 				fromdate: params.fromdate,
 				todate: params.todate,
-				UID: appSettings.UID,
+				UID: params.UID,
 				Token: params.Token,
 				Page: params.Page,
 			},
@@ -555,6 +560,26 @@ export const GetAttendanceRecord = async (params) => {
 	}
 	return result;
 };
+
+export const studentGetDetailAttendanceRecord = async (params) => {
+	let result;
+
+	try {
+		let res = await instance.get(path + '/studentGetDetailAttendanceRecord', {
+			params: {
+				BookingID: params.BookingID,
+				UID: params.UID,
+				Token: params.Token,
+			},
+			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
 export const GetReferral = async (params) => {
 	let result;
 	try {
@@ -603,14 +628,14 @@ export const LessionHistory = async (params) => {
 	}
 	return result;
 };
-export const LoadFeeConfirm = async () => {
+export const LoadFeeConfirm = async (params) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/LoadFeeConfirm', {
 			params: {
-				UID: appSettings.UID,
-				FeeConfirmID: 8,
-				token: '',
+				UID: params.UID,
+				FeeConfirmID: params.FeeConfirmID,
+				token: params.token,
 			},
 		});
 		result = res.data;
@@ -619,14 +644,13 @@ export const LoadFeeConfirm = async () => {
 	}
 	return result;
 };
-export const GetEvaluationContent = async () => {
+export const GetEvaluationContent = async (params) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetEvaluationContent', {
 			params: {
-				UID: appSettings.UID,
-				FeeConfirmID: 8,
-				token: '',
+				UID: params.UID,
+				token: params.token,
 			},
 		});
 		result = res.data;
@@ -635,10 +659,30 @@ export const GetEvaluationContent = async () => {
 	}
 	return result;
 };
-export const UpdateProfile = async (params) => {
+// export const UpdateProfile = async (params) => {
+// 	let result;
+// 	try {
+// 		let res = await instance.get(path + '/UpdateProfile', {
+// 			params: {
+// 				UID: params.UID,
+// 				Token: params.Token,
+// 			},
+// 			//Param: int BookingID, int UID ? 0, string Token ? null
+// 		});
+// 		result = res.data;
+// 	} catch (error) {
+// 		return error.message ? error.message : (result = '');
+// 	}
+// 	return result;
+// };
+
+export const GetListTeacher = async (params) => {
 	let result;
+
+	// console.log('Params trong E-Talk: ', params);
+
 	try {
-		let res = await instance.get(path + '/UpdateProfile', {
+		let res = await instance.get(path + '/API_LoadTeacher', {
 			params: {
 				UID: params.UID,
 				Token: params.Token,
@@ -652,18 +696,18 @@ export const UpdateProfile = async (params) => {
 	return result;
 };
 
-export const GetListTeacher = async (params) => {
+export const GetListTeacherPage = async (params) => {
 	let result;
 
-	// console.log('Params trong E-Talk: ', params);
+	console.log('Params trong E-Talk: ', params);
 
 	try {
-		let res = await instance.get(path + '/API_LoadTeacher', {
+		let res = await instance.get(path + '/GetListTeacher', {
 			params: {
 				Search: '',
 				UID: params.UID,
 				Token: params.Token,
-				Page: 1,
+				Page: params.Page,
 			},
 			//Param: int BookingID, int UID ? 0, string Token ? null
 		});
@@ -689,6 +733,51 @@ export const LoadCourseInfo = async (params) => {
 		});
 		result = res.data;
 	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const StudyProcess = async (params) => {
+	let result;
+
+	// console.log('Params trong E-Talk: ', params);
+
+	try {
+		let res = await instance.get(path + '/StudyProcess', {
+			params: {
+				UID: params.UID,
+				Token: params.Token,
+				Page: 1,
+			},
+			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const addEvaluation = async (params) => {
+	console.log('Feed Back', params);
+
+	let result;
+	try {
+		const formdata = new FormData();
+		formdata.append('UID', params.UID);
+		formdata.append('token', params.token);
+		formdata.append('feedbackID', params.feedbackID);
+		formdata.append('internetRate', params.internetRate);
+		formdata.append('documentRate', params.documentRate);
+		formdata.append('performanceRate', params.performanceRate);
+		formdata.append('satisfiedRate ', params.satisfiedRate);
+		formdata.append('ContentRate', params.ContentRate);
+		console.log('form data', formdata);
+		let res = await instance.post(path + '/EditFeedback', formdata, {});
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
 		return error.message ? error.message : (result = '');
 	}
 	return result;

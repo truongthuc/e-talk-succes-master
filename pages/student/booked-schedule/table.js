@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { getStudentLayout } from '~/components/Layout';
 import { GetBookingScheduleForStudent } from '~/api/studentAPI';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import {
 	convertDateFromTo as cvDate,
 	getDifferentMinBetweenTime,
 } from '~/utils';
+import Pagination from '@material-ui/lab/Pagination';
 import Skeleton from 'react-loading-skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from 'react-datepicker';
@@ -13,98 +14,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './table.module.scss';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { i18n, withTranslation } from '~/i18n';
-const fakeData = [
-	{
-		BookingID: 2,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '24/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessionMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-	{
-		BookingID: 3,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '25/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessonMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-	{
-		BookingID: 4,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '24/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessionMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-	{
-		BookingID: 5,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '25/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessonMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-	{
-		BookingID: 6,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '24/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessionMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-	{
-		BookingID: 3,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 0,
-		StudentName: null,
-		ScheduleTimeVN: '25/06/2020 14:00 - 14:25',
-		DocumentName: 'React JS in future',
-		LessonName: 'Lession 3: Complete React Hook',
-		LessonMaterial: '',
-		SkypeID: 'live:123123',
-		SpecialRequest: '',
-		Status: 0,
-		FinishType: 0,
-	},
-];
+import Box from '@material-ui/core/Box';
+import { makeStyles } from '@material-ui/core/styles';
+import dayjs from 'dayjs';
 
 const checkCancelTime = (startDate) => {
 	const oneMinutes = 1000 * 60 * 60;
@@ -114,7 +26,47 @@ const checkCancelTime = (startDate) => {
 	return Math.round(diffTime / oneMinutes) > 30 ? true : false;
 };
 
+const useStyles = makeStyles((theme) => ({
+	stylePagi: {
+		'& > button': {
+			'&:focus': {
+				outline: '0',
+				border: '0',
+			},
+		},
+	},
+}));
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
 const TableView = ({ t }) => {
+	const classes = useStyles();
+
 	const [schedules, setSchedules] = useState(1);
 	const [isLoading, setIsLoading] = useState(true);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -123,11 +75,24 @@ const TableView = ({ t }) => {
 	const [fromDate, setFromDate] = useState('');
 	const [toDate, setToDate] = useState('');
 	const [data, setData] = useState();
+	const [showAll, setShowAll] = useState(false);
+	const [statusSearch, setStatusSearch] = useState(false);
+
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	const _onFilterDate = (e) => {
+		e.preventDefault();
+		// loadAllClassesData();
+
+		setStatusSearch(true);
+	};
+
 	const getAPI = async (params) => {
 		setIsLoading(true);
 		const res = await GetBookingScheduleForStudent(params);
 		console.log(res);
 		if (res.Code === 200) {
+			dispatch({ type: 'ADD_PAGE', res });
 			setData(res.Data);
 			setPageSize(res.PageSize);
 			setTotalResult(res.TotalResult);
@@ -135,6 +100,13 @@ const TableView = ({ t }) => {
 			setData({});
 		}
 		setIsLoading(false);
+	};
+
+	const showAllData = () => {
+		setFromDate('');
+		setToDate('');
+
+		setShowAll(true);
 	};
 
 	useEffect(() => {
@@ -146,14 +118,35 @@ const TableView = ({ t }) => {
 			UID = localStorage.getItem('UID');
 			Token = localStorage.getItem('token');
 		}
+		if (statusSearch) {
+			getAPI({
+				fromdate: dayjs(fromDate).format('DD/MM/YYYY'),
+				todate: dayjs(toDate).format('DD/MM/YYYY'),
+				UID: UID,
+				Page: 1,
+				Token: Token,
+			});
+			setStatusSearch(false);
+		}
+	}, [statusSearch]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
 		getAPI({
-			fromdate: '',
-			todate: '',
+			fromdate: fromDate,
+			todate: toDate,
 			UID: UID,
-			Page: 1,
+			Page: state.page,
 			Token: Token,
 		});
-	}, []);
+	}, [state.page]);
 
 	return (
 		<>
@@ -197,7 +190,7 @@ const TableView = ({ t }) => {
 							<button
 								type="button"
 								className="btn btn-primary wd-100p wd-sm-auto btn-ab"
-								// onClick={getUpcomingSchedule}
+								onClick={_onFilterDate}
 							>
 								<FontAwesomeIcon icon="search" className="fa fa-search" />{' '}
 							</button>
@@ -257,7 +250,7 @@ const TableView = ({ t }) => {
 											<td>{ls.DocumentDetailName}</td>
 											<td>{ls.DocumentName}</td>
 											<td>{ls.TimeCourse}</td>
-											<td>{ls.Date}</td>
+											<td>{ls.StartDate}</td>
 											<td>{ls.TimeStudy}</td>
 											<td>{ls.ClassName}</td>
 											<td>{ls.StatusName}</td>
@@ -282,7 +275,7 @@ const TableView = ({ t }) => {
 							</PerfectScrollbar>
 						</table>
 					</div>
-					{totalResult > pageSize && (
+					{/* {totalResult > pageSize && (
 						<Pagination
 							innerClass="pagination mg-t-15"
 							activePage={pageNumber}
@@ -294,7 +287,15 @@ const TableView = ({ t }) => {
 							linkClass="page-link"
 							activeClass="active"
 						/>
-					)}
+					)} */}
+					<Box display={`flex`} justifyContent={`center`} mt={4}>
+						<Pagination
+							count={Math.ceil(state?.TotalResult / state?.PageSize)}
+							color="secondary"
+							onChange={(obj, page) => dispatch({ type: 'SELECT_PAGE', page })}
+							className={classes.stylePagi}
+						/>
+					</Box>
 				</div>
 			</div>
 		</>

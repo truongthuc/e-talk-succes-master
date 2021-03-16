@@ -1,6 +1,6 @@
 import React, { useReducer, useState, useRef, useEffect } from 'react';
 import Pagination from 'react-js-pagination';
-import { GetListFeedback } from '~/api/studentAPI';
+import { GetListFeedback, addEvaluation } from '~/api/studentAPI';
 import { convertDateFromTo, randomId } from '~/utils';
 import Skeleton from 'react-loading-skeleton';
 import './index.module.scss';
@@ -14,8 +14,6 @@ import TextareaAutosize from 'react-autosize-textarea';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
 import { toast, ToastContainer } from 'react-toastify';
-import Router, { useRouter } from 'next/router';
-
 const fakeData = [
 	{
 		BookingID: randomId(),
@@ -99,6 +97,11 @@ const initialState = {
 	summary: '',
 	vocabulary: '',
 	finishedType: '',
+	internetRate: '',
+	documentRate: '',
+	performanceRate: '',
+	satisfiedRate: '',
+	ContentRate: '',
 	finishedOptions: [],
 	studentComments: [
 		{
@@ -172,67 +175,66 @@ const LessonItem = ({
 	CourseName,
 	LessionName,
 	PackgaeName,
-	rate,
-	ContentFeedBack,
+	feedbackID,
 	StudyDate,
 	LessonDetail,
 	start,
 	end,
-	DocumentRate,
 	date,
+
 	TeacherUID,
 	TeacherName,
 	Status,
 	StatusString,
 }) => {
 	const [show, setShow] = useState(false);
+	const handleClose = () => setShow(false);
+	const handleShow = () => setShow(true);
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const updateState = (key, value) => {
 		dispatch({ type: 'UPDATE_STATE', payload: { key, value } });
 	};
+
+	const [dataUser, setDataUser] = useState();
+
+	console.log('Data Feed ID: ', feedbackID);
+
 	const [submitLoading, setSubmitLoading] = useState(false);
 
 	const _submitFeedback = async (e) => {
 		e.preventDefault();
 		try {
-			if (!state?.rate) {
-				toast.warning('Please leave your rate !!', {
-					position: toast.POSITION.TOP_CENTER,
-					autoClose: 2000,
-				});
-				return;
-			}
-			https: setSubmitLoading(true);
+			// if (!state?.rate) {
+			// 	toast.warning('Please leave your rate !!', {
+			// 		position: toast.POSITION.TOP_CENTER,
+			// 		autoClose: 2000,
+			// 	});
+			// 	return;
+			// }
+			// https: setSubmitLoading(true);
 			const res = await addEvaluation({
-				ElearnBookingID: parseInt(state?.lessonInfo.BookingID || 0),
-				FinishedType: parseInt(
-					!!state.finishedType && !!state.finishedType
-						? state.finishedType.ID
-						: 0,
-				),
-				Rate: state?.rate ?? 0,
-				Note: state?.note ?? '',
-				Pronunciation: state?.pronounce ?? '',
-				Vocabulary: state?.vocabulary ?? '',
-				Grammar: state?.grammar ?? '',
-				SentenceDevelopmentAndSpeak: state?.memorize ?? '',
+				UID: dataUser.UID,
+				token: dataUser.token,
+				feedbackID: state.feedbackID,
+				internetRate: state.internetRate,
+				documentRate: state.documentRate,
+				performanceRate: state.performanceRate,
+				satisfiedRate: state.satisfiedRate,
+				ContentRate: state.ContentRate,
+				feedbackID: feedbackID,
 			});
-			if (res.Code === 1) {
-				toast.success('Update feedback success, redirect after 2 seconds !!', {
+			if (res.Code === 200) {
+				toast.success('Update feedback success!', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
-				setTimeout(
-					() =>
-						router.replace(`/evaluation/detail/${state.lessonInfo.BookingID}`),
-					2000,
-				);
-			}
-			res.Code !== 1 &&
+				setShow(false);
+			} else {
 				toast.error('Update feedback failed !!', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
+			}
 		} catch (error) {
 			console.log(
 				error?.message ?? 'Lỗi gọi api addEvaluation, vui lòng xem lại tham số',
@@ -240,37 +242,34 @@ const LessonItem = ({
 		}
 		setSubmitLoading(false);
 	};
+
+	useEffect(() => {
+		if (localStorage.getItem('isLogin')) {
+			let UID = localStorage.getItem('UID');
+			let token = localStorage.getItem('token');
+			setDataUser({
+				UID: UID,
+				token: token,
+			});
+		}
+	}, []);
+
 	const classes = useStyles();
 	return (
 		<tr>
 			<td style={{ letterSpacing: '0.5px' }}>{CourseName}</td>
 			<td>{PackgaeName}</td>
 			<td className="tx-nowrap">
-				<span>{TeacherName}</span>
+				<Link
+					href={`/student/teacher-profile/[id]`}
+					as={`/student/teacher-profile/${TeacherUID}`}
+				>
+					<a href={true}>{TeacherName}</a>
+				</Link>
 			</td>
 			<td style={{ whiteSpace: 'pre-line' }}>{StudyDate}</td>
 			<td className="tx-nowrap">
-				<span className="tx-success">
-					<div className="raiting-box">
-						<div className={classes.root}>
-							<div className="rating-item">
-								<span className="txt-rating">Rating:</span>
-								<Rating
-									name="rating"
-									defaultValue={DocumentRate}
-									size="large"
-									onClick={(e) =>
-										updateState(
-											'rate',
-											parseInt(e.target.getAttribute('value')),
-										)
-									}
-								/>
-							</div>
-						</div>
-						<StatelessTextarea name={ContentFeedBack}></StatelessTextarea>
-					</div>
-				</span>
+				<span className="tx-success"></span>
 				<ToastContainer
 					position="top-right"
 					autoClose={2000}
@@ -283,12 +282,117 @@ const LessonItem = ({
 					pauseOnHover
 				/>
 			</td>
+			<td style={{ textAlign: 'right' }}>
+				<Button
+					className="btn btn-info btn-icon btn-evalation"
+					onClick={handleShow}
+				>
+					<i className="fas fa-file-alt mg-r-10"></i>
+					Đánh giá
+				</Button>
+				<Modal show={show} onHide={handleClose}>
+					<Modal.Header closeButton>
+						<Modal.Title>Thông tin đánh giá</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<div className="raiting-box">
+							<div className={classes.root}>
+								<div className="rating-item">
+									<span className="txt-rating">Kết nối mạng:</span>
+									<Rating
+										name="internetRate"
+										defaultValue={0}
+										size="large"
+										onClick={(e) =>
+											updateState(
+												'internetRate',
+												parseInt(e.target.getAttribute('value')),
+											)
+										}
+									/>
+								</div>
+								<div className="rating-item">
+									<span className="txt-rating">Sách / tài liệu:</span>
+									<Rating
+										name="documentRate"
+										defaultValue={0}
+										size="large"
+										onClick={(e) =>
+											updateState(
+												'documentRate',
+												parseInt(e.target.getAttribute('value')),
+											)
+										}
+									/>
+								</div>
+								<div className="rating-item">
+									<span className="txt-rating">Hiệu quả giáo viên:</span>
+									<Rating
+										name="performanceRate"
+										defaultValue={0}
+										size="large"
+										onClick={(e) =>
+											updateState(
+												'performanceRate',
+												parseInt(e.target.getAttribute('value')),
+											)
+										}
+									/>
+								</div>
+								<div className="rating-item">
+									<span className="txt-rating">Hài lòng của học viên:</span>
+									<Rating
+										name="satisfiedRate"
+										defaultValue={0}
+										size="large"
+										onClick={(e) =>
+											updateState(
+												'satisfiedRate',
+												parseInt(e.target.getAttribute('value')),
+											)
+										}
+									/>
+								</div>
+							</div>
+							<textarea
+								placeholder="General feedback..."
+								onChange={(e) => updateState('ContentRate', e.target.value)}
+							></textarea>
+						</div>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button
+							className="btn btn-info btn-icon btn-evalation"
+							onClick={handleClose}
+						>
+							Close
+						</Button>
+						<Button
+							className="btn btn-info btn-icon btn-evalation mar-l-10"
+							onClick={_submitFeedback}
+						>
+							{submitLoading ? (
+								<span
+									className="spinner-border wd-20 ht-20 mar-r-5"
+									role="status"
+								>
+									<span className="sr-only">Submitting...</span>
+								</span>
+							) : (
+								<>
+									<FontAwesomeIcon icon="save" className="mar-r-5" />
+								</>
+							)}
+							<span>{submitLoading ? 'Submitting...' : 'Submit Feedback'}</span>
+						</Button>
+					</Modal.Footer>
+				</Modal>
+			</td>
 		</tr>
 	);
 };
 
 const ScholarshipFeedback = ({ t }) => {
-	const router = useRouter();
 	const [data, setData] = useState({});
 	const [fromDate, setFromDate] = useState(null);
 	const [toDate, setToDate] = useState(null);
@@ -334,24 +438,21 @@ const ScholarshipFeedback = ({ t }) => {
 		end = toDate;
 	};
 
-	useEffect(() => {
-		if (!localStorage.getItem('isLogin')) {
-			router.push({
-				pathname: '/',
-			});
-		} else {
-			let RoleID = parseInt(localStorage.getItem('RoleID'));
-			if (RoleID !== 5) {
-				localStorage.clear();
-				router.push({
-					pathname: '/',
-				});
-			}
-		}
+	let UID = null;
+	let Token = null;
 
+	// GET UID and Token
+	if (localStorage.getItem('UID')) {
+		UID = localStorage.getItem('UID');
+		Token = localStorage.getItem('token');
+	}
+
+	console.log('DATA: ', data);
+
+	useEffect(() => {
 		getAPI({
-			UID: 61215,
-			Token: '',
+			UID: UID,
+			Token: Token,
 			Page: 1,
 		});
 	}, []);
@@ -371,6 +472,7 @@ const ScholarshipFeedback = ({ t }) => {
 										<th>{t('teacher')}</th>
 										<th>{t('date')}</th>
 										<th>{t('feebback')}</th>
+										<th></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -392,25 +494,34 @@ const ScholarshipFeedback = ({ t }) => {
 												<td>
 													<Skeleton />
 												</td>
-											</tr>
-											<tr>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
 												<td>
 													<Skeleton />
 												</td>
 											</tr>
 											<tr>
+												<td>
+													<Skeleton />
+												</td>
+												<td>
+													<Skeleton />
+												</td>
+												<td>
+													<Skeleton />
+												</td>
+												<td>
+													<Skeleton />
+												</td>
+												<td>
+													<Skeleton />
+												</td>
+												<td>
+													<Skeleton />
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<Skeleton />
+												</td>
 												<td>
 													<Skeleton />
 												</td>
@@ -444,8 +555,7 @@ const ScholarshipFeedback = ({ t }) => {
 												Status={item.Status}
 												StatusString={item.StatusString}
 												StudyDate={item.StudyDate}
-												ContentFeedBack={item.ContentFeedBack}
-												DocumentRate={item.DocumentRate}
+												feedbackID={item.ID}
 											/>
 										))
 									) : data.length === 0 ? (

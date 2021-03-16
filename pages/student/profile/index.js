@@ -19,6 +19,7 @@ import Select from 'react-select';
 import { i18n, withTranslation } from '~/i18n';
 import { toast } from 'react-toastify';
 import 'react-toastify/scss/main.scss';
+import { ToastContainer } from 'react-toastify';
 import { toastInit, convertDDMMYYYYtoMMDDYYYY } from '~/utils';
 
 import {
@@ -34,7 +35,6 @@ import {
 import { getStudentLayout } from '~/components/Layout';
 import './index.module.scss';
 import dayjs from 'dayjs';
-import Router, { useRouter } from 'next/router';
 
 const schema = Yup.object().shape({
 	Address: Yup.string(),
@@ -92,7 +92,6 @@ const convertTargetStringToNum = (listString, map) => {
 };
 
 const StudentProfile = ({ t }) => {
-	const router = useRouter();
 	const [profile, setProfile] = useState({});
 	const [loadingProfile, setLoadingProfile] = useState(true);
 	const [loadingUpdateProfile, setLoadingUpdateProfile] = useState(false);
@@ -102,6 +101,8 @@ const StudentProfile = ({ t }) => {
 	const [selectedTarget, setSelectedTarget] = useState(null);
 	const [avatar, setAvatar] = useState('');
 	const [loadingAvatar, setLoadingAvatar] = useState(false);
+
+	console.log('Profile: ', profile);
 
 	const updateProfileToastSuccess = () =>
 		toast.success(UPDATE_PROFILE_SUCCESS, toastInit);
@@ -120,15 +121,25 @@ const StudentProfile = ({ t }) => {
 	});
 
 	const onSubmit = (resProfile) => {
-		// console.log(resProfile);
-		// const array = resProfile.SelectTarget.split(',');
-		// let z = convertTargetStringToNum(array, listTarget);
-
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
 		const newProfile = {
-			...resProfile,
+			UID: profile.UID,
+			Introduce: resProfile.Introduce,
+			Country: resProfile.Country,
+			Timezone: resProfile.TimeZoneID,
+			BankName: resProfile.BankName,
+			CardHolder: resProfile.CardHolder,
+			AccountNumber: resProfile.AccountNumber,
+			Branch: resProfile.Branch,
+			BankAddress: resProfile.BankAddress,
 			Avatar: avatar,
 			BirthDay: dayjs(resProfile.BirthDay).format('DD/MM/YYYY'),
-			// Target: z.join(','),
+			Token: Token,
 		};
 		console.log(newProfile);
 		onUpdateProfileAPI(newProfile);
@@ -138,10 +149,10 @@ const StudentProfile = ({ t }) => {
 		console.log(err);
 	};
 
-	const getAPI = async () => {
+	const getAPI = async (params) => {
 		try {
 			setLoadingProfile(true);
-			const resProfile = await getProfile();
+			const resProfile = await getProfile(params);
 			if (resProfile.Code === 200) {
 				setProfile({
 					...resProfile.Data,
@@ -153,34 +164,23 @@ const StudentProfile = ({ t }) => {
 				});
 			}
 			setLoadingProfile(false);
-
-			const resTarget = await getListTargetAPI();
-			if (resTarget.Code === 1 && resTarget.Data.length > 0) {
-				setListTarget(resTarget.Data);
-			}
-
-			let arrayProfile = [];
-
-			if (resProfile.Data && resProfile.Data.Target) {
-				arrayProfile = resProfile.Data.Target.split(',');
-			}
-
-			let z = convertTargetNumToString(arrayProfile, resTarget.Data);
-			setSelectedTarget(z);
 		} catch {}
 	};
+
 	// const getTimeZone = async () => {
-	// 	const res = await GetProfile();
-	// 	if (res.Code === 1 && res.Data.length > 0) {
+	// 	const res = await getProfile();
+	// 	if (res.Code === 200 && res.Data.length > 0) {
 	// 		setListTimeZone(res.Data);
 	// 	}
 	// };
+
 	const getLanguage = async () => {
 		const res = await getListLanguageAPI();
 		if (res.Code === 1 && res.Data.length > 0) {
 			setListLanguage(res.Data);
 		}
 	};
+
 	const onUpdateProfileAPI = async (params) => {
 		setLoadingUpdateProfile(true);
 		const res = await UpdateProfile(params);
@@ -191,22 +191,25 @@ const StudentProfile = ({ t }) => {
 		}
 		setLoadingUpdateProfile(false);
 	};
+
 	const renderTarget = (options) => {
 		return options.map((item) => item.TargetName);
 	};
+
 	const handleUploadImage = async (e) => {
 		setLoadingAvatar(true);
-		console.log('hinh ne', files);
+
 		let files = e.target.files;
+		console.log(files);
 		if (!files) {
 			setLoadingAvatar(false);
 			return;
 		} else {
 			const res = await UploadFilePost(files);
-			if (res.Code === 200) {
-				//Upload Avatar success
-				const avatar = res.Data[0].UrlIMG;
-				setAvatar(avatar);
+			console.log('IMG after up: ', res);
+			if (res.rs === true) {
+				setAvatar(res.g);
+				console.log('Run vô đây');
 				let output = document.getElementById('avatar');
 				output.src = URL.createObjectURL(files[0]);
 				output.onload = function () {
@@ -215,23 +218,19 @@ const StudentProfile = ({ t }) => {
 			}
 			setLoadingAvatar(false);
 		}
+		console.log('hinh ne', files);
 	};
 	useEffect(() => {
-		if (!localStorage.getItem('isLogin')) {
-			router.push({
-				pathname: '/',
-			});
-		} else {
-			let RoleID = parseInt(localStorage.getItem('RoleID'));
-			if (RoleID !== 5) {
-				localStorage.clear();
-				router.push({
-					pathname: '/',
-				});
-			}
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
 		}
-		getAPI();
-		// getTimeZone();
+		getAPI({
+			UID: UID,
+			Token: Token,
+		});
 		getLanguage();
 	}, []);
 
@@ -277,11 +276,7 @@ const StudentProfile = ({ t }) => {
 														<img
 															id="avatar"
 															alt="Avatar"
-															src={
-																profile.AvatarThumnail
-																	? profile.AvatarThumnail
-																	: '/static/assets/img/default-avatar.png'
-															}
+															src={avatar}
 															// onError={(e) => {
 															// 	e.target.onerror = null;
 															// 	e.target.src =
@@ -304,11 +299,11 @@ const StudentProfile = ({ t }) => {
 												type="text"
 												className="form-control"
 												placeholder=""
-												disabled={true}
 												name="StudentCode"
 												required
 												defaultValue={profile.StudentCode}
 												ref={register}
+												disabled
 											/>
 										</div>
 									</div>
@@ -372,6 +367,44 @@ const StudentProfile = ({ t }) => {
 											)}
 										</div>
 									</div>
+									<div className="form-row align-items-center">
+										<div className="form-group col-sm-3 col-label-fixed">
+											<p className="mg-b-0 tx-medium">Múi giờ:</p>
+										</div>
+										<div className="form-group col-sm-9">
+											{/* {!!TimeZoneList && TimeZoneList.length > 0 && (
+												<select
+													name="TimeZoneID"
+													ref={register}
+													defaultValue={
+														profile.TimeZoneID ? profile.TimeZoneID : '0'
+													}
+													className="form-control"
+												>
+													<option value="0">Chọn Múi Giờ</option>
+													<RenderListTimeZone list={TimeZoneList} />
+												</select>
+											)}
+											{errors.TimeZoneID && (
+												<span className="text-danger d-block mt-2">
+													{errors.TimeZoneID.message}
+												</span>
+											)} */}
+											<input
+												type="text"
+												className="form-control"
+												placeholder="TimeZoneID"
+												ref={register}
+												defaultValue={profile.TimeZoneID}
+												name="TimeZoneID"
+											/>
+											{errors.TimeZoneID && (
+												<span className="text-danger d-block mt-2">
+													{errors.TimeZoneID.message}
+												</span>
+											)}
+										</div>
+									</div>
 								</div>
 								<div className="col-md-6">
 									<div className="form-row align-items-center">
@@ -397,6 +430,28 @@ const StudentProfile = ({ t }) => {
 											)}
 										</div>
 									</div>
+									<div className="form-row align-items-center d-none">
+										<div className="form-group col-sm-3 col-label-fixed">
+											<p className="mg-b-0 tx-medium">
+												{t('first-and-last-name')}:
+											</p>
+										</div>
+										<div className="form-group col-sm-9">
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Họ và tên"
+												ref={register}
+												defaultValue={profile.UID}
+												name="FullName"
+											/>
+											{errors.UID && (
+												<span className="text-danger d-block mt-2">
+													{errors.UID.message}
+												</span>
+											)}
+										</div>
+									</div>
 									<div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
 											<p className="mg-b-0 tx-medium">Email:</p>
@@ -418,6 +473,26 @@ const StudentProfile = ({ t }) => {
 											)}
 										</div>
 									</div>
+									<div className="form-row align-items-center d-none">
+										<div className="form-group col-sm-3 col-label-fixed">
+											<p className="mg-b-0 tx-medium">Email:</p>
+										</div>
+										<div className="form-group col-sm-9">
+											<input
+												type="email"
+												className="form-control"
+												name="Avatar"
+												ref={register}
+												defaultValue={profile.Avatar}
+												placeholder="Ex:example@domain.com"
+											/>
+											{errors.Email && (
+												<span className="text-danger d-block mt-2">
+													{errors.Avatar.message}
+												</span>
+											)}
+										</div>
+									</div>
 									<div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
 											<p className="mg-b-0 tx-medium">{t('sex')}:</p>
@@ -428,11 +503,50 @@ const StudentProfile = ({ t }) => {
 												name="Gender"
 												ref={register}
 												defaultValue={profile.Gender}
+												disabled
 											>
 												<option value="1">Nam</option>
 												<option value="2">Nữ</option>
 												<option value="3">Khác</option>
 											</select>
+										</div>
+									</div>
+									<div className="form-row align-items-center">
+										<div className="form-group col-sm-3 col-label-fixed">
+											<p className="mg-b-0 tx-medium">Country:</p>
+										</div>
+										<div className="form-group col-sm-9">
+											{/* {!!TimeZoneList && TimeZoneList.length > 0 && (
+												<select
+													name="TimeZoneID"
+													ref={register}
+													defaultValue={
+														profile.TimeZoneID ? profile.TimeZoneID : '0'
+													}
+													className="form-control"
+												>
+													<option value="0">Chọn Múi Giờ</option>
+													<RenderListTimeZone list={TimeZoneList} />
+												</select>
+											)}
+											{errors.TimeZoneID && (
+												<span className="text-danger d-block mt-2">
+													{errors.TimeZoneID.message}
+												</span>
+											)} */}
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Country"
+												ref={register}
+												defaultValue={profile.Country}
+												name="Country"
+											/>
+											{errors.Country && (
+												<span className="text-danger d-block mt-2">
+													{errors.Country.message}
+												</span>
+											)}
 										</div>
 									</div>
 								</div>
@@ -449,7 +563,6 @@ const StudentProfile = ({ t }) => {
 												name="CardHolder"
 												ref={register}
 												defaultValue={profile.CardHolder}
-												disabled
 											/>
 											{errors.CardHolder && (
 												<span className="text-danger d-block mt-2">
@@ -472,7 +585,6 @@ const StudentProfile = ({ t }) => {
 												name="BankName"
 												ref={register}
 												defaultValue={profile.BankName}
-												disabled
 											/>
 											{errors.BankName && (
 												<span className="text-danger d-block mt-2">
@@ -492,10 +604,9 @@ const StudentProfile = ({ t }) => {
 												type="text"
 												className="form-control"
 												placeholder="BankAddress"
-												name="BankAddresse"
+												name="BankAddress"
 												ref={register}
 												defaultValue={profile.BankAddress}
-												disabled
 											/>
 											{errors.BankAddress && (
 												<span className="text-danger d-block mt-2">
@@ -518,7 +629,6 @@ const StudentProfile = ({ t }) => {
 												name="Branch"
 												ref={register}
 												defaultValue={profile.Branch}
-												disabled
 											/>
 											{errors.Branch && (
 												<span className="text-danger d-block mt-2">
@@ -541,7 +651,6 @@ const StudentProfile = ({ t }) => {
 												name="AccountNumber"
 												ref={register}
 												defaultValue={profile.AccountNumber}
-												disabled
 											/>
 											{errors.AccountNumber && (
 												<span className="text-danger d-block mt-2">
@@ -640,6 +749,17 @@ const StudentProfile = ({ t }) => {
 											</button>
 										</div>
 									</div>
+									<ToastContainer
+										position="top-right"
+										autoClose={2000}
+										hideProgressBar={false}
+										newestOnTop={false}
+										closeOnClick
+										rtl={false}
+										pauseOnFocusLoss
+										draggable
+										pauseOnHover
+									/>
 								</div>
 							</div>
 						</div>

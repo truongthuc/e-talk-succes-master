@@ -33,6 +33,7 @@ const FeeConfirmStatus = [
 	{ value: '2', label: 'Bị bác bỏ' },
 	{ value: '0', label: 'Đang chờ' },
 ];
+
 const schema = Yup.object().shape({
 	FullName: Yup.string().required('Họ tên không được để trống'),
 	Phone: Yup.number()
@@ -74,6 +75,9 @@ const DepositConfirmation = ({ t }) => {
 			});
 		}
 	};
+
+	console.log('Profile: ', profile);
+
 	const {
 		register,
 		handleSubmit,
@@ -102,15 +106,16 @@ const DepositConfirmation = ({ t }) => {
 		onUpdateProfileAPI(newProfile);
 	};
 	const [initialState, setinitialState] = useState(initialState);
-	const getAPI = async () => {
+	const getAPI = async (params) => {
 		try {
 			setLoadingProfile(true);
-			const resProfile = await LoadFeeConfirm();
+			const resProfile = await LoadFeeConfirm(params);
 			if (resProfile.Code === 200) {
-				setProfile({
-					...resProfile.Data,
-					BirthDay: new Date(resProfile.Data.BirthDay),
-				});
+				setProfile(resProfile.Data);
+				// setProfile({
+				// 	...resProfile.Data,
+				// 	BirthDay: new Date(resProfile.Data.BirthDay),
+				// });
 				reset({
 					...resProfile.Data,
 					BirthDay: new Date(resProfile.Data.BirthDay),
@@ -134,10 +139,32 @@ const DepositConfirmation = ({ t }) => {
 		} catch {}
 	};
 	useEffect(() => {
+		// --- Get ID ---
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+		linkClone = link[link.length - 1];
+		linkClone = linkClone.split('-');
+
+		console.log('Link: ', linkClone);
+
+		let FeeConfirmID = parseInt(linkClone[linkClone.length - 1]);
+
+		console.log('GET FeeConfirmID: ', FeeConfirmID);
+
+		// --------------
+
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			UID: 61241,
-			FeeConfirmID: 8,
-			token: '',
+			UID: UID,
+			FeeConfirmID: FeeConfirmID,
+			token: Token,
 		});
 		// getTimeZone();
 		// getLanguage();
@@ -253,9 +280,15 @@ const DepositConfirmation = ({ t }) => {
 												selected={profile.PaymentMethod}
 												disabled
 											>
-												<option value={profile.PaymentMethod} selected>
-													{PaymentMethod[1].label}
-												</option>
+												{profile.PaymentType === 0 ? (
+													<option value={profile.PaymentMethod} selected>
+														Ngân hàng
+													</option>
+												) : (
+													<option value={profile.PaymentMethod} selected>
+														Tiền mặt
+													</option>
+												)}
 											</select>
 										</div>
 									</div>
@@ -267,94 +300,120 @@ const DepositConfirmation = ({ t }) => {
 											<select
 												name="FeeConfirmStatus"
 												ref={register}
-												defaultValue={FeeConfirmStatus}
+												value={profile.FeeConfirmStatus}
 												className="form-control"
 												selected={profile.FeeConfirmStatus}
 												disabled
 											>
-												<option value={profile.FeeConfirmStatus} selected>
-													{FeeConfirmStatus[0].label}
+												<option
+													value={0}
+													selected={profile.PaymentMethod === 0 && true}
+												>
+													Đang chờ
+												</option>
+												<option
+													value={1}
+													selected={profile.PaymentMethod === 1 && false}
+												>
+													Đã duyệt
+												</option>
+												<option
+													value={2}
+													selected={profile.PaymentMethod === 2 && true}
+												>
+													Bị bác bỏ
 												</option>
 											</select>
 										</div>
 									</div>
 								</div>
-								<div className="col-md-6">
-									<div className="form-row align-items-center">
-										<div className="form-group col-sm-4 col-label-fixed">
-											<p className="mg-b-0 tx-medium">{t('school-package')}:</p>
+								{profile.PaymentType !== 1 && (
+									<div className="col-md-6">
+										<div className="form-row align-items-center">
+											<div className="form-group col-sm-4 col-label-fixed">
+												<p className="mg-b-0 tx-medium">{t('bank-etalk')}:</p>
+											</div>
+											<div className="form-group col-sm-8">
+												<input
+													type="text"
+													className="form-control"
+													placeholder=""
+													ref={register}
+													value={profile.FormBank}
+													name="FormBank"
+													disabled
+												/>
+												{errors.FullName && (
+													<span className="text-danger d-block mt-2">
+														{errors.FullName.message}
+													</span>
+												)}
+											</div>
 										</div>
-										<div className="form-group col-sm-8">
-											<input
-												type="text"
-												className="form-control"
-												placeholder="PackageName"
-												ref={register}
-												defaultValue={profile.PackageName}
-												name="PackageName"
-												disabled
-											/>
-											{errors.FullName && (
-												<span className="text-danger d-block mt-2">
-													{errors.FullName.message}
-												</span>
-											)}
+										<div className="form-row align-items-center">
+											<div className="form-group col-sm-4 col-label-fixed">
+												<p className="mg-b-0 tx-medium">
+													{t('method-payment')}:
+												</p>
+											</div>
+											<div className="form-group col-sm-8">
+												<select
+													name="FeeConfirmStatus"
+													ref={register}
+													value={profile.PaymentMethod}
+													className="form-control"
+													selected={profile.PaymentMethod}
+													disabled
+												>
+													<option
+														value={0}
+														selected={profile.PaymentMethod === 0 && true}
+													>
+														Tiền mặt
+													</option>
+													<option
+														value={1}
+														selected={profile.PaymentMethod === 1 && false}
+													>
+														ATM
+													</option>
+													<option
+														value={2}
+														selected={profile.PaymentMethod === 2 && true}
+													>
+														Internet Banking
+													</option>
+												</select>
+
+												{errors.Email && (
+													<span className="text-danger d-block mt-2">
+														{errors.Email.message}
+													</span>
+												)}
+											</div>
 										</div>
-									</div>
-									<div className="form-row align-items-center">
-										<div className="form-group col-sm-4 col-label-fixed">
-											<p className="mg-b-0 tx-medium">{t('course')}:</p>
+										<div className="form-row align-items-center">
+											<div className="form-group col-sm-4 col-label-fixed">
+												<p className="mg-b-0 tx-medium">{t('bank-student')}:</p>
+											</div>
+											<div className="form-group col-sm-8">
+												<input
+													type="text"
+													className="form-control"
+													placeholder=""
+													ref={register}
+													value={profile.ToBank}
+													name="StudyDay"
+													disabled
+												/>
+												{errors.FullName && (
+													<span className="text-danger d-block mt-2">
+														{errors.FullName.message}
+													</span>
+												)}
+											</div>
 										</div>
-										<div className="form-group col-sm-8">
-											<input
-												type="email"
-												className="form-control"
-												name="CourseName"
-												ref={register}
-												defaultValue={profile.CourseName}
-												placeholder="CourseName"
-												disabled
-											/>
-											<input
-												type="email"
-												className="form-control"
-												name="CourseName"
-												ref={register}
-												defaultValue={profile.CourseName}
-												placeholder="CourseName"
-												disabled
-											/>
-											{errors.Email && (
-												<span className="text-danger d-block mt-2">
-													{errors.Email.message}
-												</span>
-											)}
-										</div>
-									</div>
-									<div className="form-row align-items-center">
-										<div className="form-group col-sm-4 col-label-fixed">
-											<p className="mg-b-0 tx-medium">
-												{t('total-number-of-lessons')}:
-											</p>
-										</div>
-										<div className="form-group col-sm-8">
-											<input
-												type="text"
-												className="form-control"
-												placeholder="StudyDay"
-												ref={register}
-												defaultValue={profile.StudyDay}
-												name="StudyDay"
-												disabled
-											/>
-											{errors.FullName && (
-												<span className="text-danger d-block mt-2">
-													{errors.FullName.message}
-												</span>
-											)}
-										</div>
-									</div>
-									{/* <div className="form-row align-items-center">
+										{/* <div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
 											<p className="mg-b-0 tx-medium">{t('sex')}:</p>
 										</div>
@@ -371,7 +430,8 @@ const DepositConfirmation = ({ t }) => {
 											</select>
 										</div>
 									</div> */}
-								</div>
+									</div>
+								)}
 							</div>
 						</div>
 					</form>
