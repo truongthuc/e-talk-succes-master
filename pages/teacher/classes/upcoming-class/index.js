@@ -71,7 +71,7 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 						<FontAwesomeIcon icon="clock" className="fa fa-clock tx-primary" />{' '}
 						<span className="tx-medium">Your time</span>:
 					</span>
-					<span className="">{data.VNTime}</span>
+					<span className="">{data.TimeZoneName}</span>
 				</div>
 			</td>
 			<td className="clr-lesson">

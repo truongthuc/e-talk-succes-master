@@ -55,12 +55,10 @@ export const updatePassAPI = async (obj) => {
 
 	try {
 		const formdata = new FormData();
-		formdata.append('UID', UID);
-		formdata.append('token', obj.Token);
+		formdata.append('UID', localStorage.getItem('UID'));
+		formdata.append('token', localStorage.getItem('token'));
 		formdata.append('oldPass', obj.OldPass);
 		formdata.append('newPass', obj.NewPass);
-
-		console.log('get token: ', obj.Token);
 
 		console.log('Form Data: ', formdata);
 		let res = await instance.post(

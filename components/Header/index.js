@@ -43,7 +43,6 @@ const Header = ({ t, isStudent }) => {
 		dataProfile,
 		changeIsAuth,
 	} = useAuth();
-
 	const _handleChangeSelect = (selected) => {
 		setLang(selected);
 		i18n.changeLanguage(selected.value === 'en' ? 'en' : 'vi');
@@ -92,7 +91,9 @@ const Header = ({ t, isStudent }) => {
 							className="fas fa-globe-europe mg-r-5"
 						/>
 						Timezone:
-						<span className="tx-medium mg-l-10 tx-primary font-10">GTM +7</span>
+						<span className="tx-medium mg-l-10 tx-primary font-10">
+							GTM {dataUser?.TimeZoneName ?? '+7'}
+						</span>
 					</span>
 				</div>
 				<div className="navbar-right justify-content">

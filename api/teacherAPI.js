@@ -126,9 +126,9 @@ export const teacherUpcomingLessons = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherUpcomingLessons', {
 			params: {
-				page: 1,
-				UID: 61230,
-				Token: '',
+				page: params.page || 1,
+				UID: localStorage.getItem('UID'),
+				Token: localStorage.getItem('token'),
 			},
 		});
 		result = res.data;

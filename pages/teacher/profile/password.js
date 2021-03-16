@@ -35,12 +35,12 @@ const ChangePassword = ({ t }) => {
 				OldPass: data.oldPassword,
 				NewPass: data.newPassword,
 			});
-			res.Code === 1 &&
+			res.Code === 200 &&
 				toast.success('Change password success', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
-			res.Code !== 1 &&
+			res.Code !== 200 &&
 				setError('wrongPassword', {
 					type: 'manual',
 					message: 'Old password not correct, please try again !!',
@@ -48,7 +48,7 @@ const ChangePassword = ({ t }) => {
 		} catch (err) {
 			console.log(err?.mesage ?? 'Call api updatePassAPI không thành công !!');
 		}
-		setSubmitLoading(true);
+		setSubmitLoading(false);
 	};
 
 	useEffect(() => {}, []);
@@ -77,7 +77,7 @@ const ChangePassword = ({ t }) => {
 								<div className="pd-r-15">
 									<FontAwesomeIcon
 										icon="exclamation-circle"
-										class="fas fa-exclamation-circle mg-r-10"
+										className="fas fa-exclamation-circle mg-r-10"
 									/>{' '}
 									<span className="">{errors.wrongPassword?.message}</span>
 								</div>
