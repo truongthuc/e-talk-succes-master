@@ -20,7 +20,6 @@ import { Context as ProfileContext } from '~/context/ProfileContext';
 import { UploadFilePost } from '~/api/optionAPI';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { i18n, withTranslation } from '~/i18n';
-import { makeStyles } from '@material-ui/core/styles';
 
 const Schema = Yup.object().shape({
 	fullName: Yup.string().required('Full name is required'),
@@ -40,35 +39,6 @@ const Schema = Yup.object().shape({
 	// 	.nullable(false)
 	// 	.required('Level of purpose must be at least one option'),
 });
-
-const useStyles = makeStyles((theme) => ({
-	modal: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	paper: {
-		backgroundColor: theme.palette.background.paper,
-		boxShadow: theme.shadows[5],
-		padding: theme.spacing(2, 4, 3),
-		borderRadius: '10px',
-		width: '68%',
-		height: '98%',
-		overflowY: 'auto',
-	},
-	col: {
-		width: '50%',
-		padding: '0 10px',
-		[theme.breakpoints.down('sm')]: {
-			width: '100%',
-		},
-	},
-	rowForm: {
-		display: 'flex',
-		justifyContent: 'space-between',
-		flexWrap: 'wrap',
-	},
-}));
 
 const optionState = {
 	locationOptions: [],
@@ -147,13 +117,13 @@ const ProfileVideo = React.forwardRef((props, ref) => {
 				} mg-x-auto`}
 			>
 				<div className="upload-container ">
-					{/* <div className="lds-ellipsis">
+					<div className="lds-ellipsis">
 						<div></div>
 						<div></div>
 						<div></div>
 						<div></div>
-					</div> */}
-					{/* <label
+					</div>
+					<label
 						className={`upload-avatar ${checkValidURL() ? 'renewVideo' : ''} `}
 					>
 						<input
@@ -169,7 +139,7 @@ const ProfileVideo = React.forwardRef((props, ref) => {
 								Chưa có video giới thiệu bấm vào đây để upload video
 							</span>
 						)}
-					</label> */}
+					</label>
 					{checkValidURL() && (
 						<CardMedia
 							component="iframe"
@@ -224,21 +194,21 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 					isLoading ? 'loading-style' : ''
 				} mg-x-auto`}
 			>
-				{/* <div className="lds-ellipsis">
+				<div className="lds-ellipsis">
 					<div></div>
 					<div></div>
 					<div></div>
 					<div></div>
-				</div> */}
+				</div>
 				<div className="upload-container wd-100 ht-100">
 					<label className="upload-avatar">
-						{/* <input
+						<input
 							ref={inputFileRef}
 							type="file"
 							accept="image/*"
 							className="upload-box hidden d-none upload-file"
 							onChange={handleUploadImage}
-						/> */}
+						/>
 						<img
 							src={
 								checkValidURL()
@@ -256,9 +226,6 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 });
 
 function TeacherInformation({ t }) {
-	console.log('Scroll: ', scroll);
-
-	const classes = useStyles();
 	const [state, dispatch] = useReducer(reducer, optionState);
 	const [submitLoading, setSubmitLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -316,8 +283,7 @@ function TeacherInformation({ t }) {
 					// 	) ?? null,
 					location:
 						res.Data?.NationList.find(
-							(option, index) =>
-								option.ID === parseInt(res.Data?.TeacherNational),
+							(option, index) => option.Nation === res.Data?.TeacherNational,
 						) ?? null,
 					birthday:
 						(() => {
@@ -336,6 +302,11 @@ function TeacherInformation({ t }) {
 				updateUserInfo({ ...res.Data, Avatar: res.Data?.TeacherIMG ?? '' });
 				updateState('timeZoneOptions', res.Data?.TimezoneList ?? []);
 				updateState('locationOptions', res.Data?.NationList ?? []);
+				// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
+				// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
+				// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
+				// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
+				// 	updateState('locationOptions', locationRes.Data ?? []);
 
 				setMultipleValue(obj);
 			}
@@ -344,6 +315,49 @@ function TeacherInformation({ t }) {
 		}
 		setIsLoading(false);
 	};
+
+	// const loadSelectOptionAPI = async () => {
+	// try {
+	// 	const [
+	// 		proficienRes,
+	// 		educationRes,
+	// 		purposeRes,
+	// 		timezoneRes,
+	// 		locationRes,
+	// 	] = await Promise.all([
+	// 		getEnglishProficiencyOptions(),
+	// 		getLevelOfEducationOptions(),
+	// 		getListLevelPurpose(),
+	// 		getTimeZone(),
+	// 		getLocationOptions(),
+	// 	]);
+	// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
+	// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
+	// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
+	// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
+	// 	updateState('locationOptions', locationRes.Data ?? []);
+	// } catch (err) {
+	// 	console.log(
+	// 		err?.message ?? 'Call Promise all failed, check params again...',
+	// 	);
+	// }
+	// };
+
+	// const loadStateOptions = async (LocationID) => {
+	// 	try {
+	// 		const res = await getStateOptions({
+	// 			LocationID,
+	// 		});
+	// 		if (res.Code === 1) {
+	// 			updateState('stateOptions', res.Data);
+	// 		}
+	// 	} catch (err) {
+	// 		console.log(
+	// 			err?.message ??
+	// 				'Call api getLocationOptions failed, check params again...',
+	// 		);
+	// 	}
+	// };
 
 	const _onSubmitInformation = async (data, e) => {
 		e.preventDefault();
@@ -427,302 +441,423 @@ function TeacherInformation({ t }) {
 						name="avatar"
 					/>
 					{/* <ProfileAvatar ref={register} name="avatar" avatar={getValues('avatar')} updateAvatar={setValue} /> */}
-					<div className={`teacher-info mg-l-0-f mg-t-30 ${classes.rowForm}`}>
-						<div className={classes.col}>
-							<h5 className="mg-b-20">
-								<FontAwesomeIcon icon="user" className="fas fa-user mg-r-5" />
-								{t('basic-information')}
-							</h5>
-							<div className="row group-float-label">
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.fullName ? 'error-form' : ''
-											}`}
-											placeholder="Full name *"
-											name="fullName"
-											ref={register}
-											// defaultValue={}
-											required
-											id="full-name"
-										/>
-										<label htmlFor="full-name">Full Name *</label>
-									</div>
-									{!!errors && !!errors.fullName && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.fullName?.message}
-										</span>
-									)}
+					<div className="teacher-info mg-l-0-f mg-t-30">
+						<h5 className="mg-b-20">
+							<FontAwesomeIcon icon="user" className="fas fa-user mg-r-5" />
+							{t('basic-information')}
+						</h5>
+						<div className="row group-float-label">
+							<div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.fullName ? 'error-form' : ''
+										}`}
+										placeholder="Full name *"
+										name="fullName"
+										ref={register}
+										// defaultValue={}
+										required
+										id="full-name"
+									/>
+									<label htmlFor="full-name">Full Name *</label>
 								</div>
+								{!!errors && !!errors.fullName && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.fullName?.message}
+									</span>
+								)}
+							</div>
 
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.phoneNumber ? 'error-form' : ''
-											}`}
-											placeholder="Phone number *"
-											name="phoneNumber"
-											ref={register}
-											required
-											id="phone-number"
-										/>
-										<label htmlFor="phone-number">Phone Number *</label>
-									</div>
-									{!!errors && !!errors.phoneNumber && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.phoneNumber?.message}
-										</span>
-									)}
+							<div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.phoneNumber ? 'error-form' : ''
+										}`}
+										placeholder="Phone number *"
+										name="phoneNumber"
+										ref={register}
+										required
+										id="phone-number"
+									/>
+									<label htmlFor="phone-number">Phone Number *</label>
 								</div>
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.email ? 'error-form' : ''
-											}`}
-											placeholder="Email*"
-											name="email"
-											ref={register}
-											required
-											readOnly
-											id="email"
-										/>
-										<label htmlFor="email">Email</label>
-									</div>
-								</div>
-								<div className="form-group col-12 col-sm-6">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.skypeId ? 'error-form' : ''
-											}`}
-											placeholder="Skype ID *"
-											name="skypeId"
-											ref={register}
-											required
-											id="skype-id"
-										/>
-										<label htmlFor="skype-id">Skype ID *</label>
-									</div>
-									{!!errors && !!errors.skypeId && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.skypeId?.message}
-										</span>
-									)}
-								</div>
-								<div className="form-group col-12 col-sm-6">
-									<div className="input-float">
-										<input
-											type="date"
-											className={`form-control ${
-												!!errors && errors.birthday ? 'error-form' : ''
-											}`}
-											placeholder="BirthDay *"
-											name="birthday"
-											ref={register}
-											required
-											id="birthday"
-										/>
-										<label htmlFor="birthday">BirthDay *</label>
-									</div>
-									{!!errors && !!errors.skypeId && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.skypeId?.message}
-										</span>
-									)}
-								</div>
-								<div className="form-group col-12 col-sm-12 col-lg-12">
-									<div className="input-float">
-										<Controller
-											as={
-												<Select
-													key={(option) => `${option.ID}-${option.Nation}`}
-													isSearchable={true}
-													isLoading={isLoading}
-													loadingMessage={`Loading...`}
-													options={state.locationOptions}
-													getOptionLabel={(option) => `${option.Nation}`}
-													getOptionValue={(option) => `${option.ID}`}
-													styles={appSettings.selectStyle}
-													placeholder="Select location..."
-													className={`${
-														!!errors && !!errors.location ? 'error-form' : ''
-													}`}
-												/>
-											}
-											control={control}
-											name="location"
-											id="location"
-										/>
-
-										<label htmlFor="location">Location</label>
-									</div>
-									{!!errors && !!errors.location && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.location?.message}
-										</span>
-									)}
-								</div>
-
-								<div className="form-group col-12 col-sm-12 col-lg-12">
-									<div className="input-float">
-										<Controller
-											as={
-												<Select
-													key={(option) =>
-														`${option.ID}-${option.TimeZoneValue}`
-													}
-													isSearchable={true}
-													isLoading={optionLoaded}
-													loadingMessage={() => 'Loading options...'}
-													options={state.timeZoneOptions}
-													getOptionLabel={(option) => `${option.TimeZoneName}`}
-													getOptionValue={(option) => `${option.ID}`}
-													styles={appSettings.selectStyle}
-													placeholder="Select timezone..."
-													menuPosition="fixed"
-													className={`${
-														!!errors && !!errors.timeZone ? 'error-form' : ''
-													}`}
-												/>
-											}
-											control={control}
-											name="timeZone"
-											id="time-zone"
-										/>
-
-										<label htmlFor="time-zone">Time zone *</label>
-									</div>
-									{!!errors && !!errors.timeZone && (
-										<span className="tx-danger mg-t-5 d-block">
-											{errors.timeZone?.message}
-										</span>
-									)}
+								{!!errors && !!errors.phoneNumber && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.phoneNumber?.message}
+									</span>
+								)}
+							</div>
+							<div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.email ? 'error-form' : ''
+										}`}
+										placeholder="Email*"
+										name="email"
+										ref={register}
+										required
+										readOnly
+										id="email"
+									/>
+									<label htmlFor="email">Email</label>
 								</div>
 							</div>
-							<hr
-								className="mg-b-30 mg-t-0"
-								style={{ borderStyle: 'dashed' }}
-							/>
-						</div>
-
-						<div className={classes.col}>
-							<h5 className="mg-b-20">
-								<FontAwesomeIcon
-									icon="user-graduate"
-									className="fas fa-user-graduate mg-r-5"
-								/>
-								{t('education-attainment')}
-							</h5>
-							<div className="row group-float-label">
-								<div className="form-group col-12 col-sm-6">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.schoolName ? 'error-form' : ''
-											}`}
-											placeholder="School name"
-											name="schoolName"
-											ref={register}
-											id="school-name"
-										/>
-										<label htmlFor="school-name">School name</label>
-									</div>
+							<div className="form-group col-12 col-sm-3">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.skypeId ? 'error-form' : ''
+										}`}
+										placeholder="Skype ID *"
+										name="skypeId"
+										ref={register}
+										required
+										id="skype-id"
+									/>
+									<label htmlFor="skype-id">Skype ID *</label>
 								</div>
-								<div className="form-group col-12 col-sm-6">
-									<div className="input-float">
-										<input
-											type="text"
-											className={`form-control ${
-												!!errors && errors.major ? 'error-form' : ''
-											}`}
-											placeholder="Marjor"
-											name="major"
-											ref={register}
-											id="marjor"
-										/>
-										<label htmlFor="major">Course *</label>
-									</div>
-								</div>
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<textarea
-											type="text"
-											className={`form-control ${
-												!!errors && errors.experience ? 'error-form' : ''
-											}`}
-											placeholder="Experience"
-											name="experience"
-											ref={register}
-											id="experience"
-										/>
-										<label htmlFor="experience">Experience</label>
-									</div>
-								</div>
+								{!!errors && !!errors.skypeId && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.skypeId?.message}
+									</span>
+								)}
 							</div>
-							<hr
-								className="mg-b-30 mg-t-0"
-								style={{ borderStyle: 'dashed' }}
-							/>
-							<h5 className="mg-b-20">
-								<FontAwesomeIcon
-									icon="info-circle"
-									className="fas fa-circle mg-r-5"
-								/>
-								{t('introduce-attainment')}
-							</h5>
-							<div className="row group-float-label">
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<textarea
-											type="text"
-											className={`form-control ${
-												!!errors && errors.biography ? 'error-form' : ''
-											}`}
-											placeholder="Biography"
-											name="biography"
-											ref={register}
-											id="biography"
-										/>
-										<label htmlFor="biography">Biography</label>
-									</div>
+							<div className="form-group col-12 col-sm-3">
+								<div className="input-float">
+									<input
+										type="date"
+										className={`form-control ${
+											!!errors && errors.birthday ? 'error-form' : ''
+										}`}
+										placeholder="BirthDay *"
+										name="birthday"
+										ref={register}
+										required
+										id="birthday"
+									/>
+									<label htmlFor="birthday">BirthDay *</label>
 								</div>
-								<div className="form-group col-12 col-sm-12">
-									<div className="input-float">
-										<textarea
-											type="text"
-											className={`form-control ${
-												!!errors && errors.description ? 'error-form' : ''
-											}`}
-											placeholder="Description"
-											name="description"
-											ref={register}
-											id="description"
-										/>
-										<label htmlFor="description">Description</label>
-									</div>
-								</div>
-								<div className="form-group col-12 col-sm-12">
+								{!!errors && !!errors.skypeId && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.skypeId?.message}
+									</span>
+								)}
+							</div>
+							<div className="form-group col-12 col-sm-12 col-lg-6">
+								<div className="input-float">
 									<Controller
 										as={
-											<ProfileVideo
-												getValues={getValues}
-												updateVideo={setValue}
+											<Select
+												key={(option) => `${option.ID}-${option.Nation}`}
+												isSearchable={true}
+												isLoading={isLoading}
+												loadingMessage={`Loading...`}
+												options={state.locationOptions}
+												getOptionLabel={(option) => `${option.Nation}`}
+												getOptionValue={(option) => `${option.TeacherNational}`}
+												styles={appSettings.selectStyle}
+												placeholder="Select location..."
+												className={`${
+													!!errors && !!errors.location ? 'error-form' : ''
+												}`}
 											/>
 										}
 										control={control}
-										name="linkVideoIntroduce"
+										name="location"
+										id="location"
 									/>
+
+									<label htmlFor="location">Location</label>
+								</div>
+								{!!errors && !!errors.location && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.location?.message}
+									</span>
+								)}
+							</div>
+
+							<div className="form-group col-12 col-sm-12 col-lg-6">
+								<div className="input-float">
+									<Controller
+										as={
+											<Select
+												key={(option) => `${option.ID}-${option.TimeZoneValue}`}
+												isSearchable={true}
+												isLoading={optionLoaded}
+												loadingMessage={() => 'Loading options...'}
+												options={state.timeZoneOptions}
+												getOptionLabel={(option) => `${option.TimeZoneName}`}
+												getOptionValue={(option) => `${option.ID}`}
+												styles={appSettings.selectStyle}
+												placeholder="Select timezone..."
+												menuPosition="fixed"
+												className={`${
+													!!errors && !!errors.timeZone ? 'error-form' : ''
+												}`}
+												isDisabled={true}
+											/>
+										}
+										control={control}
+										name="timeZone"
+										id="time-zone"
+									/>
+
+									<label htmlFor="time-zone">Time zone *</label>
+								</div>
+								{!!errors && !!errors.timeZone && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.timeZone?.message}
+									</span>
+								)}
+							</div>
+							{/* <div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<Controller
+										as={
+											<Select
+												isMulti={true}
+												key={(option) => `${option.id}`}
+												isSearchable={false}
+												isLoading={isLoading}
+												loadingMessage={() => 'Loading options...'}
+												options={state.levelOfPurposeOptions}
+												getOptionLabel={(option) =>
+													`${option.PurposeLevelName}`
+												}
+												getOptionValue={(option) => `${option.ID}`}
+												styles={appSettings.selectStyle}
+												menuPosition="fixed"
+												className={`${
+													!!errors && !!errors.levelOfPurpose
+														? 'error-form'
+														: ''
+												}`}
+											/>
+										}
+										control={control}
+										name="levelOfPurpose"
+										id="level-purpose"
+									/>
+
+									<label htmlFor="level-purpose">Level purpose</label>
+								</div>
+								{!!errors && !!errors.levelOfPurpose && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.levelOfPurpose?.message}
+									</span>
+								)}
+							</div> */}
+						</div>
+						<hr className="mg-b-30 mg-t-0" style={{ borderStyle: 'dashed' }} />
+						<h5 className="mg-b-20">
+							<FontAwesomeIcon
+								icon="user-graduate"
+								className="fas fa-user-graduate mg-r-5"
+							/>
+							{t('education-attainment')}
+						</h5>
+						<div className="row group-float-label">
+							{/* <div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<Controller
+										as={
+											<Select
+												key={(option) => `${option.id}`}
+												isSearchable={false}
+												isLoading={isLoading}
+												loadingMessage={() => 'Loading options...'}
+												options={state.levelOfEducationOptions}
+												getOptionLabel={(option) =>
+													`${option.LevelOfEducationName}`
+												}
+												getOptionValue={(option) => `${option.ID}`}
+												styles={appSettings.selectStyle}
+												placeholder="Select level..."
+												menuPosition="fixed"
+												className={`${
+													!!errors && !!errors.levelOfEducation
+														? 'error-form'
+														: ''
+												}`}
+											/>
+										}
+										control={control}
+										name="levelOfEducation"
+										id="level-education"
+									/>
+
+									<label htmlFor="level-education">Level of Education</label>
+								</div>
+								{!!errors && !!errors.levelOfEducation && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.levelOfEducation?.message}
+									</span>
+								)}
+							</div> */}
+							<div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.schoolName ? 'error-form' : ''
+										}`}
+										placeholder="School name"
+										name="schoolName"
+										ref={register}
+										id="school-name"
+									/>
+									<label htmlFor="school-name">School name</label>
 								</div>
 							</div>
+							<div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control ${
+											!!errors && errors.major ? 'error-form' : ''
+										}`}
+										placeholder="Marjor"
+										name="major"
+										ref={register}
+										id="marjor"
+									/>
+									<label htmlFor="major">Course *</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.experience ? 'error-form' : ''
+										}`}
+										placeholder="Experience"
+										name="experience"
+										ref={register}
+										id="experience"
+									/>
+									<label htmlFor="experience">Experience</label>
+								</div>
+							</div>
+							{/* <div className="form-group col-12 col-sm-6">
+								<div className="input-float">
+									<Controller
+										as={
+											<Select
+												key={(option) => `${option.id}`}
+												isSearchable={false}
+												isLoading={isLoading}
+												loadingMessage={() => 'Loading options...'}
+												options={state.englishProficienOptions}
+												getOptionLabel={(option) =>
+													`${option.EnglishProficiencyName}`
+												}
+												getOptionValue={(option) => `${option.ID}`}
+												styles={appSettings.selectStyle}
+												placeholder="Select proficiency..."
+												menuPosition="fixed"
+												className={`${
+													!!errors && !!errors.englishProficien
+														? 'error-form'
+														: ''
+												}`}
+											/>
+										}
+										control={control}
+										name="englishProficien"
+										id="english-proficien"
+									/>
+
+									<label htmlFor="english-proficien">English proficiency</label>
+								</div>
+								{!!errors && !!errors.englishProficien && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.englishProficien?.message}
+									</span>
+								)}
+							</div> */}
 						</div>
+						<hr className="mg-b-30 mg-t-0" style={{ borderStyle: 'dashed' }} />
+						<h5 className="mg-b-20">
+							<FontAwesomeIcon
+								icon="info-circle"
+								className="fas fa-circle mg-r-5"
+							/>
+							{t('introduce-attainment')}
+						</h5>
+						<div className="row group-float-label">
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.biography ? 'error-form' : ''
+										}`}
+										placeholder="Biography"
+										name="biography"
+										ref={register}
+										id="biography"
+									/>
+									<label htmlFor="biography">Biography</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<div className="input-float">
+									<textarea
+										type="text"
+										className={`form-control ${
+											!!errors && errors.description ? 'error-form' : ''
+										}`}
+										placeholder="Description"
+										name="description"
+										ref={register}
+										id="description"
+									/>
+									<label htmlFor="description">Description</label>
+								</div>
+							</div>
+							<div className="form-group col-12 col-sm-12">
+								<Controller
+									as={
+										<ProfileVideo
+											getValues={getValues}
+											updateVideo={setValue}
+										/>
+									}
+									control={control}
+									name="linkVideoIntroduce"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="tx-center">
+						<button
+							type="submit"
+							className="btn btn-primary d-inline-flex align-items-center"
+							disabled={submitLoading}
+						>
+							{submitLoading ? (
+								<div
+									className="spinner-border wd-20 ht-20 mg-r-5"
+									role="status"
+								>
+									<span className="sr-only">Submitting...</span>
+								</div>
+							) : (
+								<>
+									<FontAwesomeIcon className="fa fa-save mg-r-5" icon="save" />
+								</>
+							)}
+							<span>{submitLoading ? 'Updating' : 'Save'} information</span>
+						</button>
 					</div>
 				</form>
 			</div>

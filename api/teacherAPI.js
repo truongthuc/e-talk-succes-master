@@ -538,8 +538,8 @@ export const getTeacherInfoProfile = async (params = {}) => {
 		let res = await instance.get(path + '/teacherGetInfo', {
 			params: {
 				...params,
-				UID: params.UID,
-				Token: params.Token,
+				UID: localStorage.getItem('UID'),
+				Token: localStorage.getItem('token'),
 			},
 		});
 		result = res.data;
