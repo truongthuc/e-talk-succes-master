@@ -25,6 +25,7 @@ import Skeleton from 'react-loading-skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
+import { toastInit } from '~/utils';
 console.log('o tren', dataHy.EvaluationDetail);
 
 function getData() {
@@ -108,14 +109,14 @@ const EvaluationDetail = ({ t }) => {
 		dispatch({ type: 'EDIT_MODE', payload: value });
 	};
 
-	const getFeedbackDetail = async () => {
+	const [statusEdit, setStatusEdit] = useState(false);
+
+	const getFeedbackDetail = async (values) => {
 		updateState('isLoading', true);
 		try {
 			// const params = getParamsUrl();
 			// if (!BookingID) return;
-			const res = await teacherLoadEvaluation({
-				BookingID: parseInt(BookingID, 10),
-			});
+			const res = await teacherLoadEvaluation(values);
 			res.Code === 200 &&
 				dispatch({
 					type: 'SET_STATE',
@@ -135,7 +136,7 @@ const EvaluationDetail = ({ t }) => {
 		updateState('isLoading', false);
 	};
 	const [values, setValues] = useState({
-		EvaluationID: '23',
+		EvaluationID: '',
 		textBook: '',
 		EnglishLevel: '',
 		generalEvaluation: '',
@@ -159,9 +160,22 @@ const EvaluationDetail = ({ t }) => {
 		try {
 			const res = await teacherUpdateEvaluation(values);
 			console.log('Res: ', res);
-			res.Code === 200
-				? (getFeedbackDetail(), setEditMode(false))
-				: alert('Update khong thanh cong');
+
+			if (res.Code === 200) {
+				setStatusEdit(true);
+				getFeedbackDetail();
+				setEditMode(false);
+				toast.success('Update feedback success!', {
+					position: toast.POSITION.TOP_CENTER,
+					autoClose: 2000,
+				});
+			}
+			if (res.Code === 403) {
+				localStorage.clear();
+				router.push({
+					pathname: '/',
+				});
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -175,194 +189,56 @@ const EvaluationDetail = ({ t }) => {
 	// };
 
 	useEffect(() => {
-		getFeedbackDetail({
-			evaluationID: 23,
-			UID: 61230,
-			Token: '',
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+		link = link[link.length - 2];
+
+		console.log('Link: ', link);
+
+		// get uid and token
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		setValues({
+			...values,
+			Token: Token,
+			UID: UID,
+			EvaluationID: link,
 		});
-	}, []);
+
+		getFeedbackDetail({
+			EvaluationID: link,
+			UID: UID,
+			Token: Token,
+		});
+
+		if (statusEdit) {
+			setStatusEdit(false);
+		}
+	}, [statusEdit]);
 
 	return (
 		<>
+			<ToastContainer
+				position="top-right"
+				autoClose={2000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+			/>
 			<h1 className="main-title-page">{t('evaluation-detail')}</h1>
 			<div className="row">
-				<div className="col-xl-4 col-lg-5 mg-b-30">
-					<div className="card lesson-sidebar">
-						<div className="card-body">
-							<div className="row">
-								<div className="col-sm-12 mg-b-15">
-									{/* <!--thông tin buổi học--> */}
-									<div className="">
-										<h5 className="mg-b-15">{t('lesson-information')}</h5>
-										<div className="infomation__wrap">
-											<div className="st-time">
-												<p className="st-teacher-text d-flex justify-content-between">
-													<span className="">
-														<FontAwesomeIcon
-															icon="book-open"
-															className="fa fa-book-open tx-primary st-icon wd-20 mg-r-5"
-														/>
-														{t('course')}:{' '}
-													</span>
-													<span className="">
-														{state.isLoading ? (
-															<Skeleton />
-														) : !!dataHy.EvaluateClass[0] &&
-														  !!dataHy.EvaluateClass[0].DocumentName ? (
-															dataHy.EvaluateClass[0].DocumentName
-														) : (
-															''
-														)}
-													</span>
-												</p>
-											</div>
-											<div className="st-time">
-												<p className="st-teacher-text d-flex justify-content-between">
-													<span className="">
-														<FontAwesomeIcon
-															icon="book-reader"
-															className="fa fa-book-reader tx-primary graduate st-icon wd-20 mg-r-5"
-														/>
-														{t('lesson')}:
-													</span>
-													<span className="st-tengv">
-														{state.isLoading ? (
-															<Skeleton />
-														) : !!dataHy.EvaluateClass[0] &&
-														  !!dataHy.EvaluateClass[0].Lesson ? (
-															dataHy.EvaluateClass[0].Lesson
-														) : (
-															''
-														)}
-													</span>
-												</p>
-											</div>
-											<div className="st-time">
-												<p className="st-teacher-text d-flex justify-content-between">
-													<span className="tx-black tx-normal">
-														<FontAwesomeIcon
-															icon="clock"
-															className="fa fa-clock tx-primary clock st-icon wd-20 mg-r-5"
-														/>
-														{t('time')}:
-													</span>
-													<span className="">
-														{state.isLoading ? (
-															<Skeleton />
-														) : !!dataHy.EvaluateClass[0] &&
-														  !!dataHy.EvaluateClass[0].ScheduleDate ? (
-															dataHy.EvaluateClass[0].ScheduleDate
-														) : (
-															''
-														)}
-													</span>
-												</p>
-											</div>
-											<div className="st-time">
-												<p className="st-teacher-text d-flex justify-content-between">
-													<span className="">
-														<FontAwesomeIcon
-															icon="book"
-															className="fa fa-book tx-primary open st-icon wd-20 mg-r-5"
-														/>
-														{t('material')}:
-													</span>
-													<a
-														href={
-															!!dataHy.EvaluateClass[0] &&
-															!!dataHy.EvaluateClass[0].MaterialLink
-																? dataHy.EvaluateClass[0].MaterialLink
-																: ''
-														}
-														target="_blank"
-														rel="noreferrer"
-														className="tx-right"
-													>
-														{state.isLoading ? (
-															<Skeleton />
-														) : !!dataHy.EvaluateClass[0] &&
-														  !!dataHy.EvaluateClass[0].Material ? (
-															dataHy.EvaluateClass[0].Material
-														) : (
-															''
-														)}
-													</a>
-												</p>
-											</div>
-											{/* <div className="st-time">
-												<div className="st-teacher-text d-flex justify-content-between align-items-center">
-													<span className="">
-														<FontAwesomeIcon
-															icon="lightbulb"
-															className="fas fa-lightbulb tx-primary open st-icon wd-20 mg-r-5"
-														/>
-														{t('finished-type')}:
-													</span>
-													<span className="">
-														{!!dataHy.EvaluationDetail[0] &&
-														!!dataHy.EvaluationDetail[0].finishedType
-															? dataHy.EvaluationDetail[0].finishedType
-															: ''}
-													</span>
-												</div>
-											</div> */}
-										</div>
-									</div>
-									{/* <!--/thông tin buổi học--> */}
-								</div>
-								<div className="col-sm-12 mg-b-15">
-									{/* <!--thang danh gia--> */}
-									<div className="infomation__wrap">
-										<h5 className="mg-b-15 mg-md-t-15 mg-t-15 mg-md-t-0-f">
-											{t('student-information')}
-										</h5>
-										<div className="st-time">
-											<p className="st-teacher-text d-flex justify-content-between">
-												<span className="">
-													<FontAwesomeIcon
-														icon="user-graduate"
-														className="fa fa-user-graduate  tx-primary st-icon wd-20 mg-r-5"
-													/>
-													{t('name')}:{' '}
-												</span>
-												<span className="">
-													{state.isLoading ? (
-														<Skeleton />
-													) : !!dataHy.EvaluateClass[0] &&
-													  !!dataHy.EvaluateClass[0].StudentName ? (
-														dataHy.EvaluateClass[0].StudentName
-													) : (
-														''
-													)}
-												</span>
-											</p>
-										</div>
-									</div>
-								</div>
-								<div className="col-sm-12">
-									<div>
-										<h5 className="mg-b-15 mg-md-t-15 mg-t-15 mg-md-t-0-f">
-											{t('student-feedback')}
-										</h5>
-
-										<span className="word-break">
-											{state.isLoading ? (
-												<Skeleton count={2} />
-											) : !!dataHy.EvaluateClass[0] &&
-											  !!dataHy.EvaluateClass[0].StudentNote ? (
-												dataHy.EvaluateClass[0].StudentNote
-											) : (
-												<span className="tx-danger">
-													Student haven't feedback yet.
-												</span>
-											)}
-										</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 				<div className="col-xl-8 col-lg-7">
 					<div className="row">
 						<div className="col-12">

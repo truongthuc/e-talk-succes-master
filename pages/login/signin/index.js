@@ -294,6 +294,7 @@ const Signin = ({ t, isStudent }) => {
 					});
 				}, 2000);
 			} else {
+				setLoading(false);
 				setLoginSuccess({
 					status: true,
 					message: value.message,
@@ -335,7 +336,7 @@ const Signin = ({ t, isStudent }) => {
 				</div>
 			) : (
 				<div
-					className="d-flex flex-column align-items-center justify-content-center"
+					className="d-flex flex-column login-page"
 					style={{
 						background:
 							'url(http://mypage.e-talk.vn/Content/form/images/bl1.jpg) no-repeat center center ',

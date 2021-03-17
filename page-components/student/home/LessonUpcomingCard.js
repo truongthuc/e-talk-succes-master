@@ -22,19 +22,19 @@ const LessonUpcomingCard = ({
 	// useEffect(() => {
 	// 	feather.replace();
 	// }, []);
+	const handleEnterClass = async (lesson) => {
+		// try {
+		// 	const res = addScheduleLog({ BookingID: lesson.BookingID });
+		// } catch (error) {
+		// 	console.log(error?.message ?? `Can't add schedule log !!`);
+		// }
+		window.location.href = `skype:${lesson.skypeId}?chat`;
+	};
 
 	return (
 		<li className="cr-item upcoming-lesson lesson-info position-relative">
 			<div
-				// className={`${lock.id === BookingID && lock.lock ? '' : 'd-none'}`}
-				style={{
-					zIndex: '99',
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
-				}}
+			// className={`${lock.id === BookingID && lock.lock ? '' : 'd-none'}`}
 			></div>
 			<div className="media">
 				<div className="teacher-information">
@@ -104,40 +104,28 @@ const LessonUpcomingCard = ({
 					<div className="course-actions mg-t-15">
 						<div className="action-left">
 							<a
-								href={`skype:${TeacherSkype}?chat`}
-								className="btn btn-sm btn-info d-flex justify-content-center align-items-center tx-medium"
+								href={true}
+								className=" btn btn-sm btn-info d-flex justify-content-center align-items-center tx-medium"
 								rel="noopener"
+								target="_blank"
 								style={{ cursor: 'pointer' }}
+								onClick={(e) => {
+									e.preventDefault();
+									handleEnterClass(TeacherSkype);
+								}}
 							>
-								<div>
-									<i className="fab fa-skype mg-r-5"></i>VÀO HỌC
-								</div>
+								VÀO HỌC
 							</a>
-							<a
+							{/* <a
 								style={{ cursor: 'pointer' }}
 								href={true}
 								className="btn btn-sm btn-success tx-medium"
 								data-toggle="modal"
 								data-target="#js-md-required"
-								// onClick={() =>
-								// 	handleRequireLesson(
-								// 		BookingID,
-								// 		avatar,
-								// 		TeacherUID,
-								// 		TeacherName,
-								// 		LessionMaterial,
-								// 		LessionName,
-								// 		SpecialRequest,
-								// 		date,
-								// 		start,
-								// 		end,
-								// 		DocumentName,
-								// 		SkypeID,
-								// 	)
-								// }
+								
 							>
 								<i className="fas fa-edit mg-r-5"></i>GHI CHÚ
-							</a>
+							</a> */}
 						</div>
 						{/* <div className="action-right">
 							{cancelable ? (

@@ -35,6 +35,18 @@ const useStyles = makeStyles((theme) => ({
 			},
 		},
 	},
+	wrapBtn: {
+		position: 'absolute',
+		top: '-70px',
+		right: '0',
+		borderRadius: '999px',
+	},
+	btnShow: {
+		borderRadius: '999px',
+	},
+	wrapFilter: {
+		right: '110px!important',
+	},
 }));
 // ----------- PHÂN TRANG ---------------
 
@@ -139,6 +151,27 @@ const TableView = ({ t }) => {
 			UID = localStorage.getItem('UID');
 			Token = localStorage.getItem('token');
 		}
+		if (showAll) {
+			getAPI({
+				fromdate: fromDate,
+				todate: toDate,
+				UID: UID,
+				Page: state.page,
+				Token: Token,
+			});
+			setShowAll(false);
+		}
+	}, [showAll]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
 		getAPI({
 			fromdate: fromDate,
 			todate: toDate,
@@ -154,7 +187,7 @@ const TableView = ({ t }) => {
 			<div className="card">
 				<div className="card-body bg-white-radius">
 					<div
-						className="d-flex from-to-group mg-b-15 flex-wrap absoulute-date"
+						className={`d-flex from-to-group mg-b-15 flex-wrap absoulute-date ${classes.wrapFilter}`}
 						id="filter-time"
 					>
 						<div className="d-flex flex-wrap-0">
@@ -195,6 +228,16 @@ const TableView = ({ t }) => {
 								<FontAwesomeIcon icon="search" className="fa fa-search" />{' '}
 							</button>
 						</div>
+					</div>
+					<div className={classes.wrapBtn}>
+						{' '}
+						<button
+							type="button"
+							className={`btn btn-primary  ${classes.btnShow}`}
+							onClick={() => setShowAll(true)}
+						>
+							Show all
+						</button>
 					</div>
 					<div className="table-responsive">
 						<table className="table table-borderless responsive-table">
@@ -247,8 +290,8 @@ const TableView = ({ t }) => {
 										<tr key={`${index}`}>
 											<td>{ls.TeacherName}</td>
 											<td>{ls.PackageName}</td>
-											<td>{ls.DocumentDetailName}</td>
 											<td>{ls.DocumentName}</td>
+											<td>{ls.DocumentDetailName}</td>
 											<td>{ls.TimeCourse}</td>
 											<td>{ls.StartDate}</td>
 											<td>{ls.TimeStudy}</td>

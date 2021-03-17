@@ -240,12 +240,10 @@ export const AuthProvider = ({ children, history }) => {
 				// 		router.back();
 				// 	}
 				// }, 1000);
+			} else if (res.Code === 201) {
+				alert(res.Message);
 			} else {
 				alert('Đăng nhập không thành công');
-			}
-			if (res.Code === 2) {
-				check.status = false;
-				check.message = res.Message;
 			}
 		} catch (error) {
 			// setLoading(false);
@@ -269,6 +267,17 @@ export const AuthProvider = ({ children, history }) => {
 		setOpenModal(true);
 
 		localStorage.clear();
+	};
+
+	const changeDataUser = (linkImg) => {
+		console.log('Link img bên auth: ', linkImg);
+		let data = JSON.parse(localStorage.getItem('dataUser'));
+		data.AvatarThumnail = linkImg;
+
+		setCheckLogin({
+			...checkLogin,
+			data: data,
+		});
 	};
 
 	const handleLogout = async (UID) => {
@@ -300,6 +309,7 @@ export const AuthProvider = ({ children, history }) => {
 				updatePass,
 				handleLogin,
 				handleLogout,
+				changeDataUser,
 			}}
 		>
 			{children}

@@ -540,7 +540,7 @@ const StudentMenu = ({ t }) => {
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					{/* <li className="">
 						<Link href="/student/notification/other">
 							<a href={true} className="">
 								<FontAwesomeIcon
@@ -550,7 +550,7 @@ const StudentMenu = ({ t }) => {
 								<span>{t('menu-student:tuition-others')}</span>
 							</a>
 						</Link>
-					</li>
+					</li> */}
 				</ul>
 			</li>
 
@@ -594,6 +594,12 @@ const Menu = ({ t, isStudent }) => {
 		handleLogout(UID);
 	};
 	const { dataUser, handleLogout } = useAuth();
+
+	let linkImg = dataUser?.AvatarThumnail;
+	if (linkImg?.charAt(0) === '/') {
+		linkImg = linkImg?.substring(1);
+	}
+
 	return (
 		<>
 			<aside className="aside aside-fixed">
@@ -617,7 +623,7 @@ const Menu = ({ t, isStudent }) => {
 							<div className="d-flex align-items-center justify-content-center">
 								<a href={`#loggedinMenu`} data-toggle="collapse" className="">
 									<img
-										src="/static/img/avatar.jpg"
+										src={linkImg}
 										className="rounded-circle avatar-xl object-fit"
 										alt=""
 									/>

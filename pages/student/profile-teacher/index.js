@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import Select from 'react-select';
 import ListSchedule from '~/page-components/student/booking-schedule/ListSchedule';
-import { GetListTeacherPage } from '~/api/studentAPI';
+import {
+	GetListTeacherPage,
+	GetTeacherProfile,
+	getTeacherInfoProfile,
+} from '~/api/studentAPI';
 // import Pagination from 'react-js-pagination';
 import Pagination from '@material-ui/lab/Pagination';
 
@@ -19,43 +23,58 @@ import { ToastContainer } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import './index.module.scss';
 import { getStudentLayout } from '~/components/Layout';
+import DetailTeacher from './DetailTeacher';
 import dayjs from 'dayjs';
 import Swiper from 'swiper';
 import Link from 'next/link';
 // import data from '../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
-const genderArr = [
-	{
-		label: 'Tất cả giới tính',
-		value: '0',
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
+
+import CloseIcon from '@material-ui/icons/Close';
+
+const useStyles = makeStyles((theme) => ({
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
-	{
-		label: 'Nam',
-		value: '1',
+	paper: {
+		position: 'relative',
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		borderRadius: '10px',
+		width: '68%',
+		height: '98%',
+		overflowY: 'hidden',
+		[theme.breakpoints.down('md')]: {
+			width: '75%',
+		},
+		[theme.breakpoints.down('sm')]: {
+			width: '98%',
+			padding: '16px 10px 24px 10px',
+		},
 	},
-	{
-		label: 'Nữ',
-		value: '2',
+	btnClose: {
+		position: 'absolute',
+		bottom: '13px',
+		left: '50%',
+		transform: 'translateX(-50%)',
 	},
-];
-const nationArr = [
-	{
-		label: 'Tất cả quốc tịch',
-		value: '0',
+	iconClose: {
+		position: 'absolute',
+		top: '0px',
+		right: '0px',
+		padding: '15px',
+		border: 'none',
+		background: 'none',
 	},
-	{
-		label: 'Giáo viên Philippines',
-		value: '1',
-	},
-	{
-		label: 'Giáo viên Việt Nam',
-		value: '2',
-	},
-	{
-		label: 'Giáo viên bản ngữ',
-		value: '3',
-	},
-];
+}));
 
 // const initialState = {
 // 	nation: [],
@@ -144,6 +163,33 @@ const ProfileTeacher = ({ t }) => {
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
+
+	const classes = useStyles();
+	const [open, setOpen] = React.useState(false);
+
+	const [dataTeacher, setDataTeacher] = useState(null);
+
+	const closeModal = () => {
+		setOpen(false);
+	};
+
+	const openModal = (e) => {
+		e.preventDefault();
+
+		let teacherID = e.currentTarget.attributes['TeacherID'].value;
+		teacherID = parseInt(teacherID);
+
+		setDataTeacher(teacherID);
+
+		setOpen(true);
+
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+	};
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -457,50 +503,48 @@ const ProfileTeacher = ({ t }) => {
 		});
 	}, [state.page]);
 
-	function handlePageClick({ selected: selectedPage }) {
-		setCurrentPage(selectedPage);
-	}
+	// function handlePageClick({ selected: selectedPage }) {
+	// 	setCurrentPage(selectedPage);
+	// }
 
 	return (
 		<>
+			<Modal
+				aria-labelledby="transition-modal-title"
+				aria-describedby="transition-modal-description"
+				className={classes.modal}
+				open={open}
+				onClose={closeModal}
+				closeAfterTransition
+				BackdropComponent={Backdrop}
+				BackdropProps={{
+					timeout: 500,
+				}}
+			>
+				<Fade in={open}>
+					<div className={classes.paper}>
+						<button className={classes.iconClose} onClick={closeModal}>
+							<CloseIcon />
+						</button>
+						<DetailTeacher dataTeacher={dataTeacher} />
+						{/* <Button
+							className={classes.btnClose}
+							variant="contained"
+							color="secondary"
+							onClick={closeModal}
+						>
+							Close
+						</Button> */}
+					</div>
+				</Fade>
+			</Modal>
 			<h1 className="main-title-page">{t('Profile-teacher')}</h1>
 			<div className="media-body-wrap pd-15 shadow">
-				{/* <div
-					className="form-row"
-					style={{ maxWidth: 600, zIndex: 2, position: 'relative' }}
-				>
-					<div className="col-sm-6 item">
-						<input
-							className="form-control margin-bottom-10"
-							name="searchText"
-							type="text"
-							placeholder="Nhập tên giáo viên..."
-							onChange={handleChange}
-						/>
-					</div>
-					<div className="col-sm-3 item search-btn-group">
-						<a
-							href={true}
-							className="submit-search btn btn-primary btn-block"
-							onClick={(e) => onSearch(e, 1)}
-						>
-							<i className="fa fa-search mg-r-5"></i>
-							{t('search')}
-						</a>
-					</div>
-				</div> */}
-
 				<div className="filter-group pd-t-5 mg-t-15 bd-t" id="list-tutor">
 					<div className="filter-row row">
 						<div className="left col-12">
 							<h5>{t('list-of-teachers')}</h5>
 						</div>
-						{/*  <div className="right col-md-10" style={{ alignItems: 'center', display: 'inline-flex' }}>
-							<div className="custom-control custom-checkbox">
-							<input type="checkbox" className="custom-control-input" id="display-schedule" />
-							<label className="custom-control-label" htmlFor="display-schedule">Hiển thị lịch</label>
-							</div>
-						</div> */}
 					</div>
 					<div className="filter-row row pos-relative">
 						<div className="col-sm-12">
@@ -583,6 +627,8 @@ const ProfileTeacher = ({ t }) => {
 														<a
 															href="/teacher/profile"
 															className="submit-search btn border-radius-5 btn-block w-100 bg-blue"
+															onClick={openModal}
+															teacherID={item.TeacherID}
 														>
 															<i className="fa fa-user"></i> Xem thông tin
 														</a>
@@ -614,21 +660,6 @@ const ProfileTeacher = ({ t }) => {
 											}
 											c
 										/>
-
-										{/* <ReactPaginate
-													previousLabel={'←'}
-													nextLabel={'→'}
-													pageCount={pageCount}
-													onPageChange={handlePageClick}
-													containerClassName={'paginate-wrap'}
-													subContainerClassName={'paginate-inner'}
-													pageClassName={'paginate-li'}
-													pageLinkClassName={'paginate-a'}
-													activeClassName={'paginate-active'}
-													nextLinkClassName={'paginate-next-a'}
-													previousLinkClassName={'paginate-prev-a'}
-													breakLinkClassName={'paginate-break-a'}
-												/> */}
 									</Box>
 								</div>
 							) : (

@@ -44,7 +44,10 @@ body {
 		z-index: 999;
 	}
 }
-
+.teacher-avatar .lds-ellipsis {
+	width: 100%;
+	background: black;
+}
 .lds-ellipsis {
 	display: block !important;
 	position: relative;
@@ -313,9 +316,12 @@ body {
 }
 .table-tutor-ds .list-tutor-ds li .infomation-bottom {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-end;
 	padding: 10px 15px;
 	background: #f1f4f9;
+}
+.infomation-bottom .btn {
+	margin-left: 10px;
 }
 .table-tutor-ds
 	.list-tutor-ds
@@ -408,3 +414,16 @@ body {
 		width: 100px !important;
 	}
 }
+
+
+// .card ::-webkit-input-placeholder { /* Edge */
+//   color: red;
+// }
+
+// .card :-ms-input-placeholder { /* Internet Explorer 10-11 */
+//   color: red;
+// }
+
+// .card ::placeholder {
+//   color: red;
+// }

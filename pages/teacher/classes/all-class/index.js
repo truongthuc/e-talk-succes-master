@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import { teacherAllClass, addScheduleLog } from '~/api/teacherAPI';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import Select from 'react-select';
 import { appSettings } from '~/config';
 import { getLayout } from '~/components/Layout';
@@ -13,7 +13,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
-console.log('o ngoai', dataHy.allClass);
+import Pagination from '@material-ui/lab/Pagination';
+import Box from '@material-ui/core/Box';
 
 import Router, { useRouter } from 'next/router';
 
@@ -207,6 +208,34 @@ const AllClassRow = ({ data, showStudentModal }) => {
 	);
 };
 
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
 const AllClasses = ({ t }) => {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(true);
@@ -222,8 +251,11 @@ const AllClasses = ({ t }) => {
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
 
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	console.log('STATE: ', state);
+
 	const layData = getData();
-	console.log('tu hy', layData);
 
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
@@ -260,16 +292,13 @@ const AllClasses = ({ t }) => {
 		setFilterStatusAllClass(event.target.value);
 	};
 
-	const loadAllClassesData = async () => {
+	const loadAllClassesData = async (params) => {
 		setIsLoading(true);
 		console.log(fromDate);
 		try {
-			const res = await teacherAllClass({
-				Status: parseInt(filterStatusAllClass.value),
-				fromDate: fromDate ? DateTimeFormat.format(new Date(fromDate)) : '',
-				toDate: toDate ? DateTimeFormat.format(new Date(toDate)) : '',
-			});
-			if (res?.Code && res.Code === 200) {
+			const res = await teacherAllClass(params);
+			if (res.Code === 200) {
+				dispatch({ type: 'ADD_PAGE', res });
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
@@ -282,19 +311,43 @@ const AllClasses = ({ t }) => {
 		setIsLoading(false);
 	};
 	useEffect(() => {
-		console.log(filterStatusAllClass);
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		loadAllClassesData({
+			status: filterStatusAllClass.value,
+			fromdate: '',
+			todate: '',
+			UID: UID,
+			page: 1,
+			token: Token,
+		});
 	}, [filterStatusAllClass]);
 
 	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		loadAllClassesData({
-			status: 1,
+			status: 6,
 			fromdate: '',
 			todate: '',
-			UID: 61241,
-			page: 1,
-			token: '',
+			UID: UID,
+			page: state.page,
 		});
-	}, [pageNumber, filterStatusAllClass]);
+	}, [state.page]);
 
 	return (
 		<>
@@ -419,18 +472,17 @@ const AllClasses = ({ t }) => {
 						</table>
 					</div>
 
-					{totalResult > pageSize && (
-						<Pagination
-							innerClass="pagination mg-t-15"
-							activePage={pageNumber}
-							itemsCountPerPage={pageSize}
-							totalItemsCount={totalResult}
-							pageRangeDisplayed={5}
-							onChange={(page) => setPageNumber(page)}
-							itemClass="page-item"
-							linkClass="page-link"
-							activeClass="active"
-						/>
+					{state?.TotalResult > 0 && (
+						<Box display={`flex`} justifyContent={`center`} mt={4}>
+							<Pagination
+								count={Math.ceil(state?.TotalResult / state?.PageSize)}
+								color="secondary"
+								onChange={(obj, page) =>
+									dispatch({ type: 'SELECT_PAGE', page })
+								}
+								c
+							/>
+						</Box>
 					)}
 				</div>
 			</div>

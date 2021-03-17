@@ -28,7 +28,6 @@
 			}
 		}
 	}
-
 	.fc-event {
 		border-radius: 0;
 		padding: 2px;
@@ -38,9 +37,111 @@
 		border-color: #fff;
 		min-height: calc(2rem - 1px);
 
+		.label-book {
+			font-size: 0.7rem;
+			color: black;
+			font-weight: 500;
+		}
+
 		&:hover {
 			.fix-btn {
 				display: inline-block;
+			}
+		}
+
+		&.off-slot {
+			background-color: #dcdcdc;
+			border-color: #dcdcdc;
+
+			&:hover {
+				.label-book {
+					color: black;
+				}
+			}
+
+			.fc-event-main {
+				background-color: #e2e2e2;
+				border-color: #e2e2e2;
+			}
+		}
+
+		&.custom-color-B {
+			background-color: yellow !important;
+			border-color: yellow !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: black;
+			}
+			.label-book {
+				color: white !important;
+			}
+		}
+
+		&.custom-color-C {
+			background-color: red !important;
+			border-color: red !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: black;
+			}
+			.label-book {
+				color: white !important;
+			}
+		}
+
+		&.custom-color-D {
+			background-color: #808080 !important;
+			border-color: #808080 !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: black;
+			}
+			.label-book {
+				color: white !important;
+			}
+		}
+
+		&.custom-color-E {
+			background-color: #1f4e78 !important;
+			border-color: #1f4e78 !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: white;
+			}
+			.label-book {
+				color: white !important;
+			}
+		}
+
+		&.custom-color-F {
+			background-color: purple !important;
+			border-color: purple !important;
+			.fc-event-main {
+				color: black;
+			}
+		}
+
+		&.custom-color-G {
+			background-color: #88b0f1 !important;
+			border-color: #88b0f1 !important;
+			.fc-event-main {
+				color: black;
+			}
+		}
+
+		&.custom-color-H {
+			background-color: #def6da !important;
+			border-color: #def6da !important;
+			.fc-event-main {
+				color: black;
+			}
+		}
+
+		&.custom-color-I {
+			background-color: #ff6fa2 !important;
+			border-color: #ff6fa2 !important;
+			.fc-event-main {
+				color: black;
 			}
 		}
 
@@ -62,7 +163,8 @@
 			}
 		}
 
-		.fas {
+		.fas,
+		.far {
 			margin-right: 5px;
 		}
 
@@ -140,6 +242,117 @@
 			}
 		}
 	}
+	// .fc-event {
+	// 	border-radius: 0;
+	// 	padding: 2px;
+	// 	bottom: 0;
+	// 	position: relative;
+	// 	height: 100%;
+	// 	border-color: #fff;
+	// 	min-height: calc(2rem - 1px);
+
+	// 	&:hover {
+	// 		.fix-btn {
+	// 			display: inline-block;
+	// 		}
+	// 	}
+
+	// 	&.booked-slot {
+	// 		background-color: #d9f2da;
+	// 		border-color: #fff;
+	// 		cursor: pointer;
+	// 		.fc-event-main {
+	// 			color: #257300;
+	// 		}
+	// 	}
+
+	// 	&.available-slot {
+	// 		background-color: #d9ecf2;
+	// 		border-color: #d9ecf2;
+	// 		.fc-event-main {
+	// 			background-color: #d9ecf2;
+	// 			border-color: #d9ecf2;
+	// 		}
+	// 	}
+
+	// 	.fas {
+	// 		margin-right: 5px;
+	// 	}
+
+	// 	&.empty-slot {
+	// 		background-color: transparent;
+	// 		border-color: transparent;
+
+	// 		&:hover {
+	// 			background-color: rgba($primary-color, 0.09);
+	// 		}
+	// 	}
+
+	// 	&.is-loading {
+	// 		background-color: #fff262;
+	// 		border-color: #fff262;
+	// 	}
+
+	// 	&.fc-event-past {
+	// 		background-color: #ececec;
+	// 		background-image: repeating-linear-gradient(
+	// 			-45deg,
+	// 			transparent 0 2px,
+	// 			#eaeaea 0 3px
+	// 		);
+	// 		border-color: #fff;
+
+	// 		.booking-name {
+	// 			color: #777;
+	// 		}
+
+	// 		.label-book.booked {
+	// 			color: #777;
+	// 		}
+
+	// 		&.empty-slot {
+	// 			background-color: #d8d8d8;
+	// 			border-color: #eeeeee !important;
+	// 		}
+
+	// 		&.available-slot {
+	// 			.inner-content {
+	// 				color: #777;
+	// 				display: initial;
+	// 			}
+	// 		}
+
+	// 		.fix-btn {
+	// 			display: none;
+	// 		}
+	// 	}
+
+	// 	&.hot-slot {
+	// 		&:after {
+	// 			content: '\f06d';
+	// 			font-family: 'Font Awesome 5 Free';
+	// 			font-weight: bold;
+	// 			position: absolute;
+	// 			left: 35%;
+	// 			top: 50%;
+	// 			z-index: -1;
+	// 			color: rgba($primary-color, 20%);
+	// 			font-size: 16px;
+	// 			transform: translate(-50%, -50%);
+	// 		}
+
+	// 		&:before {
+	// 			content: 'HOT';
+	// 			position: absolute;
+	// 			left: 60%;
+	// 			top: 50%;
+	// 			z-index: -1;
+	// 			color: rgba($primary-color, 20%);
+	// 			font-size: 16px;
+	// 			transform: translate(-50%, -50%);
+	// 		}
+	// 	}
+	// }
 
 	.fc-timegrid-col-events {
 		margin: 1px;

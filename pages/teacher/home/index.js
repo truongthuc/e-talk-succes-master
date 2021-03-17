@@ -168,6 +168,8 @@ const Home = ({ t }) => {
 		console.log('Filtered, chua co API');
 	};
 
+	console.log('State: ', state);
+
 	const getAPI = async (params) => {
 		setIsLoading(true);
 		const res = await teacherDashboard(params);
@@ -197,10 +199,19 @@ const Home = ({ t }) => {
 			}
 		}
 
-		getAPI({
-			UID: 61241,
-			Token: '',
-		});
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		// getAPI({
+		// 	UID: UID,
+		// 	Token: Token,
+		// });
 	}, []);
 
 	return (

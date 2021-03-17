@@ -1,24 +1,61 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
 import { getScheduleLog } from '~/api/teacherAPI';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import { getLayout } from '~/components/Layout';
 import Skeleton from 'react-loading-skeleton';
-import { teacherEvaluatedClasses, addScheduleLog } from '~/api/teacherAPI';
+import {
+	teacherEvaluatedClasses,
+	addScheduleLog,
+	teacherDeleteEvaluation,
+} from '~/api/teacherAPI';
 import { Popover, OverlayTrigger, Overlay } from 'react-bootstrap';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
+import { toast, ToastContainer } from 'react-toastify';
+import { toastInit } from '~/utils';
 
 function getData() {
 	const andt = dataHy.evaluationClass;
 	return andt;
 }
 
-const FinishedRow = ({ data, showStudentModal }) => {
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
+const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 	const {
+		EvaluationID,
 		BookingID,
 		ScheduleTimeVN,
 		ScheduleTimeUTC,
@@ -31,7 +68,7 @@ const FinishedRow = ({ data, showStudentModal }) => {
 		VNTime,
 		LessionName,
 		SkypeID,
-		EvaluationID,
+
 		StudentCode,
 		StatusString,
 		Status,
@@ -40,6 +77,9 @@ const FinishedRow = ({ data, showStudentModal }) => {
 		GenderID,
 		SpecialRequest,
 	} = data;
+
+	console.log('IDDDD: ', EvaluationID);
+
 	const handleEnterClass = async (e) => {
 		e.preventDefault();
 		try {
@@ -50,8 +90,52 @@ const FinishedRow = ({ data, showStudentModal }) => {
 		window.location.href = `skype:${SkypeID}?chat`;
 	};
 
+	const deleteItem = (e) => {
+		e.preventDefault();
+
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		(async () => {
+			try {
+				const res = await teacherDeleteEvaluation({
+					UID: UID,
+					Token: Token,
+					EvaluationID: EvaluationID,
+				});
+
+				if (res.Code === 200) {
+					statusDelete();
+					toast.success('Update feedback success!', {
+						position: toast.POSITION.TOP_CENTER,
+						autoClose: 2000,
+					});
+				}
+			} catch (error) {
+				console.log('Error: ', error);
+			}
+		})();
+	};
+
 	return (
 		<tr>
+			<ToastContainer
+				position="top-right"
+				autoClose={2000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+			/>
 			<td className="clr-time">
 				<div className="mg-b-5">
 					<span className="">{data.StudentCode}</span>
@@ -114,7 +198,11 @@ const FinishedRow = ({ data, showStudentModal }) => {
 					href={`/teacher/evaluation/detail/[eid]`}
 					as={`/teacher/evaluation/detail/${BookingID}`}
 				>
-					<a href={true} className="btn btn-sm btn-danger rounded-5">
+					<a
+						href={true}
+						onClick={deleteItem}
+						className="btn btn-sm btn-danger rounded-5"
+					>
 						<FontAwesomeIcon
 							icon="trash-alt"
 							className="fas fa-trash-alt mg-r-5"
@@ -136,6 +224,9 @@ const EvaluatedClasses = ({ t }) => {
 	const [totalResult, setTotalResult] = useState(0);
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	const [statusDelete, setStatusDelete] = useState(false);
 
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
@@ -143,7 +234,6 @@ const EvaluatedClasses = ({ t }) => {
 	};
 
 	const layData = getData();
-	console.log('tu hy', layData);
 
 	const unMountComponents = () => {
 		mdStudentInfo.current = false;
@@ -166,18 +256,20 @@ const EvaluatedClasses = ({ t }) => {
 		return unMountComponents;
 	}, []);
 
-	const loadFinishedClass = async () => {
+	const loadFinishedClass = async (params) => {
 		try {
-			const res = await teacherEvaluatedClasses({
-				Page: pageNumber,
-				Status: 2,
-			});
-			if (res?.Code && res.Code === 200) {
+			const res = await teacherEvaluatedClasses(params);
+			if (res.Code === 200) {
+				dispatch({ type: 'ADD_PAGE', res });
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
-			} else {
-				console.log('Code response khác 1');
+			}
+			if (res.Code === 403) {
+				localStorage.clear();
+				router.push({
+					pathname: '/',
+				});
 			}
 			setIsLoading(false);
 			return;
@@ -189,8 +281,38 @@ const EvaluatedClasses = ({ t }) => {
 	};
 
 	useEffect(() => {
-		loadFinishedClass();
-	}, [pageNumber]);
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		if (statusDelete) {
+			loadFinishedClass({
+				page: state.page,
+				UID: UID,
+			});
+		}
+	}, [statusDelete]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		loadFinishedClass({
+			page: state.page,
+			UID: UID,
+		});
+	}, [state.page, statusDelete]);
 
 	return (
 		<>
@@ -272,6 +394,7 @@ const EvaluatedClasses = ({ t }) => {
 											key={`${item.BookingID}`}
 											data={item}
 											showStudentModal={showStudentModal}
+											statusDelete={() => setStatusDelete(true)}
 										/>
 									))
 								) : (
@@ -294,18 +417,17 @@ const EvaluatedClasses = ({ t }) => {
 						</table>
 					</div>
 
-					{totalResult > pageSize && (
-						<Pagination
-							innerClass="pagination mg-t-15"
-							activePage={pageNumber}
-							itemsCountPerPage={pageSize}
-							totalItemsCount={totalResult}
-							pageRangeDisplayed={5}
-							onChange={(page) => setPageNumber(page)}
-							itemClass="page-item"
-							linkClass="page-link"
-							activeClass="active"
-						/>
+					{state?.TotalResult > 0 && (
+						<Box display={`flex`} justifyContent={`center`} mt={4}>
+							<Pagination
+								count={Math.ceil(state?.TotalResult / state?.PageSize)}
+								color="secondary"
+								onChange={(obj, page) =>
+									dispatch({ type: 'SELECT_PAGE', page })
+								}
+								c
+							/>
+						</Box>
 					)}
 				</div>
 			</div>

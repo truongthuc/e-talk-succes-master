@@ -5,7 +5,7 @@ import './LessonHistoryCard.module.scss';
 const LessonHistoryCard = ({
 	onHandleRatingLesson,
 	BookingID,
-	avatar = '/static/assets/img/default-avatar.png',
+	avatar,
 	TeacherUID,
 	CourseName,
 	TeacherName,
@@ -60,7 +60,7 @@ const LessonHistoryCard = ({
 									href={`/ElearnStudent/lessonDetail?ID=${BookingID}`}
 									className="no-hl course-name tx-bold"
 								>
-									{item.CourseName}
+									{CourseName}
 								</a>
 							</h5>
 							<div className="course-information tx-14">
@@ -83,7 +83,7 @@ const LessonHistoryCard = ({
 									<p className="tx-14 mg-b-0">{note}</p>
 								</div>
 							)}
-							<div className="course-rate mg-t-15">
+							{/* <div className="course-rate mg-t-15">
 								<h6 className="mg-b-10 tx-bold">Đánh giá buổi học:</h6>
 								<div className="rating-wrap ">
 									{Status === 3 || Status === 4 ? (
@@ -124,7 +124,7 @@ const LessonHistoryCard = ({
 										</a>
 									)}
 								</div>
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</div>

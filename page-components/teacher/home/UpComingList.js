@@ -121,6 +121,8 @@ const UpComingList = ({ itemShow, t }) => {
 	const [totalResult, setTotalResult] = useState(0);
 
 	const showStudentModal = (studentId) => {
+		console.log('StudentID: ', studentId);
+
 		setStudentId(studentId);
 		if ($) {
 			$(mdStudentInfo.current).modal('show');
@@ -172,9 +174,17 @@ const UpComingList = ({ itemShow, t }) => {
 	};
 
 	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
 		getAPI({
-			UID: 61241,
-			Token: '',
+			UID: UID,
+			Token: Token,
 		});
 	}, []);
 
@@ -190,7 +200,7 @@ const UpComingList = ({ itemShow, t }) => {
 									<th>{t('your-time')}</th>
 									<th>{t('course')}</th>
 									<th>{t('lesson')}</th>
-									<th>{t('student')}</th>
+									{/* <th>{t('student')}</th> */}
 									<th className="tx-right">{t('actions')}</th>
 								</tr>
 							</thead>
@@ -246,7 +256,7 @@ const UpComingList = ({ itemShow, t }) => {
 															<span className="">{ls.LessonName}</span>
 														</div>
 													</td>
-													<td className="lg-valign-middle">
+													{/* <td className="lg-valign-middle">
 														<a
 															href={true}
 															onClick={(e) => {
@@ -257,7 +267,7 @@ const UpComingList = ({ itemShow, t }) => {
 														>
 															{ls.StudentName}
 														</a>
-													</td>
+													</td> */}
 													<td className="tx-nowrap tx-right">
 														<a
 															href={true}

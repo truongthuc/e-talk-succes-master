@@ -283,8 +283,7 @@ function TeacherInformation({ t }) {
 					// 	) ?? null,
 					location:
 						res.Data?.NationList.find(
-							(option, index) =>
-								option.ID === parseInt(res.Data?.TeacherNational),
+							(option, index) => option.Nation === res.Data?.TeacherNational,
 						) ?? null,
 					birthday:
 						(() => {
@@ -562,7 +561,7 @@ function TeacherInformation({ t }) {
 												loadingMessage={`Loading...`}
 												options={state.locationOptions}
 												getOptionLabel={(option) => `${option.Nation}`}
-												getOptionValue={(option) => `${option.ID}`}
+												getOptionValue={(option) => `${option.TeacherNational}`}
 												styles={appSettings.selectStyle}
 												placeholder="Select location..."
 												className={`${
@@ -602,6 +601,7 @@ function TeacherInformation({ t }) {
 												className={`${
 													!!errors && !!errors.timeZone ? 'error-form' : ''
 												}`}
+												isDisabled={true}
 											/>
 										}
 										control={control}

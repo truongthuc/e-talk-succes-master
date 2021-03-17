@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/scss/main.scss';
 import { ToastContainer } from 'react-toastify';
 import { toastInit, convertDDMMYYYYtoMMDDYYYY } from '~/utils';
+import { useAuth } from '~/api/auth.js';
 
 import {
 	FETCH_ERROR,
@@ -92,6 +93,7 @@ const convertTargetStringToNum = (listString, map) => {
 };
 
 const StudentProfile = ({ t }) => {
+	const { changeDataUser } = useAuth();
 	const [profile, setProfile] = useState({});
 	const [loadingProfile, setLoadingProfile] = useState(true);
 	const [loadingUpdateProfile, setLoadingUpdateProfile] = useState(false);
@@ -102,7 +104,9 @@ const StudentProfile = ({ t }) => {
 	const [avatar, setAvatar] = useState('');
 	const [loadingAvatar, setLoadingAvatar] = useState(false);
 
-	console.log('Profile: ', profile);
+	const [statusUpdate, setStatusUpdate] = useState(false);
+
+	const [action, setAction] = useState(true);
 
 	const updateProfileToastSuccess = () =>
 		toast.success(UPDATE_PROFILE_SUCCESS, toastInit);
@@ -128,7 +132,7 @@ const StudentProfile = ({ t }) => {
 			Token = localStorage.getItem('token');
 		}
 		const newProfile = {
-			UID: profile.UID,
+			UID: UID,
 			Introduce: resProfile.Introduce,
 			Country: resProfile.Country,
 			Timezone: resProfile.TimeZoneID,
@@ -139,7 +143,6 @@ const StudentProfile = ({ t }) => {
 			BankAddress: resProfile.BankAddress,
 			Avatar: avatar,
 			BirthDay: dayjs(resProfile.BirthDay).format('DD/MM/YYYY'),
-			Token: Token,
 		};
 		console.log(newProfile);
 		onUpdateProfileAPI(newProfile);
@@ -158,6 +161,7 @@ const StudentProfile = ({ t }) => {
 					...resProfile.Data,
 					BirthDay: new Date(resProfile.Data.BirthDay),
 				});
+				setAvatar(resProfile.Data.AvatarThumnail);
 				reset({
 					...resProfile.Data,
 					BirthDay: new Date(resProfile.Data.BirthDay),
@@ -181,11 +185,19 @@ const StudentProfile = ({ t }) => {
 		}
 	};
 
+	const startFix = (e) => {
+		e.preventDefault();
+		setAction(false);
+	};
+
 	const onUpdateProfileAPI = async (params) => {
 		setLoadingUpdateProfile(true);
 		const res = await UpdateProfile(params);
 		if (res.Code === 200) {
 			updateProfileToastSuccess();
+			setStatusUpdate(true);
+			setAction(true);
+			changeDataUser(avatar);
 		} else {
 			updateProfileToastFail();
 		}
@@ -234,6 +246,22 @@ const StudentProfile = ({ t }) => {
 		getLanguage();
 	}, []);
 
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+		if (statusUpdate) {
+			getAPI({
+				UID: UID,
+				Token: Token,
+			});
+			setStatusUpdate(false);
+		}
+	}, [statusUpdate]);
+
 	return (
 		<>
 			<h1 className="main-title-page">{t('profile')}</h1>
@@ -276,7 +304,7 @@ const StudentProfile = ({ t }) => {
 														<img
 															id="avatar"
 															alt="Avatar"
-															src={avatar}
+															src={profile.AvatarThumnail}
 															// onError={(e) => {
 															// 	e.target.onerror = null;
 															// 	e.target.src =
@@ -339,6 +367,7 @@ const StudentProfile = ({ t }) => {
 												name="BirthDay"
 												render={({ onChange, value, name }) => (
 													<DatePicker
+														disabled={action}
 														dateFormat="dd/MM/yyyy"
 														className="form-control"
 														placeholderText={`Birthday`}
@@ -397,6 +426,7 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.TimeZoneID}
 												name="TimeZoneID"
+												disabled={action}
 											/>
 											{errors.TimeZoneID && (
 												<span className="text-danger d-block mt-2">
@@ -444,6 +474,7 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.UID}
 												name="FullName"
+												disabled={action}
 											/>
 											{errors.UID && (
 												<span className="text-danger d-block mt-2">
@@ -485,6 +516,7 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.Avatar}
 												placeholder="Ex:example@domain.com"
+												disabled={action}
 											/>
 											{errors.Email && (
 												<span className="text-danger d-block mt-2">
@@ -541,6 +573,7 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.Country}
 												name="Country"
+												disabled={action}
 											/>
 											{errors.Country && (
 												<span className="text-danger d-block mt-2">
@@ -563,6 +596,7 @@ const StudentProfile = ({ t }) => {
 												name="CardHolder"
 												ref={register}
 												defaultValue={profile.CardHolder}
+												disabled={action}
 											/>
 											{errors.CardHolder && (
 												<span className="text-danger d-block mt-2">
@@ -585,6 +619,7 @@ const StudentProfile = ({ t }) => {
 												name="BankName"
 												ref={register}
 												defaultValue={profile.BankName}
+												disabled={action}
 											/>
 											{errors.BankName && (
 												<span className="text-danger d-block mt-2">
@@ -607,6 +642,7 @@ const StudentProfile = ({ t }) => {
 												name="BankAddress"
 												ref={register}
 												defaultValue={profile.BankAddress}
+												disabled={action}
 											/>
 											{errors.BankAddress && (
 												<span className="text-danger d-block mt-2">
@@ -629,6 +665,7 @@ const StudentProfile = ({ t }) => {
 												name="Branch"
 												ref={register}
 												defaultValue={profile.Branch}
+												disabled={action}
 											/>
 											{errors.Branch && (
 												<span className="text-danger d-block mt-2">
@@ -651,6 +688,7 @@ const StudentProfile = ({ t }) => {
 												name="AccountNumber"
 												ref={register}
 												defaultValue={profile.AccountNumber}
+												disabled={action}
 											/>
 											{errors.AccountNumber && (
 												<span className="text-danger d-block mt-2">
@@ -673,7 +711,7 @@ const StudentProfile = ({ t }) => {
 												name="SkypeID"
 												ref={register}
 												defaultValue={profile.SkypeID}
-												disabled
+												disabled={action}
 											/>
 											{errors.SkypeID && (
 												<span className="text-danger d-block mt-2">
@@ -696,7 +734,7 @@ const StudentProfile = ({ t }) => {
 												name="SRegisterLink"
 												ref={register}
 												defaultValue={profile.RegisterLink}
-												disabled
+												disabled={action}
 											/>
 											{errors.RegisterLink && (
 												<span className="text-danger d-block mt-2">
@@ -719,6 +757,7 @@ const StudentProfile = ({ t }) => {
 												name="Introduce"
 												ref={register}
 												defaultValue={profile.Introduce}
+												disabled={action}
 											/>
 											{errors.Introduce && (
 												<span className="text-danger d-block mt-2">
@@ -732,21 +771,35 @@ const StudentProfile = ({ t }) => {
 									<div className="form-row  align-items-center ">
 										<div className="form-group col-sm-3 col-label-fixed"></div>
 										<div className="form-group col-sm-9 mg-b-0-f">
-											<button
-												type="submit"
-												disabled={loadingUpdateProfile ? true : ''}
-												className="btn btn-primary rounded"
-												style={{
-													width: loadingUpdateProfile ? '120px' : 'auto',
-													color: '#fff',
-												}}
-											>
-												{loadingUpdateProfile ? (
-													<i className="fa fa-spinner fa-spin"></i>
-												) : (
-													'Lưu Thông Tin'
-												)}
-											</button>
+											{!action ? (
+												<button
+													type="submit"
+													disabled={loadingUpdateProfile ? true : ''}
+													className="btn btn-primary rounded"
+													style={{
+														width: loadingUpdateProfile ? '120px' : 'auto',
+														color: '#fff',
+													}}
+												>
+													{loadingUpdateProfile ? (
+														<i className="fa fa-spinner fa-spin"></i>
+													) : (
+														'Save'
+													)}
+												</button>
+											) : (
+												<button
+													type="button"
+													onClick={startFix}
+													className="btn btn-primary rounded"
+													style={{
+														width: loadingUpdateProfile ? '120px' : 'auto',
+														color: '#fff',
+													}}
+												>
+													Fix profile
+												</button>
+											)}
 										</div>
 									</div>
 									<ToastContainer

@@ -4,11 +4,16 @@ import { GetReferral } from '~/api/studentAPI';
 import './index.module.scss';
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
+import ReactHtmlParser, {
+	processNodes,
+	convertNodeToElement,
+	htmlparser2,
+} from 'react-html-parser';
 const Referral = ({ t }) => {
 	const router = useRouter();
 	const [url, setUrl] = useState('');
 	const [isCopy, setIsCopy] = useState(false);
-	const [data, setData] = useState();
+	const [dataRefer, setDataRefer] = useState();
 	const refInput = useRef(true);
 	const [loading, setLoading] = useState(false);
 	const copy = (element) => {
@@ -20,16 +25,17 @@ const Referral = ({ t }) => {
 			}, 3000);
 		};
 	};
+
+	console.log('Data refer: ', dataRefer);
+
 	const getAPI = async (params) => {
 		setLoading(true);
 		const res = await GetReferral(params);
 		console.log(res);
-		if (res.Code === 1) {
-			setData(res.Data);
-			setPageSize(res.PageSize);
-			setTotalResult(res.TotalResult);
+		if (res.Code === 200) {
+			setDataRefer(res.Data);
 		} else {
-			setData({});
+			setDataRefer({});
 		}
 		setLoading(false);
 	};
@@ -58,11 +64,17 @@ const Referral = ({ t }) => {
 			}
 		}
 
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			Search: '',
-			UID: '',
+			UID: UID,
 			Page: 1,
-			Token: '',
+			Token: Token,
 		});
 	}, []);
 	return (
@@ -73,33 +85,14 @@ const Referral = ({ t }) => {
 					<div className="row">
 						<div className="col-12">
 							<div className="mg-b-30">
-								<h2>“{t('more-friends-more-fun')}”</h2>
+								{/* <h2>“{t('more-friends-more-fun')}”</h2> */}
+								<h2>{dataRefer?.TitlePost}</h2>
 								<p>
 									{t('p-1')} <strong>{t('p-2')}.</strong>
 								</p>
 							</div>
-							<div className="tx-center mg-b-30">
-								<h4 className="tx-primary mg-b-15">{t('p-3')}</h4>
-								<div className="form-group mg-x-auto" style={{ maxWidth: 600 }}>
-									<input
-										onClick={copyShareUrl}
-										ref={refInput}
-										className="shareUrl-input js-shareUrl form-control tx-center bg-secondary bd-secondary"
-										type="text"
-										readonly="readonly"
-										value={url}
-									/>
-								</div>
-								{isCopy ? (
-									<p className="tx-success mg-t-15">
-										{t('successfully-copied')}
-									</p>
-								) : (
-									''
-								)}
-							</div>
 						</div>
-						<div className="col-md-6">
+						{/* <div className="col-md-6">
 							<h5>{t('how-to-join')}</h5>
 							<ul>
 								<li>{t('p-4')}</li>
@@ -125,48 +118,60 @@ const Referral = ({ t }) => {
 								<li>{t('p-15')}</li>
 								<li>{t('p-16')}</li>
 							</ul>
+						</div> */}
+						<div>
+							<img src={dataRefer?.ImgPost} />
 						</div>
-						{/* <div className="col-12 mg-t-30">
+						<div className="refer-content">
+							{ReactHtmlParser(dataRefer?.ContentPost)}
+						</div>
+						<div className="col-12 mg-t-30">
+							<div className="tx-center mg-b-30">
+								<h4 className="tx-primary mg-b-15">{t('p-3')}</h4>
+								<div className="form-group mg-x-auto" style={{ maxWidth: 600 }}>
+									<input
+										onClick={copyShareUrl}
+										ref={refInput}
+										className="shareUrl-input js-shareUrl form-control tx-center bg-secondary bd-secondary"
+										type="text"
+										readonly="readonly"
+										value={dataRefer?.RegisterLink}
+									/>
+								</div>
+								{isCopy ? (
+									<p className="tx-success mg-t-15">
+										{t('successfully-copied')}
+									</p>
+								) : (
+									''
+								)}
+							</div>
 							<h5 className="mg-b-15">Danh sách đã mời</h5>
 							<div className="table-responsive ">
 								<table className="table table-500">
 									<thead>
 										<tr>
-											<th>STT</th>
+											<th>ID</th>
 											<th>{t('invited-account')}</th>
 											<th>{t('join-date')}</th>
 											<th>{t('reward-points')}</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
-											<td>1</td>
-											<td>Nguyễn Yến Nhi</td>
-											<td>20/04/2020</td>
-											<td>100.000</td>
-										</tr>
-										<tr>
-											<td>2</td>
-											<td>Nguyễn Yến Nhi</td>
-											<td>20/04/2020</td>
-											<td>100.000</td>
-										</tr>
-										<tr>
-											<td>3</td>
-											<td>Nguyễn Yến Nhi</td>
-											<td>20/04/2020</td>
-											<td>100.000</td>
-										</tr>
-										<tr>
-											<td>4</td>
-											<td>Nguyễn Yến Nhi</td>
-											<td>20/04/2020</td>
-											<td>100.000</td>
-										</tr>
+										{dataRefer?.RefferFriend.length > 0
+											? dataRefer.RefferFriend.map((item) => (
+													<tr>
+														<td>{item.ID}</td>
+														<td>{item.FullName}</td>
+														<td>{item.CreatedDate}</td>
+														<td>{item.RewardPoints}</td>
+													</tr>
+											  ))
+											: "<div>There's not have data</div>"}
 									</tbody>
 								</table>
 							</div>
-						</div> */}
+						</div>
 					</div>
 				</div>
 			</div>

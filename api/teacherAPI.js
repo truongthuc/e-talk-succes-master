@@ -6,8 +6,8 @@ export const teacherDashboard = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherDashboard', {
 			params: {
-				UID: 61230,
-				token: '',
+				UID: params.UID,
+				token: params.Token,
 			},
 		});
 		result = res.data;
@@ -22,9 +22,9 @@ export const teacherMonthlyStatistics = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherMonthlyStatistics', {
 			params: {
-				UID: 61230,
-				token: '',
-				typeSearch: 1,
+				UID: params.UID,
+				token: params.token,
+				typeSearch: params.typeSearch,
 			},
 		});
 		result = res.data;
@@ -38,12 +38,12 @@ export const teacherAllClass = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherAllClass', {
 			params: {
-				UID: 61230,
-				token: '',
-				status: 1,
+				UID: params.UID,
+				token: params.token,
+				status: params.status,
 				fromdate: '',
 				todate: '',
-				page: 1,
+				page: params.page,
 			},
 		});
 		result = res.data;
@@ -109,10 +109,8 @@ export const teacherEvaluatedClasses = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherEvaluatedClasses', {
 			params: {
-				sort: 0,
-				page: 1,
-				UID: 61230,
-				Token: '',
+				page: params.page,
+				UID: params.UID,
 			},
 		});
 		result = res.data;
@@ -174,9 +172,8 @@ export const teacherMissingFeedback = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherMissingFeedback', {
 			params: {
-				UID: 61230,
-				Token: '',
-				page: 1,
+				UID: params.UID,
+				page: params.Page,
 			},
 		});
 		result = res.data;
@@ -541,8 +538,8 @@ export const getTeacherInfoProfile = async (params = {}) => {
 		let res = await instance.get(path + '/teacherGetInfo', {
 			params: {
 				...params,
-				UID: 61230,
-				Token: '',
+				UID: localStorage.getItem('UID'),
+				Token: localStorage.getItem('token'),
 			},
 		});
 		result = res.data;
@@ -831,8 +828,8 @@ export const teacherSaveEvaluation = async (values) => {
 	console.log('Values ben api: ', values);
 	try {
 		const formdata = new FormData();
-		formdata.append('UID', '61230');
-		formdata.append('Token', '');
+		formdata.append('UID', values.UID);
+		formdata.append('Token', values.Token);
 		formdata.append('CourseStudentID', values.CourseStudentID);
 		formdata.append('TextBook', values.grammar);
 		formdata.append('EnglishLevel', values.pronunciation);
@@ -857,8 +854,8 @@ export const teacherUpdateEvaluation = async (values) => {
 	console.log('Values ben api:================================= ', values);
 	try {
 		const formdata = new FormData();
-		formdata.append('UID', '61230');
-		formdata.append('Token', '');
+		formdata.append('UID', values.UID);
+		formdata.append('Token', values.Token);
 		formdata.append('EvaluationID', values.EvaluationID);
 		formdata.append('TextBook', values.textBook);
 		formdata.append('EnglishLevel', values.EnglishLevel);
@@ -946,13 +943,15 @@ export const cancelSlotByDate = async (obj) => {
 };
 
 export const teacherLoadEvaluation = async (params = {}) => {
+	console.log('Params load eva: ', params);
+
 	let result;
 	try {
 		let res = await instance.get(path + '/teacherLoadEvaluation', {
 			params: {
-				evaluationID: 23,
-				UID: 61230,
-				Token: '',
+				evaluationID: params.EvaluationID,
+				UID: params.UID,
+				Token: params.Token,
 			},
 			//Param: int BookingID, int UID ? 0, string Token ? null
 		});
@@ -985,5 +984,28 @@ export const teacherUpdateTeachingSchedule = async (obj) => {
 		console.log('Error: ', error);
 		return error.message ? error.message : (result = '');
 	}
+	return result;
+};
+
+export const teacherDeleteEvaluation = async (values) => {
+	let result;
+
+	console.log('Values ben api: ', values);
+	try {
+		const formdata = new FormData();
+		formdata.append('UID', values.UID);
+		formdata.append('Token', values.Token);
+		formdata.append('EvaluationID', values.EvaluationID);
+		let res = await instance.post(
+			path + '/teacherDeleteEvaluation',
+			formdata,
+			{},
+		);
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+
 	return result;
 };
