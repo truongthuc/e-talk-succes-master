@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
 import { getScheduleLog } from '~/api/teacherAPI';
-import Pagination from 'react-js-pagination';
+
 import { getLayout } from '~/components/Layout';
 import Skeleton from 'react-loading-skeleton';
 import { teacherUpcomingLessons, addScheduleLog } from '~/api/teacherAPI';
@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
 
 function getData() {
 	const andt = dataHy.UpcommingClass;
@@ -71,7 +73,7 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 						<FontAwesomeIcon icon="clock" className="fa fa-clock tx-primary" />{' '}
 						<span className="tx-medium">Your time</span>:
 					</span>
-					<span className="">{data.TimeZoneName}</span>
+					<span className="">{data.VNTime}</span>
 				</div>
 			</td>
 			<td className="clr-lesson">
@@ -131,18 +133,6 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 			</td>
 			<td className="clr-actions">
 				<a
-					href={LessionMaterial}
-					className="btn btn-sm btn-warning rounded-5 mg-r-10"
-					target="_blank"
-					rel="noreferrer"
-				>
-					<FontAwesomeIcon
-						icon="book-open"
-						className="fa fa-book-open clrm-icon"
-					/>{' '}
-					Material
-				</a>
-				<a
 					href={`skype:${data.TeacherSkype}?chat`}
 					className=" btn btn-sm btn-info rounded-5"
 					onClick={handleEnterClass}
@@ -158,6 +148,34 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 	);
 };
 
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
 const UpcomingClasses = ({ t }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -167,6 +185,7 @@ const UpcomingClasses = ({ t }) => {
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
 	const router = useRouter();
+	const [state, dispatch] = useReducer(reducer, initialState);
 
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
@@ -178,7 +197,6 @@ const UpcomingClasses = ({ t }) => {
 	};
 
 	const layData = getData();
-	console.log('tu hy', layData);
 
 	useEffect(() => {
 		if (!localStorage.getItem('isLogin')) {
@@ -196,10 +214,11 @@ const UpcomingClasses = ({ t }) => {
 		}
 		return unMountComponents;
 	}, []);
-	const loadUpcomingClasses = async () => {
+	const loadUpcomingClasses = async (params) => {
 		try {
-			const res = await teacherUpcomingLessons({ Page: pageNumber });
+			const res = await teacherUpcomingLessons(params);
 			if (res?.Code && res.Code === 200) {
+				dispatch({ type: 'ADD_PAGE', res });
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
@@ -216,12 +235,33 @@ const UpcomingClasses = ({ t }) => {
 	};
 
 	useEffect(() => {
+		if (!localStorage.getItem('isLogin')) {
+			router.push({
+				pathname: '/',
+			});
+		} else {
+			let RoleID = parseInt(localStorage.getItem('RoleID'));
+			if (RoleID !== 4) {
+				localStorage.clear();
+				router.push({
+					pathname: '/',
+				});
+			}
+		}
+
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		loadUpcomingClasses({
-			page: 1,
-			UID: 61230,
-			Token: '',
+			page: state.page,
+			UID: UID,
+			Token: Token,
 		});
-	}, [pageNumber]);
+	}, [state.page]);
 
 	return (
 		<>
@@ -235,7 +275,6 @@ const UpcomingClasses = ({ t }) => {
 									<th className="clr-time">{t('schedule')}</th>
 									<th className="clr-lesson">{t('lesson')}</th>
 									<th className="clr-student">{t('student')}</th>
-									<th className="clr-student">{t('notes')}</th>
 									<th className="clr-status">{t('status')}</th>
 									<th className="clr-action">{t('actions')}</th>
 								</tr>
@@ -332,19 +371,17 @@ const UpcomingClasses = ({ t }) => {
 							</tbody>
 						</table>
 					</div>
-
-					{totalResult > pageSize && (
-						<Pagination
-							innerClass="pagination mg-t-15"
-							activePage={pageNumber}
-							itemsCountPerPage={pageSize}
-							totalItemsCount={totalResult}
-							pageRangeDisplayed={5}
-							onChange={(page) => setPageNumber(page)}
-							itemClass="page-item"
-							linkClass="page-link"
-							activeClass="active"
-						/>
+					{state?.TotalResult > 0 && (
+						<Box display={`flex`} justifyContent={`center`} mt={4}>
+							<Pagination
+								count={Math.ceil(state?.TotalResult / state?.PageSize)}
+								color="secondary"
+								onChange={(obj, page) =>
+									dispatch({ type: 'SELECT_PAGE', page })
+								}
+								c
+							/>
+						</Box>
 					)}
 				</div>
 			</div>

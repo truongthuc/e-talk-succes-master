@@ -255,8 +255,10 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 	);
 });
 
-function TeacherInformation({ t }) {
+function TeacherInformation({ t, dataTeacher }) {
 	console.log('Scroll: ', scroll);
+
+	console.log('Data Teacher trong đây: ', dataTeacher);
 
 	const classes = useStyles();
 	const [state, dispatch] = useReducer(reducer, optionState);
@@ -289,10 +291,10 @@ function TeacherInformation({ t }) {
 			setValue(property, dataObj[property]);
 		}
 	};
-	const loadTeacherInfo = async () => {
+	const loadTeacherInfo = async (params) => {
 		setIsLoading(true);
 		try {
-			const res = await getTeacherInfoProfile();
+			const res = await getTeacherInfoProfile(params);
 			setOptionLoaded(true);
 			if (res.Code === 200) {
 				console.log('loadTeacherInfo res.Data', res.Data);
@@ -310,10 +312,7 @@ function TeacherInformation({ t }) {
 						) ?? null,
 					schoolName: res.Data?.TeacherSchool ?? '',
 					major: res.Data?.Course ?? '',
-					// englishProficien:
-					// 	[...state.englishProficienOptions].find(
-					// 		(option, index) => option.ID === res.Data?.EnglishProficiency,
-					// 	) ?? null,
+
 					location:
 						res.Data?.NationList.find(
 							(option, index) =>
@@ -410,7 +409,17 @@ function TeacherInformation({ t }) {
 	// }, [watchLocation]);
 
 	useEffect(() => {
-		loadTeacherInfo();
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		loadTeacherInfo({
+			UID: dataTeacher,
+			Token: Token,
+		});
 	}, []);
 
 	useEffect(() => {
@@ -447,6 +456,8 @@ function TeacherInformation({ t }) {
 											// defaultValue={}
 											required
 											id="full-name"
+											value={dataTeacher?.TeacherName}
+											disabled
 										/>
 										<label htmlFor="full-name">Full Name *</label>
 									</div>
@@ -469,6 +480,8 @@ function TeacherInformation({ t }) {
 											ref={register}
 											required
 											id="phone-number"
+											value={dataTeacher?.PhoneNumber}
+											disabled
 										/>
 										<label htmlFor="phone-number">Phone Number *</label>
 									</div>
@@ -491,6 +504,8 @@ function TeacherInformation({ t }) {
 											required
 											readOnly
 											id="email"
+											value={dataTeacher?.Email}
+											disabled
 										/>
 										<label htmlFor="email">Email</label>
 									</div>
@@ -507,6 +522,8 @@ function TeacherInformation({ t }) {
 											ref={register}
 											required
 											id="skype-id"
+											value={dataTeacher?.SkypeID}
+											disabled
 										/>
 										<label htmlFor="skype-id">Skype ID *</label>
 									</div>
@@ -528,6 +545,8 @@ function TeacherInformation({ t }) {
 											ref={register}
 											required
 											id="birthday"
+											value={dataTeacher?.BirthDay}
+											disabled
 										/>
 										<label htmlFor="birthday">BirthDay *</label>
 									</div>
@@ -561,7 +580,7 @@ function TeacherInformation({ t }) {
 											id="location"
 										/>
 
-										<label htmlFor="location">Location</label>
+										<label htmlFor="location">location</label>
 									</div>
 									{!!errors && !!errors.location && (
 										<span className="tx-danger mg-t-5 d-block">
@@ -632,6 +651,8 @@ function TeacherInformation({ t }) {
 											name="schoolName"
 											ref={register}
 											id="school-name"
+											value={dataTeacher?.TeacherSchool}
+											disabled
 										/>
 										<label htmlFor="school-name">School name</label>
 									</div>
@@ -647,6 +668,8 @@ function TeacherInformation({ t }) {
 											name="major"
 											ref={register}
 											id="marjor"
+											value={dataTeacher?.Course}
+											disabled
 										/>
 										<label htmlFor="major">Course *</label>
 									</div>
@@ -661,6 +684,7 @@ function TeacherInformation({ t }) {
 											placeholder="Experience"
 											name="experience"
 											ref={register}
+											value={dataTeacher?.Experience}
 											id="experience"
 										/>
 										<label htmlFor="experience">Experience</label>
@@ -704,6 +728,8 @@ function TeacherInformation({ t }) {
 											placeholder="Description"
 											name="description"
 											ref={register}
+											disabled
+											value={dataTeacher?.Description}
 											id="description"
 										/>
 										<label htmlFor="description">Description</label>

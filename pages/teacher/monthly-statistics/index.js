@@ -9,19 +9,19 @@ import { i18n, Link, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
 const timeOptions = [
 	{
-		value: 4,
+		value: 1,
 		label: 'This month',
 	},
 	{
-		value: 1,
+		value: 2,
 		label: '30 days ago',
 	},
 	{
-		value: 2,
+		value: 3,
 		label: 'Last month',
 	},
 	{
-		value: 3,
+		value: 4,
 		label: 'Last 3 month',
 	},
 ];
@@ -35,10 +35,7 @@ const MonthlyStatistics = ({ t }) => {
 
 	const getAPI = async (params) => {
 		setIsloading(true);
-		const res = await teacherMonthlyStatistics({
-			Type: select.value,
-			params,
-		});
+		const res = await teacherMonthlyStatistics(params);
 		if (res.Code === 200) {
 			setState(res.Data);
 		} else {
@@ -62,10 +59,19 @@ const MonthlyStatistics = ({ t }) => {
 			}
 		}
 
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
-			typeSearch: 1,
-			UID: 61230,
-			Token: '',
+			typeSearch: select.value,
+			UID: UID,
+			Token: Token,
 		});
 	}, [select]);
 	return (
@@ -203,7 +209,7 @@ const MonthlyStatistics = ({ t }) => {
 						</div>
 					</div>
 				</div>
-				<div className="card">
+				{/* <div className="card">
 					<div className="card-body">
 						<div className="table-responsive">
 							<table
@@ -258,7 +264,7 @@ const MonthlyStatistics = ({ t }) => {
 							</table>
 						</div>
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</>
 	);

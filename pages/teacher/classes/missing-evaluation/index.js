@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Pagination from 'react-js-pagination';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
+
 import { getLayout } from '~/components/Layout';
 import Skeleton from 'react-loading-skeleton';
 import { teacherMissingFeedback } from '~/api/teacherAPI';
@@ -8,11 +8,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
 
 function getData() {
 	const andt = dataHy.MissingEvaluationClasses;
 	return andt;
 }
+
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
+
 const MissingFeedbackRow = ({ data }) => {
 	const {
 		BookingID,
@@ -81,11 +112,13 @@ const MissingFeedbackClasses = ({ t }) => {
 	const [data, setData] = useState(null);
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
+	const [state, dispatch] = useReducer(reducer, initialState);
 
-	const loadMissingFeedback = async () => {
+	const loadMissingFeedback = async (params) => {
 		try {
-			const res = await teacherMissingFeedback({ Page: pageNumber });
+			const res = await teacherMissingFeedback(params);
 			if (res?.Code && res.Code === 200) {
+				dispatch({ type: 'ADD_PAGE', res });
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
@@ -100,7 +133,6 @@ const MissingFeedbackClasses = ({ t }) => {
 	};
 
 	const layData = getData();
-	console.log('tu hy', layData);
 
 	useEffect(() => {
 		if (!localStorage.getItem('isLogin')) {
@@ -117,12 +149,20 @@ const MissingFeedbackClasses = ({ t }) => {
 			}
 		}
 
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		loadMissingFeedback({
-			page: 1,
-			Token: '',
-			UID: 61230,
+			page: state.page,
+			UID: UID,
 		});
-	}, [pageNumber]);
+	}, [state.page]);
 
 	return (
 		<>
@@ -224,18 +264,17 @@ const MissingFeedbackClasses = ({ t }) => {
 							</table>
 						</div>
 
-						{totalResult > pageSize && (
-							<Pagination
-								innerClass="pagination mg-t-15"
-								activePage={pageNumber}
-								itemsCountPerPage={pageSize}
-								totalItemsCount={totalResult}
-								pageRangeDisplayed={5}
-								onChange={(page) => setPageNumber(page)}
-								itemClass="page-item"
-								linkClass="page-link"
-								activeClass="active"
-							/>
+						{state?.TotalResult > 0 && (
+							<Box display={`flex`} justifyContent={`center`} mt={4}>
+								<Pagination
+									count={Math.ceil(state?.TotalResult / state?.PageSize)}
+									color="secondary"
+									onChange={(obj, page) =>
+										dispatch({ type: 'SELECT_PAGE', page })
+									}
+									c
+								/>
+							</Box>
 						)}
 					</>
 				</div>

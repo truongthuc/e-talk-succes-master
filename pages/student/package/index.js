@@ -80,6 +80,27 @@ const Package = ({ t }) => {
 	console.log(data);
 	const [initialState, setinitialState] = useState(initialState);
 
+	// const returnStatus = {
+	// 	1: 'Chưa hoàn thành',
+	// 	3: 'Hoàn thành',
+	// 	4: 'Chưa đóng học phí',
+	// 	5: 'Đã đóng học phí',
+	// };
+
+	const returnStatus = (status) => {
+		let text = '';
+		if (status === 1) {
+			text = 'Chưa hoàn thành';
+		} else if (status === 3) {
+			text = 'Hoàn thành';
+		} else if (status === 4) {
+			text = 'Chưa đóng học phí';
+		} else {
+			text = 'Đã đóng học phí';
+		}
+		return text;
+	};
+
 	const getAPI = async (params) => {
 		setLoading(true);
 
@@ -236,7 +257,11 @@ const Package = ({ t }) => {
 
 												<td>
 													<span className="badge badge-warning badge-beauty">
-														Đang học
+														{
+															// item.Status == 1 && "Chưa hoàn thành"
+															// item.Status == 3 && "Hoàn thành khóa học"
+															returnStatus(item.Status)
+														}
 													</span>
 												</td>
 											</tr>

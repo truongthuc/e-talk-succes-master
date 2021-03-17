@@ -109,7 +109,7 @@ export const GetTeacherProfile = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetTeacherProfile', {
 			params: {
-				UID: appSettings.UID,
+				UID: params.UID,
 				Token: params.Token,
 				TeacherID: params.TeacherID,
 			},
@@ -120,6 +120,24 @@ export const GetTeacherProfile = async (params) => {
 	}
 	return result;
 };
+
+export const getTeacherInfoProfile = async (params = {}) => {
+	let result;
+	try {
+		let res = await instance.get(path + '/teacherGetInfo', {
+			params: {
+				...params,
+				UID: params.UID,
+				Token: params.Token,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
 export const GetNotifications = async (params) => {
 	let result;
 	try {
@@ -258,6 +276,7 @@ export const setEventAvailable = async (params, ...ars) => {
 		formdata.append('title', '');
 		formdata.append('courseID', params.courseID);
 		formdata.append('teacherID', params.teacher);
+		formdata.append('timeCourse', params.timeCourse);
 		console.log('form data', formdata);
 		let res = await instance.post(path + '/StudentBooking', formdata, {});
 		result = res.data;
@@ -267,14 +286,14 @@ export const setEventAvailable = async (params, ...ars) => {
 	}
 	return result;
 };
-export const StudentCancelBooked = async (params, ...ars) => {
+export const StudentCancelBooked = async (params) => {
 	console.log('StudentCancelBooked', params);
 	let result;
 	try {
 		const formdata = new FormData();
 		formdata.append('bookingID', params.BookingID);
-		formdata.append('UID', appSettings.UID);
-		formdata.append('Token', '');
+		formdata.append('UID', params.UID);
+		formdata.append('Token', params.Token);
 		console.log('form data', formdata);
 		let res = await instance.post(path + '/StudentCancelBooked', formdata, {});
 		result = res.data;
@@ -416,22 +435,28 @@ export const UpdateProfile = async (params, ...ars) => {
 	console.log('UpdateProfile', params);
 	let result;
 	try {
-		const formdata = new FormData();
-		formdata.append('UID', params.UID);
-		formdata.append('BirthDay', params.BirthDay);
-		formdata.append('Introduce', params.Introduce);
-		formdata.append('Country', params.Country);
-		formdata.append('Timezone', params.Timezone);
-		formdata.append('Token', params.Token);
-		formdata.append('BankName', params.BankName);
-		formdata.append('CardHolder', params.CardHolder);
-		formdata.append('AccountNumber', params.AccountNumber);
-		formdata.append('Branch', params.Branch);
-		formdata.append('BankAddress', params.BankAddress);
-		formdata.append('Avatar', params.Avatar);
-		formdata.append('Token', params.Token);
-		console.log('form data', formdata);
-		let res = await instance.post(path + '/UpdateProfile', formdata, {});
+		// const formdata = new FormData();
+		// formdata.append('UID', params.UID);
+		// formdata.append('BirthDay', params.BirthDay);
+		// formdata.append('Introduce', params.Introduce);
+		// formdata.append('Country', params.Country);
+		// formdata.append('Timezone', params.Timezone);
+		// formdata.append('Token', params.Token);
+		// formdata.append('BankName', params.BankName);
+		// formdata.append('CardHolder', params.CardHolder);
+		// formdata.append('AccountNumber', params.AccountNumber);
+		// formdata.append('Branch', params.Branch);
+		// formdata.append('BankAddress', params.BankAddress);
+		// formdata.append('Avatar', params.Avatar);
+
+		// console.log('form data', formdata);
+		let fData = new FormData();
+		Object.keys(params).map((key) => {
+			fData.append(key, params[key]);
+		});
+		fData.append('Token', localStorage.getItem('token'));
+
+		let res = await instance.post(path + '/UpdateProfile', fData, {});
 		result = res.data;
 	} catch (error) {
 		console.log('Error: ', error);
@@ -585,9 +610,7 @@ export const GetReferral = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetReferral', {
 			params: {
-				fromdate: params.fromdate,
-				todate: params.todate,
-				UID: appSettings.UID,
+				UID: params.UID,
 				Token: params.Token,
 				Page: params.Page,
 			},
@@ -730,6 +753,25 @@ export const LoadCourseInfo = async (params) => {
 				bookingid: params.bookingid,
 			},
 			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const studentLoadDetailNotification = async (params) => {
+	let result;
+
+	// console.log('Params trong E-Talk: ', params);
+
+	try {
+		let res = await instance.get(path + '/studentLoadDetailNotification', {
+			params: {
+				ID: params.ID,
+				Token: params.Token,
+			},
 		});
 		result = res.data;
 	} catch (error) {

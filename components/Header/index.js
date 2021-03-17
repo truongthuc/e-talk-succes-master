@@ -43,6 +43,13 @@ const Header = ({ t, isStudent }) => {
 		dataProfile,
 		changeIsAuth,
 	} = useAuth();
+
+	let linkImg = dataUser?.AvatarThumnail;
+
+	if (linkImg?.charAt(0) === '/') {
+		linkImg = linkImg?.substring(1);
+	}
+
 	const _handleChangeSelect = (selected) => {
 		setLang(selected);
 		i18n.changeLanguage(selected.value === 'en' ? 'en' : 'vi');
@@ -222,11 +229,7 @@ const Header = ({ t, isStudent }) => {
 							data-display="static"
 						>
 							<div className="avatar avatar-sm mg-r-5">
-								<img
-									src="/static/img/avatar.jpg"
-									className="rounded-circle"
-									alt=""
-								/>
+								<img src={linkImg} className="rounded-circle" alt="" />
 							</div>
 							<div className="d-flex align-items-center">
 								<span className="name">{dataUser?.StudentName}</span>{' '}
@@ -238,11 +241,7 @@ const Header = ({ t, isStudent }) => {
 						</a>
 						<div className="dropdown-menu dropdown-menu-right tx-13">
 							<div className="avatar avatar-lg mg-b-15">
-								<img
-									src="/static/img/avatar.jpg"
-									className="rounded-circle"
-									alt=""
-								/>
+								<img src={linkImg} className="rounded-circle" alt="" />
 							</div>
 							<h6 className="tx-semibold mg-b-5">{dataUser?.StudentName}</h6>
 							<p className="mg-b-25 tx-12 tx-color-03">

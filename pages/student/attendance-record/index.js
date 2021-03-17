@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import dataHy from '../../../../data/data.json';
+// import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import dayjs from 'dayjs';
 

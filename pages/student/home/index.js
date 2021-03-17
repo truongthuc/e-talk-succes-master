@@ -112,7 +112,7 @@ const Home = ({ t }) => {
 
 	const [process, setProcess] = useState();
 
-	console.log('Process: ', process);
+	console.log('Data His: ', dataHis);
 
 	const cancelToastFail = () => toast.error(FETCH_ERROR, toastInit);
 
@@ -249,8 +249,11 @@ const Home = ({ t }) => {
 
 	const [dataComing, setDataComing] = useState();
 
+	console.log('Data Coming: ', dataComing);
+
 	const _getCoursesInfoAPI = async (params) => {
 		setLoadingCourseInfo(true);
+		setLoading(false);
 		const res = await getUpcomingLessons(params);
 		if (res.Code === 200) {
 			console.log('DATA coming up: ', res.Data);
@@ -266,6 +269,8 @@ const Home = ({ t }) => {
 		}
 		setLoadingCourseInfo(false);
 	};
+
+	console.log('Loading: ', loading);
 
 	useEffect(() => {
 		if (!localStorage.getItem('isLogin')) {
@@ -354,15 +359,13 @@ const Home = ({ t }) => {
 							</a>
 						</div>
 
-						{/* <div className="course-horizental mg-t-15">
+						<div className="course-horizental mg-t-15">
 							<ul className="list-wrap">
 								{loading ? (
 									<SkeletonLessonCard />
-								) : (
-									dataComing?.length > 0 &&
+								) : dataComing?.length > 0 ? (
 									dataComing.map((item, index) => (
 										<LessonUpcomingCard
-										
 											Avatar={item.Avatar}
 											BookingID={item.BookingID}
 											CourseName={item.CourseName}
@@ -376,9 +379,11 @@ const Home = ({ t }) => {
 											TimeStudy={item.TimeStudy}
 										/>
 									))
+								) : (
+									''
 								)}
 							</ul>
-						</div> */}
+						</div>
 					</div>{' '}
 					<div className="lesson mg-t-45 animated fadeInUp am-animation-delay-2">
 						<div className="d-xl-flex align-items-center justify-content-between ">
@@ -408,37 +413,34 @@ const Home = ({ t }) => {
 									<p className=" tx-danger tx-medium">{t('no-class-yet')}.</p>
 								)}
 							</div>
-							{/* <ul className="list-wrap">
+							<ul className="list-wrap">
 								{loading ? (
 									<SkeletonLessonCard />
 								) : (
-									!!data &&
-									data.length > 0 &&
-									data.map((item) => (
+									dataHis?.length > 0 &&
+									dataHis?.map((item) => (
 										<LessonHistoryCard
 											key={item.BookingID}
 											BookingID={item.BookingID}
-											TeacherUID={item.TeacherUID}
+											TeacherID={item.TeacherID}
 											avatar={item.Avatar}
 											TeacherName={item.TeacherName}
 											CourseName={item.CourseName}
 											LessionMaterial={item.Material}
 											SpecialRequest={item.SpecialRequest}
-											start={convertDateFromTo(item.ScheduleTimeVN).fromTime}
-											end={convertDateFromTo(item.ScheduleTimeVN).endTime}
-											date={convertDateFromTo(item.ScheduleTimeVN).date}
-											DocumentName={item.DocumentName}
-											SkypeID={item.SkypeID}
+											start={item.StartTime}
+											end={item.EndTime}
+											TimeStudy={item.TimeStudy}
 											onHandleCancelBooking={handleCancelBooking}
 											onHandleRequireLesson={handleRequireLesson}
 											lock={lock}
-											cancelable={checkCancelTime(
-												convertDateFromTo(item.ScheduleTimeVN).dateObject,
-											)}
+											// cancelable={checkCancelTime(
+											// 	convertDateFromTo(item.ScheduleTimeVN).dateObject,
+											// )}
 										/>
 									))
 								)}
-							</ul>{' '} */}
+							</ul>{' '}
 						</div>{' '}
 					</div>{' '}
 				</>

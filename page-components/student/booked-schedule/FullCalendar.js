@@ -1,5 +1,7 @@
 import lottie from '~/node_modules/lottie-web/build/player/lottie.min.js';
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
+
 import {
 	getListEventsOfWeek,
 	setEventClose,
@@ -66,7 +68,7 @@ let calendar = null;
 
 const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 	teacher = Number(teacher);
-
+	const router = useRouter();
 	const [activeDate, setActiveDate] = useState(new Date());
 	const [eventSource, setEventSource] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +85,8 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 		date: '',
 	});
 	const [dataUser, setDataUser] = useState();
+
+	console.log('Data user: ', dataUser);
 
 	const [changeData, setChangeData] = useState(false);
 	const [openData, setOpenData] = useState();
@@ -266,41 +270,36 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 		let timeTeacher = modalData?.diff;
 		let timeCourse = modalData.timeCourse;
 
-		if (timeCourse > timeTeacher) {
-			toast.error(
-				"You can't book this slot. Your choice of the period is not compatible with the course period. Please choose another slot!",
-				{
-					position: toast.POSITION.TOP_CENTER,
-					autoClose: 10000,
-				},
-			);
-			// setShowActiveModal(false);
-		} else {
-			const res = await setEventAvailable({
-				UID: dataUser?.UID,
-				token: dataUser?.token,
-				program: infoSubmit.program,
-				packageID: infoSubmit.packageID.toString(),
-				courseID: infoSubmit.courseID.toString(),
-				start: infoSubmit.start,
-				end: infoSubmit.end,
-				teacher: teacher,
+		const res = await setEventAvailable({
+			UID: dataUser?.UID,
+			token: dataUser?.token,
+			program: infoSubmit.program,
+			packageID: infoSubmit.packageID.toString(),
+			courseID: infoSubmit.courseID.toString(),
+			start: infoSubmit.start,
+			end: infoSubmit.end,
+			teacher: teacher,
+			timeCourse: timeCourse,
+		});
+		if (res.Code === 200) {
+			// event.setExtendedProp('loading', false);
+			toast.success('You have booked a lesson successfully', {
+				position: toast.POSITION.TOP_CENTER,
+				autoClose: 2000,
 			});
-			if (res.Code === 200) {
-				// event.setExtendedProp('loading', false);
-				toast.success('You have booked a lesson successfully', {
-					position: toast.POSITION.TOP_CENTER,
-					autoClose: 2000,
-				});
-				completeBooking && completeBooking();
-			} else {
-				toast.error('Open slot failed', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 2000,
-				});
-			}
-			setShowActiveModal(false);
+			completeBooking && completeBooking();
+		} else if (res.Code === 403) {
+			localStorage.clear();
+			router.push({
+				pathname: '/',
+			});
+		} else {
+			toast.error('Open slot failed', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 2000,
+			});
 		}
+		setShowActiveModal(false);
 	};
 
 	// const afterEventAdded = async (eventInfo) => {
@@ -393,6 +392,8 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 		try {
 			const res = await StudentCancelBooked({
 				BookingID: event.BookingID,
+				UID: dataUser?.UID,
+				Token: dataUser?.token,
 			});
 			if (res.Code === 200) {
 				// cancelBookedEvent(event);
@@ -402,6 +403,9 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 					autoClose: 2000,
 				});
 				$('body').find('.popover.show').remove();
+			} else if (res.Code === 403) {
+				localStorage.clear();
+				router.push('/login/signin');
 			} else {
 				toast.error(res?.Message ?? 'Cancel slot failed', {
 					position: toast.POSITION.TOP_CENTER,
@@ -453,7 +457,7 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 			let diff = getDifferentMinBetweenTime(new Date(), new Date(event.start));
 			let cancelable = diff > 60 ? true : false;
 			!!el &&
-				[...el.classList].includes('booked-slot') &&
+				[...el.classList].includes('custom-color-G') &&
 				$(el)
 					.popover({
 						html: true,
@@ -549,69 +553,73 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 		// };
 
 		const eventClick = (args) => {
-			toast.dismiss();
-			// Get time Course
-			let timeCourse = null;
-			if (localStorage.getItem('isLogin')) {
-				let dataUser = localStorage.getItem('dataUser');
-				dataUser = JSON.parse(dataUser);
+			console.log('ARG: ', args);
 
-				timeCourse = dataUser.TimeCourse;
-			}
+			if (args.el.className.includes('custom-color-H')) {
+				toast.dismiss();
+				// Get time Course
+				let timeCourse = null;
+				if (localStorage.getItem('isLogin')) {
+					let dataUser = localStorage.getItem('dataUser');
+					dataUser = JSON.parse(dataUser);
 
-			// ---------------
-
-			const element = args.el;
-
-			const { start, end, id, extendedProps } = args.event;
-			const diff = getDifferentMinBetweenTime(start, end);
-
-			setModalData({
-				...modalData,
-				start: extendedProps.StartDate,
-				end: extendedProps.EndDate,
-				diff: diff,
-				timeCourse: timeCourse,
-			});
-
-			// Get info to submit open slot
-
-			let studentid = null;
-			let bookingid = null;
-
-			if (localStorage.getItem('isLogin')) {
-				studentid = localStorage.getItem('UID');
-			}
-			bookingid = args.event.extendedProps.BookingID;
-
-			(async () => {
-				try {
-					const res = await LoadCourseInfo({
-						studentid: studentid,
-						bookingid: bookingid,
-					});
-					res.Code == 200 ? setOpenData(res.Data) : console.log('Error');
-				} catch (error) {
-					console.log(error);
+					timeCourse = dataUser.TimeCourse;
 				}
-			})();
 
-			// ---------------------------- //
+				// ---------------
 
-			if (
-				extendedProps.available ||
-				[...element.classList].includes('booked-slot') ||
-				[...element.classList].includes('booked-slot')
-			)
-				return;
+				const element = args.el;
 
-			setActiveModal({
-				...activeModal,
-				...args.event.extendedProps,
-				date: dayjs(extendedProps.StartDate).format('DD/MM/YYYY'),
-				start: dayjs(extendedProps.StartDate).format('HH:mm A'),
-				end: dayjs(extendedProps.EndDate).format('HH:mm A'),
-			});
+				const { start, end, id, extendedProps } = args.event;
+				const diff = getDifferentMinBetweenTime(start, end);
+
+				setModalData({
+					...modalData,
+					start: extendedProps.StartDate,
+					end: extendedProps.EndDate,
+					diff: diff,
+					timeCourse: timeCourse,
+				});
+
+				// Get info to submit open slot
+
+				let studentid = null;
+				let bookingid = null;
+
+				if (localStorage.getItem('isLogin')) {
+					studentid = localStorage.getItem('UID');
+				}
+				bookingid = args.event.extendedProps.BookingID;
+
+				(async () => {
+					try {
+						const res = await LoadCourseInfo({
+							studentid: studentid,
+							bookingid: bookingid,
+						});
+						res.Code == 200 ? setOpenData(res.Data) : console.log('Error');
+					} catch (error) {
+						console.log(error);
+					}
+				})();
+
+				// ---------------------------- //
+
+				if (
+					extendedProps.available ||
+					[...element.classList].includes('booked-slot') ||
+					[...element.classList].includes('booked-slot')
+				)
+					return;
+
+				setActiveModal({
+					...activeModal,
+					...args.event.extendedProps,
+					date: dayjs(extendedProps.StartDate).format('DD/MM/YYYY'),
+					start: dayjs(extendedProps.StartDate).format('HH:mm A'),
+					end: dayjs(extendedProps.EndDate).format('HH:mm A'),
+				});
+			}
 		};
 
 		calendar = new Calendar(calendarEl, {
@@ -877,7 +885,7 @@ const FullCalendar = ({ data = [], teacher, completeBooking }) => {
 
 		if (localStorage.getItem('isLogin')) {
 			let UID = localStorage.getItem('UID');
-			let token = localStorage.getItem('Token');
+			let token = localStorage.getItem('token');
 			setDataUser({
 				UID: UID,
 				token: token,

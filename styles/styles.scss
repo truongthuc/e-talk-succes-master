@@ -9497,39 +9497,40 @@ background: linear-gradient(180deg, rgba(230,30,101,1) 50%, rgb(218, 15, 86) 50%
 .formRegister .boxInput.label-radio label {
 	margin-bottom: 0 !important;
 } 
+
 // ---- style login fix bởi andeptrai -----
-.loginWrap {
-	margin: auto;
+  .loginWrap {
+    margin: auto;
 
 }
 .footerLogin {
-position: relative;
-bottom: inherit;
+  position: relative;
+  bottom: inherit;
 }
 body {
-overflow: auto;
+  overflow: auto;
 }
 .login-page {
-height: 100vh;
-justify-content: space-between;
+  height: 100vh;
+  justify-content: space-between;
 }
 .headerLogin {
-position: relative;
-top:inherit;
-left:inherit;
+  position: relative;
+  top:inherit;
+  left:inherit;
 }
 
 @media screen and (max-width:800px) {
-.login-page {
-	height: auto;
-}
-.loginWrap {
-	margin: 50px auto;
+  .login-page {
+    height: auto;
+  }
+  .loginWrap {
+    margin: 50px auto;
 }
 .footerLogin .tableFooter .columns .colum {
-width: 100%;
+  width: 100%;
 }
 .footerLogin .padding-left {
-padding-left: 0!important;
+  padding-left: 0!important;
 }
 }
