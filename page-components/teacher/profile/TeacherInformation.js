@@ -271,9 +271,8 @@ function TeacherInformation({ t }) {
 					phoneNumber: res.Data.PhoneNumber.toString() || '',
 					email: res.Data?.Email ?? '',
 					timeZone:
-						res.Data?.TimezoneList.find(
-							(option, index) =>
-								option.ID === parseInt(res.Data?.TeacherTimeZone),
+						res.Data?.NationList.find(
+							(option, index) => option.Nation === res.Data?.TeacherNational,
 						) ?? null,
 					schoolName: res.Data?.TeacherSchool ?? '',
 					major: res.Data?.Course ?? '',
@@ -300,7 +299,7 @@ function TeacherInformation({ t }) {
 
 				console.log('loadTeacherInfo', obj);
 				updateUserInfo({ ...res.Data, Avatar: res.Data?.TeacherIMG ?? '' });
-				updateState('timeZoneOptions', res.Data?.TimezoneList ?? []);
+				// updateState('timeZoneOptions', res.Data?.TimezoneList ?? []);
 				updateState('locationOptions', res.Data?.NationList ?? []);
 				// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
 				// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
@@ -415,13 +414,10 @@ function TeacherInformation({ t }) {
 		}
 		setSubmitLoading(false);
 	};
-
-	// useEffect(() => {
-	// 	!!watchLocation && !!watchLocation.ID
-	// 		? loadStateOptions(watchLocation.ID)
-	// 		: loadStateOptions(0);
-	// 	// console.log(watchLocation);
-	// }, [watchLocation]);
+	useEffect(() => {
+		setValue('timeZone', watchLocation);
+		return () => {};
+	}, [watchLocation]);
 
 	useEffect(() => {
 		loadTeacherInfo();
@@ -588,11 +584,11 @@ function TeacherInformation({ t }) {
 									<Controller
 										as={
 											<Select
-												key={(option) => `${option.ID}-${option.TimeZoneValue}`}
+												key={(option) => `${option.ID}-${option.TimeZoneName}`}
 												isSearchable={true}
 												isLoading={optionLoaded}
 												loadingMessage={() => 'Loading options...'}
-												options={state.timeZoneOptions}
+												options={[state.location]}
 												getOptionLabel={(option) => `${option.TimeZoneName}`}
 												getOptionValue={(option) => `${option.ID}`}
 												styles={appSettings.selectStyle}
