@@ -10,6 +10,39 @@ import { I18nContext } from 'next-i18next';
 import Select, { components } from 'react-select';
 import { appSettings } from '~/config';
 import Menu from '~/components/Menu';
+import { Modal } from 'react-bootstrap';
+import { loadPopup } from '~/api/loadPopup';
+import ReactHtmlParser from 'react-html-parser';
+
+let isShowNoti = false;
+
+function ModalNoti(props) {
+	const { data } = props;
+
+	return (
+		<Modal
+			{...props}
+			size="lg"
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+		>
+			<Modal.Header closeButton>
+				<Modal.Title
+					id="contained-modal-title-vcenter"
+					style={{ color: '#fa005e' }}
+				>
+					<img
+						src="/static/img/logo.png"
+						alt=""
+						style={{ width: 90, height: 'auto' }}
+					/>
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>{ReactHtmlParser(data?.PopupContent)}</Modal.Body>
+		</Modal>
+	);
+}
+
 const Layout = ({
 	children,
 	title = 'E-talk Elearning',
@@ -18,6 +51,29 @@ const Layout = ({
 	useEffect(() => {
 		isStudent ? (appSettings.UID = 1071) : (appSettings.UID = 20);
 	}, [isStudent]);
+
+	const [modalShow, setModalShow] = useState(false);
+
+	const [data, setData] = useState(false);
+
+	useEffect(() => {
+		getData();
+	}, []);
+
+	const getData = async () => {
+		try {
+			const response = await loadPopup();
+			console.log('response: ', response?.data);
+			setData(response?.data);
+
+			if (!response?.data?.IsHide) {
+				isShowNoti = true;
+				setModalShow(!modalShow);
+			}
+		} catch (error) {
+			console.log('components/Layout - getData: ', error);
+		}
+	};
 
 	return (
 		<>
@@ -35,6 +91,14 @@ const Layout = ({
 				</div>
 				<Footer />
 			</main>
+			<ModalNoti
+				show={isShowNoti}
+				onHide={() => {
+					isShowNoti = false;
+					setModalShow(!modalShow);
+				}}
+				data={data}
+			/>
 		</>
 	);
 };

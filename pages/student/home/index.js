@@ -1,25 +1,19 @@
-import React, { useState, useEffect, useReducer } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { BookOpen } from '@styled-icons/boxicons-regular/BookOpen';
 import { OpenBook } from '@styled-icons/entypo/OpenBook';
 import { CancelCircle } from '@styled-icons/icomoon/CancelCircle';
 import { TextDocument } from '@styled-icons/entypo/TextDocument';
-
 import LessonHistoryCard from '~/page-components/student/home/LessonHistoryCard';
 import LessonUpcomingCard from '~/page-components/student/home/LessonUpcomingCard';
-
 import RatingLessonModal from '~/components/common/Modal/RatingLessonModal';
 import RequireLessonModal from '~/components/common/Modal/RequireLessonModal';
 import CancelBookingLessonModal from '~/components/common/Modal/CancelBookingLessonModal';
 import PopUpCancelLesson from '~/components/common/Modal/PopUpCancelLesson';
 import SkeletonLessonCard from '~/page-components/student/home/SkeletonLessonCard';
 import { NOT_DATA_FOUND } from '~/components/common/Constant/message';
-
-import { convertDateFromTo, checkCancelTime } from '~/utils.js';
 import {
 	LessionHistory,
-	getCoursesInfoAPI,
 	getUpcomingLessons,
 	StudyProcess,
 } from '~/api/studentAPI';
@@ -28,19 +22,17 @@ import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import 'react-toastify/scss/main.scss';
 import { toastInit } from '~/utils';
-import {
-	CANCEL_BOOKING_SUCCESS,
-	FETCH_ERROR,
-} from '~components/common/Constant/toast';
+import { FETCH_ERROR } from '~components/common/Constant/toast';
 import { getStudentLayout } from '~/components/Layout';
 import { appSettings } from '~/config';
 import './index.module.scss';
-import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import dayjs from 'dayjs';
-import Link from 'next/link';
 import data from '../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
+import { Button, Modal } from 'react-bootstrap';
+
+let isShowNoti = false;
+
 const styledIcon = `
   color: ${appSettings.colors.primary};
   width: 30px;
@@ -87,6 +79,7 @@ const initialRequireLesson = {
 	DocumentName: '',
 	SkypeID: '',
 };
+
 const Home = ({ t }) => {
 	const router = useRouter();
 	const [state, setState] = useState({});
@@ -94,15 +87,12 @@ const Home = ({ t }) => {
 		id: '',
 		lock: false,
 	});
-	const [stateCancelLesson, setStateCancelLesson] = useState(
-		initialCancelLesson,
-	);
-	const [stateRatingLesson, setStateRatingLesson] = useState(
-		initialRatingLesson,
-	);
-	const [stateRequireLesson, setStateRequireLesson] = useState(
-		initialRequireLesson,
-	);
+	const [stateCancelLesson, setStateCancelLesson] =
+		useState(initialCancelLesson);
+	const [stateRatingLesson, setStateRatingLesson] =
+		useState(initialRatingLesson);
+	const [stateRequireLesson, setStateRequireLesson] =
+		useState(initialRequireLesson);
 	const [loading, setLoading] = useState(false);
 
 	const [courseInfo, setCourseInfo] = useState(null);

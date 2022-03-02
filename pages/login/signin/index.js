@@ -40,6 +40,7 @@ const FlatOption = (props) => {
 		</components.Option>
 	);
 };
+
 const useStyles = makeStyles((theme) => ({
 	styleInput: {
 		paddingLeft: '5px',

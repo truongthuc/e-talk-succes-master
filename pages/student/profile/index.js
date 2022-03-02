@@ -156,16 +156,24 @@ const StudentProfile = ({ t }) => {
 		try {
 			setLoadingProfile(true);
 			const resProfile = await getProfile(params);
+			// const d = resProfile.Data.BirthDay.replace('/', '-').replace('/', '-');
+
+			// const df = new Date('2021-11-22');
+
+			// console.log('date: ', df);
+
 			if (resProfile.Code === 200) {
 				setProfile({
 					...resProfile.Data,
 					BirthDay: new Date(resProfile.Data.BirthDay),
 				});
 				setAvatar(resProfile.Data.AvatarThumnail);
-				reset({
-					...resProfile.Data,
-					BirthDay: new Date(resProfile.Data.BirthDay),
-				});
+				// reset({
+				// 	...resProfile.Data,
+				// 	BirthDay: new Date(resProfile.Data.BirthDay),
+				// });
+
+				// KHÚC NÀY ĐANG BỊ LỖI NGÀY (YYYY-MM-DD) MỚI CONVERT KIỂU VẬY ĐƯỢC
 			}
 			setLoadingProfile(false);
 		} catch {}

@@ -25,6 +25,7 @@
 		"@fullcalendar/timegrid": "^5.3.1",
 		"@hookform/resolvers": "^0.1.1",
 		"@material-ui/core": "^4.11.2",
+		"@material-ui/icons": "^4.11.2",
 		"@material-ui/lab": "^4.0.0-alpha.57",
 		"@material-ui/styles": "^4.11.2",
 		"@tinymce/tinymce-react": "^3.7.0",
@@ -52,6 +53,7 @@
 		"react-datepicker": "^3.2.2",
 		"react-dom": "^16.13.1",
 		"react-hook-form": "^6.8.6",
+		"react-html-parser": "^2.0.2",
 		"react-js-pagination": "^3.0.3",
 		"react-loading-skeleton": "^2.1.1",
 		"react-number-format": "^4.4.1",
@@ -66,7 +68,7 @@
 		"yup": "^0.29.3"
 	},
 	"scripts": {
-		"dev": "next",
+		"dev": "next -p 3007",
 		"start": "next start -p $PORT",
 		"lint": "eslint components",
 		"build": "next build && next export",
