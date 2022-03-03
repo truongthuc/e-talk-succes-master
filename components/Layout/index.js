@@ -53,7 +53,6 @@ const Layout = ({
 	}, [isStudent]);
 
 	const [modalShow, setModalShow] = useState(false);
-
 	const [data, setData] = useState(false);
 
 	useEffect(() => {
@@ -63,10 +62,9 @@ const Layout = ({
 	const getData = async () => {
 		try {
 			const response = await loadPopup();
-			console.log('response: ', response?.data);
 			setData(response?.data);
 
-			if (!response?.data?.IsHide) {
+			if (response?.data?.IsHide !== undefined && !response?.data?.IsHide) {
 				isShowNoti = true;
 				setModalShow(!modalShow);
 			}

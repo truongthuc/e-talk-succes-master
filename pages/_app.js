@@ -13,6 +13,7 @@ import '~/styles/dashforge.scss';
 import '~/styles/styles.scss';
 import '~/components/Layout/layout.scss';
 import '~/styles/responsive.scss';
+import '~/public/static/lib/fontawesome-free-5.15.0-web/css/svg-with-js.css';
 import NProgress from 'nprogress'; //nprogress module
 import 'nprogress/nprogress.css';
 import dynamic from 'next/dynamic';

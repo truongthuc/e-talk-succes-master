@@ -471,7 +471,7 @@ const Signin = ({ t, isStudent }) => {
 											{!loading && (
 												<FontAwesomeIcon
 													icon="sign-in-alt"
-													className="fas fa-sign-in-alt"
+													className="fas fa-sign-in-alt mr-2"
 												/>
 											)}{' '}
 											{t('log-in')}
