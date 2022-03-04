@@ -111,6 +111,7 @@ const PaymentInfo = ({ t }) => {
 
 	useEffect(() => {
 		getBank();
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (

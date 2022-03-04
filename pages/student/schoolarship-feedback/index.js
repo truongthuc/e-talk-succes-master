@@ -14,78 +14,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
 import { toast, ToastContainer } from 'react-toastify';
-const fakeData = [
-	{
-		BookingID: randomId(),
-		CoursesID: randomId(),
-		DocumentID: 1,
-		DocumentName: 'Giao tiếp thực hành',
-		DocumentDetailID: 1,
-		LessionName: 'Gói học Regular',
-		TeacherName: 'Teacher Lyn',
-		Status: 1,
-		StatusString: '',
-		LessionDetail: '/student/evaluation/3',
-		Schedule: '20/10/2020 10:30 - 11:30',
-		TeacherUID: 3,
-	},
-	{
-		BookingID: randomId(),
-		CoursesID: randomId(),
-		DocumentID: 1,
-		DocumentName: 'Giao tiếp thực hành',
-		DocumentDetailID: 1,
-		LessionName: 'Gói học Regular',
-		TeacherName: 'Teacher Lyn',
-		Status: 1,
-		StatusString: '',
-		LessionDetail: '/student/evaluation/3',
-		Schedule: '20/10/2020 10:30 - 11:30',
-		TeacherUID: 3,
-	},
-	{
-		BookingID: randomId(),
-		CoursesID: randomId(),
-		DocumentID: 1,
-		DocumentName: 'Giao tiếp thực hành',
-		DocumentDetailID: 1,
-		LessionName: 'Gói học Regular',
-		TeacherName: 'Teacher Lyn',
-		Status: 1,
-		StatusString: '',
-		LessionDetail: '/student/evaluation/3',
-		Schedule: '20/10/2020 10:30 - 11:30',
-		TeacherUID: 3,
-	},
-	{
-		BookingID: randomId(),
-		CoursesID: randomId(),
-		DocumentID: 1,
-		DocumentName: 'Giao tiếp thực hành',
-		DocumentDetailID: 1,
-		LessionName: 'Gói học Regular',
-		TeacherName: 'Teacher Lyn',
-		Status: 1,
-		StatusString: '',
-		LessionDetail: '/student/evaluation/3',
-		Schedule: '20/10/2020 10:30 - 11:30',
-		TeacherUID: 3,
-	},
-	{
-		BookingID: randomId(),
-		CoursesID: randomId(),
-		DocumentID: 1,
-		DocumentName: 'Giao tiếp thực hành',
-		DocumentDetailID: 1,
-		LessionName: 'Gói học Regular',
-		TeacherName: 'Teacher Lyn',
-		Status: 1,
-		StatusString: '',
-		LessionDetail: '/student/evaluation/3',
-		Schedule: '20/10/2020 10:30 - 11:30',
-		TeacherUID: 3,
-	},
-];
+
 const initialState = {
 	isLoading: true,
 	lessonInfo: null,
@@ -181,18 +110,28 @@ const LessonItem = ({
 	start,
 	end,
 	date,
-
+	t,
 	TeacherUID,
 	TeacherName,
 	Status,
 	StatusString,
+	statusSubmit,
+	ContentFeedBack,
+	InternetRate,
+	PerformanceRate,
+	SatisfiedRate,
+	DocumentRate,
 }) => {
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
+
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const updateState = (key, value) => {
 		dispatch({ type: 'UPDATE_STATE', payload: { key, value } });
+	};
+
+	const handleShow = () => {
+		setShow(true);
 	};
 
 	const [dataUser, setDataUser] = useState();
@@ -228,6 +167,7 @@ const LessonItem = ({
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
+				statusSubmit();
 				setShow(false);
 			} else {
 				toast.error('Update feedback failed !!', {
@@ -252,6 +192,9 @@ const LessonItem = ({
 				token: token,
 			});
 		}
+		ScholarshipFeedback.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	const classes = useStyles();
@@ -259,17 +202,10 @@ const LessonItem = ({
 		<tr>
 			<td style={{ letterSpacing: '0.5px' }}>{CourseName}</td>
 			<td>{PackgaeName}</td>
-			<td className="tx-nowrap">
-				<Link
-					href={`/student/teacher-profile/[id]`}
-					as={`/student/teacher-profile/${TeacherUID}`}
-				>
-					<a href={true}>{TeacherName}</a>
-				</Link>
-			</td>
+			<td className="tx-nowrap">{TeacherName}</td>
 			<td style={{ whiteSpace: 'pre-line' }}>{StudyDate}</td>
 			<td className="tx-nowrap">
-				<span className="tx-success"></span>
+				<span className="">{ContentFeedBack}</span>
 				<ToastContainer
 					position="top-right"
 					autoClose={2000}
@@ -283,13 +219,11 @@ const LessonItem = ({
 				/>
 			</td>
 			<td style={{ textAlign: 'right' }}>
-				<Button
-					className="btn btn-info btn-icon btn-evalation"
-					onClick={handleShow}
-				>
+				<Button className="btn  btn-icon btn-info" onClick={handleShow}>
 					<i className="fas fa-file-alt mg-r-10"></i>
-					Đánh giá
+					{t('Remark')}
 				</Button>
+
 				<Modal show={show} onHide={handleClose}>
 					<Modal.Header closeButton>
 						<Modal.Title>Thông tin đánh giá</Modal.Title>
@@ -301,7 +235,7 @@ const LessonItem = ({
 									<span className="txt-rating">Kết nối mạng:</span>
 									<Rating
 										name="internetRate"
-										defaultValue={0}
+										defaultValue={InternetRate}
 										size="large"
 										onClick={(e) =>
 											updateState(
@@ -315,7 +249,7 @@ const LessonItem = ({
 									<span className="txt-rating">Sách / tài liệu:</span>
 									<Rating
 										name="documentRate"
-										defaultValue={0}
+										defaultValue={DocumentRate}
 										size="large"
 										onClick={(e) =>
 											updateState(
@@ -329,7 +263,7 @@ const LessonItem = ({
 									<span className="txt-rating">Hiệu quả giáo viên:</span>
 									<Rating
 										name="performanceRate"
-										defaultValue={0}
+										defaultValue={PerformanceRate}
 										size="large"
 										onClick={(e) =>
 											updateState(
@@ -343,7 +277,7 @@ const LessonItem = ({
 									<span className="txt-rating">Hài lòng của học viên:</span>
 									<Rating
 										name="satisfiedRate"
-										defaultValue={0}
+										defaultValue={SatisfiedRate}
 										size="large"
 										onClick={(e) =>
 											updateState(
@@ -355,20 +289,18 @@ const LessonItem = ({
 								</div>
 							</div>
 							<textarea
-								placeholder="General feedback..."
+								defaultValue={ContentFeedBack}
+								placeholder={t('Type feedback')}
 								onChange={(e) => updateState('ContentRate', e.target.value)}
 							></textarea>
 						</div>
 					</Modal.Body>
 					<Modal.Footer>
-						<Button
-							className="btn btn-info btn-icon btn-evalation"
-							onClick={handleClose}
-						>
-							Close
+						<Button className="btn  btn-icon btn-default" onClick={handleClose}>
+							{t('Close')}
 						</Button>
 						<Button
-							className="btn btn-info btn-icon btn-evalation mar-l-10"
+							className="btn  btn-icon btn-info mar-l-10"
 							onClick={_submitFeedback}
 						>
 							{submitLoading ? (
@@ -383,7 +315,7 @@ const LessonItem = ({
 									<FontAwesomeIcon icon="save" className="mar-r-5" />
 								</>
 							)}
-							<span>{submitLoading ? 'Submitting...' : 'Submit Feedback'}</span>
+							<span>{t('Submit Feedback')}</span>
 						</Button>
 					</Modal.Footer>
 				</Modal>
@@ -400,15 +332,17 @@ const ScholarshipFeedback = ({ t }) => {
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 	const [loading, setLoading] = useState(true);
+	const [statusSubmit, setStatusSubmit] = useState(false);
+	console.log('DATA feedback: ', data);
 
 	const getAPI = async (params) => {
 		setLoading(false);
 		const res = await GetListFeedback(params);
 		if (res.Code === 200) {
 			setData(res.Data);
-			setLoading(true);
-			setPageSize(res.PageSize);
-			setTotalResult(res.TotalResult);
+			// setLoading(true);
+			// setPageSize(res.PageSize);
+			// setTotalResult(res.TotalResult);
 		} else {
 			setData({});
 		}
@@ -438,23 +372,45 @@ const ScholarshipFeedback = ({ t }) => {
 		end = toDate;
 	};
 
-	let UID = null;
-	let Token = null;
-
-	// GET UID and Token
-	if (localStorage.getItem('UID')) {
-		UID = localStorage.getItem('UID');
-		Token = localStorage.getItem('token');
-	}
-
 	console.log('DATA: ', data);
 
 	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		if (statusSubmit) {
+			getAPI({
+				UID: UID,
+				Token: Token,
+				Page: 1,
+			});
+
+			setStatusSubmit(false);
+		}
+	}, [statusSubmit]);
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
 			UID: UID,
 			Token: Token,
 			Page: 1,
 		});
+		$('body').removeClass('show-aside');
 	}, []);
 	return (
 		console.log('render'),
@@ -464,7 +420,7 @@ const ScholarshipFeedback = ({ t }) => {
 				<div className="card">
 					<div className="card-body">
 						<div className="table-responsive mg-t-20">
-							<table className="table table-mobile">
+							<table className="table  table-fb">
 								<thead className="">
 									<tr>
 										<th>{t('course')}</th>
@@ -472,134 +428,147 @@ const ScholarshipFeedback = ({ t }) => {
 										<th>{t('teacher')}</th>
 										<th>{t('date')}</th>
 										<th>{t('feebback')}</th>
-										<th></th>
+										<th>{t('Action')}</th>
 									</tr>
 								</thead>
 								<tbody>
-									{loading ? (
-										<>
-											<tr>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-											</tr>
-											<tr>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-											</tr>
-											<tr>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-												<td>
-													<Skeleton />
-												</td>
-											</tr>
-										</>
-									) : !!data && Array.isArray(data) && data.length > 0 ? (
-										data.map((item) => (
-											<LessonItem
-												key={item.BookingID}
-												BookingID={item.BookingID}
-												DocumentID={item.DocumentID}
-												CourseName={item.CourseName}
-												DocumentDetailID={item.DocumentDetailID}
-												PackgaeName={item.PackgaeName}
-												LessonDetail={item.LessonDetail}
-												date={item.Schedule}
-												TeacherUID={item.TeacherUID}
-												TeacherName={item.TeacherName}
-												Status={item.Status}
-												StatusString={item.StatusString}
-												StudyDate={item.StudyDate}
-												feedbackID={item.ID}
-											/>
-										))
-									) : data.length === 0 ? (
-										<tr className="bg-transparent">
-											<td colSpan="6" className="tx-center">
-												<img
-													src="/static/img/no-data.svg"
-													alt="no-booking"
-													className="wd-200 d-block mx-auto"
+									{
+										loading ? (
+											<>
+												<tr>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+													<td>
+														<Skeleton />
+													</td>
+												</tr>
+											</>
+										) : data?.length > 0 ? (
+											data.map((item) => (
+												<LessonItem
+													key={item.BookingID}
+													BookingID={item.BookingID}
+													DocumentID={item.DocumentID}
+													CourseName={item.CourseName}
+													DocumentDetailID={item.DocumentDetailID}
+													PackgaeName={item.PackgaeName}
+													LessonDetail={item.LessonDetail}
+													date={item.Schedule}
+													TeacherUID={item.TeacherUID}
+													TeacherName={item.TeacherName}
+													Status={item.Status}
+													StatusString={item.StatusString}
+													StudyDate={item.StudyDate}
+													feedbackID={item.ID}
+													ContentFeedBack={item.ContentFeedBack}
+													statusSubmit={() => setStatusSubmit(true)}
+													t={t}
+													InternetRate={item.InternetRate}
+													DocumentRate={item.DocumentRate}
+													PerformanceRate={item.PerformanceRate}
+													SatisfiedRate={item.SatisfiedRate}
 												/>
-												<p className="tx-danger tx-medium mg-t-15">
-													{start.length > 0 && end.length > 0
-														? `Bạn chưa đăng ký lớp học nào từ ${
-																start.length > 0 ? `${start}` : ''
-														  }  ${end.length > 0 ? `đến ${end}` : ''}`
-														: start.length === 0 && end.length === 0
-														? `Bạn chưa đăng ký lớp học nào`
-														: start.length === 0
-														? `Bạn chưa đăng ký lớp học nào trước ${end}`
-														: `Bạn chưa đăng ký lớp học nào sau ${start}`}
-												</p>
-												<Link href="/student/booking-schedule">
-													<a href={true} className="btn btn-primary">
-														Đặt lịch học
-													</a>
-												</Link>
-											</td>
-										</tr>
-									) : (
-										!loading && (
-											<tr className="bg-transparent">
-												<td colSpan="6" className="tx-center">
-													<span className="d-block text-center tx-danger tx-medium">
-														Đã có lỗi xảy ra, xin vui lòng thử lại
-													</span>
-													<img
-														src="/static/assets/img/error.svg"
-														alt="error"
-														className="wd-200 mg-b-15"
-													/>
-												</td>
-											</tr>
+											))
+										) : (
+											data.length === 0 && (
+												<tr className="bg-transparent">
+													<td colSpan="6" className="tx-center">
+														<img
+															src="/static/img/no-data.svg"
+															alt="no-booking"
+															className="wd-200 d-block mx-auto"
+														/>
+														<p className="tx-danger tx-medium mg-t-15">
+															{start.length > 0 && end.length > 0
+																? `Bạn chưa đăng ký lớp học nào từ ${
+																		start.length > 0 ? `${start}` : ''
+																  }  ${end.length > 0 ? `đến ${end}` : ''}`
+																: start.length === 0 && end.length === 0
+																? `Bạn chưa đăng ký lớp học nào`
+																: start.length === 0
+																? `Bạn chưa đăng ký lớp học nào trước ${end}`
+																: `Bạn chưa đăng ký lớp học nào sau ${start}`}
+														</p>
+														{/* <Link href="/student/booking-schedule">
+															<a href={true} className="btn btn-primary">
+																Đặt lịch học
+															</a>
+														</Link> */}
+													</td>
+												</tr>
+											)
 										)
-									)}
+										// : (
+										// 	!loading && (
+										// 		<tr className="bg-transparent">
+										// 			<td colSpan="6" className="tx-center">
+										// 				<span className="d-block text-center tx-danger tx-medium">
+										// 					Đã có lỗi xảy ra, xin vui lòng thử lại
+										// 				</span>
+										// 				<img
+										// 					src="/static/assets/img/error.svg"
+										// 					alt="error"
+										// 					className="wd-200 mg-b-15 m-auto"
+										// 				/>
+										// 			</td>
+										// 			<td></td>
+										// 		</tr>
+										// 	)
+										// )
+									}
 								</tbody>
 							</table>
 						</div>
@@ -627,8 +596,5 @@ const ScholarshipFeedback = ({ t }) => {
 // export default EvaluationLists;
 
 ScholarshipFeedback.getLayout = getStudentLayout;
-ScholarshipFeedback.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(ScholarshipFeedback);

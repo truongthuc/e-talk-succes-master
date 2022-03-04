@@ -10,6 +10,9 @@ import { I18nContext } from 'next-i18next';
 import Select, { components } from 'react-select';
 import { appSettings } from '~/config';
 import Menu from '~/components/Menu';
+import { teacherGetHolidays } from '~/api/teacherAPI';
+import { useRouter } from 'next/router';
+
 import { Modal } from 'react-bootstrap';
 import { loadPopup } from '~/api/loadPopup';
 import ReactHtmlParser from 'react-html-parser';
@@ -17,7 +20,7 @@ import ReactHtmlParser from 'react-html-parser';
 let isShowNoti = false;
 
 function ModalNoti(props) {
-	const { data } = props;
+	const { data, close } = props;
 
 	return (
 		<Modal
@@ -26,15 +29,27 @@ function ModalNoti(props) {
 			aria-labelledby="contained-modal-title-vcenter"
 			centered
 		>
-			<Modal.Header closeButton>
+			<Modal.Header>
 				<Modal.Title
 					id="contained-modal-title-vcenter"
-					style={{ color: '#fa005e' }}
+					style={{
+						width: '100%',
+						display: 'flex',
+						flexDirection: 'row',
+						alignItems: 'center',
+						justifyContent: 'space-between',
+					}}
 				>
 					<img
 						src="/static/img/logo.png"
 						alt=""
-						style={{ width: 90, height: 'auto' }}
+						style={{ width: 80, height: 'auto' }}
+					/>
+
+					<i
+						onClick={() => close()}
+						className="fas fa-times"
+						style={{ color: '#f12b71' }}
 					/>
 				</Modal.Title>
 			</Modal.Header>
@@ -48,11 +63,13 @@ const Layout = ({
 	title = 'E-talk Elearning',
 	isStudent = false,
 }) => {
+	const router = useRouter();
 	useEffect(() => {
 		isStudent ? (appSettings.UID = 1071) : (appSettings.UID = 20);
 	}, [isStudent]);
 
 	const [modalShow, setModalShow] = useState(false);
+
 	const [data, setData] = useState(false);
 
 	useEffect(() => {
@@ -62,6 +79,7 @@ const Layout = ({
 	const getData = async () => {
 		try {
 			const response = await loadPopup();
+			console.log('response: ', response?.data);
 			setData(response?.data);
 
 			if (response?.data?.IsHide !== undefined && !response?.data?.IsHide) {
@@ -72,6 +90,33 @@ const Layout = ({
 			console.log('components/Layout - getData: ', error);
 		}
 	};
+
+	useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		(async () => {
+			try {
+				const res = await teacherGetHolidays({
+					UID: UID,
+					Token: Token,
+					Page: 1,
+				});
+				if (res.Code === 403) {
+					localStorage.clear();
+					router.push('/login/signin');
+				}
+			} catch (error) {
+				console.log('Error: ', error);
+			}
+		})();
+	}, [router]);
 
 	return (
 		<>
@@ -89,14 +134,20 @@ const Layout = ({
 				</div>
 				<Footer />
 			</main>
-			<ModalNoti
-				show={isShowNoti}
-				onHide={() => {
-					isShowNoti = false;
-					setModalShow(!modalShow);
-				}}
-				data={data}
-			/>
+			<div className="modal-message-noti">
+				<ModalNoti
+					show={isShowNoti}
+					onHide={() => {
+						isShowNoti = false;
+						setModalShow(!modalShow);
+					}}
+					data={data}
+					close={() => {
+						isShowNoti = false;
+						setModalShow(!modalShow);
+					}}
+				/>
+			</div>
 		</>
 	);
 };

@@ -1,0 +1,30 @@
+.cr-item .media {
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.cr-item .media .media-body .course-information .tx-medium {
+  display: inline-block;
+}
+
+@media screen and (max-width: 547px) {
+  .cr-item .media .teacher-information {
+    width: 100%;
+  }
+  .cr-item .media .teacher-information .teacher-avatar {
+    margin: 0 auto;
+  }
+  .cr-item .media .media-body {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 15px;
+  }
+  .cr-item .media .media-body h5 {
+    text-align: center;
+  }
+}
+
+.lesson-info .teacher-avatar .course-teacher {
+  background: transparent;
+  color: #000;
+}

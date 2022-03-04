@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TeacherInformation from '~/page-components/teacher/profile/TeacherInformation';
 import TeacherIntroduce from '~/page-components/teacher/profile/TeacherIntroduce';
 import TeacherExperience from '~/page-components/teacher/profile/TeacherExperience';
@@ -11,6 +11,12 @@ import { ToastContainer } from 'react-toastify';
 import { i18n, withTranslation } from '~/i18n';
 const ProfileInfor = ({ t }) => {
 	const [activePage, setActivePage] = useState('profile');
+
+	useEffect(() => {
+		ProfileInfor.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 
 	return (
 		<>
@@ -109,7 +115,5 @@ const ProfileInfor = ({ t }) => {
 // export default ProfileInfor;
 
 ProfileInfor.getLayout = getLayout;
-ProfileInfor.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(ProfileInfor);

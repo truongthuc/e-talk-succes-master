@@ -35,7 +35,7 @@ const FlatOption = (props) => {
 
 const Header = ({ t, isStudent }) => {
 	const { i18n } = useContext(I18nContext);
-	const [lang, setLang] = useState(LangOptions[0]);
+	const [lang, setLang] = useState(LangOptions[1]);
 	const {
 		isAuthenticated,
 		dataUser,
@@ -44,7 +44,10 @@ const Header = ({ t, isStudent }) => {
 		changeIsAuth,
 	} = useAuth();
 
+	console.log('LANG: ', lang);
+
 	let linkImg = dataUser?.AvatarThumnail;
+	// let timezoneName = dataUser?.TimeZoneName;;
 
 	if (linkImg?.charAt(0) === '/') {
 		linkImg = linkImg?.substring(1);
@@ -57,6 +60,7 @@ const Header = ({ t, isStudent }) => {
 	};
 
 	const setSelectLanguage = (key) => {
+		console.log('KEY: ', key);
 		setLang(LangOptions.find((item) => item.value === key));
 	};
 
@@ -64,13 +68,15 @@ const Header = ({ t, isStudent }) => {
 		if (typeof window === 'undefined') return;
 		try {
 			const language = window.localStorage.getItem('language');
-			console.log({ language });
+			console.log('Language: ', language);
 			language !== null && setSelectLanguage(JSON.parse(language));
-			language === null &&
+			if (language === null) {
+				setSelectLanguage('en');
 				window.localStorage.setItem(
 					'language',
 					JSON.stringify(i18n?.language ?? 'en'),
 				);
+			}
 		} catch (error) {}
 	};
 
@@ -84,6 +90,9 @@ const Header = ({ t, isStudent }) => {
 
 	useEffect(() => {
 		checkDefaultLanguage();
+		Header.getInitialProps = async () => ({
+			namespacesRequired: ['menu'],
+		});
 	}, []);
 	return (
 		<>
@@ -97,7 +106,7 @@ const Header = ({ t, isStudent }) => {
 							icon="globe-europe"
 							className="fas fa-globe-europe mg-r-5"
 						/>
-						Timezone:
+						{t('menu:Timezone')}:
 						<span className="tx-medium mg-l-10 tx-primary font-10">
 							GTM {dataUser?.TimeZoneName ?? '+7'}
 						</span>
@@ -229,7 +238,11 @@ const Header = ({ t, isStudent }) => {
 							data-display="static"
 						>
 							<div className="avatar avatar-sm mg-r-5">
-								<img src={linkImg} className="rounded-circle" alt="" />
+								<img
+									src={linkImg ? linkImg : '/static/img/user.png'}
+									className="rounded-circle"
+									alt=""
+								/>
 							</div>
 							<div className="d-flex align-items-center">
 								<span className="name">{dataUser?.StudentName}</span>{' '}
@@ -241,7 +254,11 @@ const Header = ({ t, isStudent }) => {
 						</a>
 						<div className="dropdown-menu dropdown-menu-right tx-13">
 							<div className="avatar avatar-lg mg-b-15">
-								<img src={linkImg} className="rounded-circle" alt="" />
+								<img
+									src={linkImg ? linkImg : '/static/img/user.png'}
+									className="rounded-circle"
+									alt=""
+								/>
 							</div>
 							<h6 className="tx-semibold mg-b-5">{dataUser?.StudentName}</h6>
 							<p className="mg-b-25 tx-12 tx-color-03">
@@ -249,7 +266,7 @@ const Header = ({ t, isStudent }) => {
 							</p>
 							<Link href={isStudent ? '/student/profile' : '/teacher/profile'}>
 								<a href={true} className="dropdown-item">
-									<i data-feather="user" /> View Profile
+									<i data-feather="user" /> {t('menu:Profile')}
 								</a>
 							</Link>
 							<div className="dropdown-divider" />
@@ -259,7 +276,7 @@ const Header = ({ t, isStudent }) => {
 								onClick={() => handleClick_logout()}
 							>
 								<i data-feather="log-out" />
-								Sign Out
+								{t('menu:Sign Out')}
 							</a>
 						</div>
 					</div>
@@ -268,9 +285,5 @@ const Header = ({ t, isStudent }) => {
 		</>
 	);
 };
-
-Header.getInitialProps = async () => ({
-	namespacesRequired: ['menu'],
-});
 
 export default withTranslation('menu')(Header);

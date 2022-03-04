@@ -94,10 +94,10 @@ const AllClassRow = ({ data, showStudentModal }) => {
 						href={true}
 						className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
 					>
-						<FontAwesomeIcon
+						{/* <FontAwesomeIcon
 							icon="vote-yea"
 							className="fas fa-vote-yea mg-r-5"
-						/>{' '}
+						/>{' '} */}
 						Detail
 					</a>
 				</Link>
@@ -131,6 +131,7 @@ const AttendanceRecord = ({ t }) => {
 	};
 
 	useEffect(() => {
+		$('body').removeClass('show-aside');
 		return unMountComponents;
 	}, []);
 
@@ -218,6 +219,12 @@ const AttendanceRecord = ({ t }) => {
 		}
 	}, [pageNumber, filterStatusAllClass]);
 
+	useEffect(() => {
+		AttendanceRecord.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
+
 	return (
 		<>
 			<h1 className="main-title-page">{t('attendance-record')}</h1>
@@ -271,9 +278,10 @@ const AttendanceRecord = ({ t }) => {
 			<div className="card mg-b-30">
 				<div className="card-body">
 					<div className="table-responsive">
-						<table className="table table-classrooms table-borderless responsive-table table-hover">
+						<table className="table table-classrooms table-borderless  table-hover">
 							<thead>
 								<tr>
+									<th className="clr-id text-left">{t('student-code')}</th>
 									<th className="clr-id text-left">{t('teacher-name')}</th>
 									<th className="clr-lesson text-left">{t('package')}</th>
 									<th className="clr-student text-left">{t('course')}</th>
@@ -369,6 +377,7 @@ const AttendanceRecord = ({ t }) => {
 								) : !!data && !!data.length > 0 ? (
 									data.map((item) => (
 										<tr>
+											<td>{item.StudentCode}</td>
 											<td>{item.TeacherName}</td>
 											<td>{item.PackageName}</td>
 											<td>{item.CourseName}</td>
@@ -433,8 +442,5 @@ const AttendanceRecord = ({ t }) => {
 
 // export default AttendanceRecord;
 AttendanceRecord.getLayout = getStudentLayout;
-AttendanceRecord.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(AttendanceRecord);

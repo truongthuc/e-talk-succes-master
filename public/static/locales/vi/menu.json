@@ -1,6 +1,6 @@
 {
 	"role": "Giáo viên",
-	"dashboard": "Bảng điều khiển",
+	"Dashboard": "Bảng điều khiển",
 	"monthly-statistics": "Thống kê tháng",
 	"booking-schedule": "Đặt lịch",
 	"schedule-log": "Bản ghi buổi dạy",
@@ -11,7 +11,7 @@
 	"attendance-record": "Điểm danh",
 	"feedback": "Feedback",
 	"end-date-student": "Ngày kết thúc gói học",
-	"day-off": "Ngày nghĩ",
+	"day-off": "Ngày nghỉ",
 	"notification": "Thông báo",
 	"ticket-support": "Ticket hỗ trợ",
 	"edit-profile": "Sửa thông tin",
@@ -23,5 +23,18 @@
 	"label-booking-schedule": "Đặt lịch dạy",
 	"label-statistics": "Thống kê",
 	"label-account": "Tài khoản",
-	"label-help-center": "Trung tâm hỗ trợ"
+	"label-help-center": "Trung tâm hỗ trợ",
+	"Schedule": "Quản lý lịch dạy",
+	"Timezone": "Múi giờ",
+	"Profile": "Hồ sơ cá nhân",
+	"Sign Out": "Thoát",
+	"Classrooms": "Quản lí lớp dạy",
+	"All classes": "Tất cả lớp dạy",
+	"Missing Evaluation": "Lớp chờ đánh giá",
+	"Evaluated": "Lớp đã đánh giá",
+	"Attendance Record": "Điểm danh",
+	"Feedback": "Phản hồi",
+	"End Date Package": "Ngày kết thúc gói học",
+	"Day off": "Ngày nghỉ",
+	"Students": "Quản lí học viên"
 }

@@ -1,6 +1,18 @@
 @import '../../../../styles/variable';
 
 #js-book-calendar {
+	.fc-list-event {
+		&:hover {
+			.fc-event-main,
+			.fc-list-event-time,
+			.label-book {
+				color: black !important;
+			}
+			.label-book.booked {
+				color: black !important;
+			}
+		}
+	}
 	.fc-timegrid-slot {
 		height: 2rem;
 	}
@@ -36,7 +48,7 @@
 		position: relative;
 		height: 100%;
 		border-color: #fff;
-		min-height: calc(2rem - 1px);
+		// min-height: calc(2rem - 1px);
 
 		.label-book {
 			font-size: 0.7rem;
@@ -66,6 +78,21 @@
 			}
 		}
 
+		&.custom-color-A {
+			background-color: blue !important;
+			border-color: blue !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: white;
+			}
+			.fc-list-event-time {
+				color: white;
+			}
+			.label-book {
+				color: white !important;
+			}
+		}
+
 		&.custom-color-B {
 			background-color: yellow !important;
 			border-color: yellow !important;
@@ -74,7 +101,7 @@
 				color: black;
 			}
 			.label-book {
-				color: white !important;
+				color: black !important;
 			}
 		}
 
@@ -109,6 +136,9 @@
 			.fc-event-main {
 				color: white;
 			}
+			.fc-list-event-time {
+				color: white;
+			}
 			.label-book {
 				color: white !important;
 			}
@@ -117,22 +147,31 @@
 		&.custom-color-F {
 			background-color: purple !important;
 			border-color: purple !important;
+			background-image: none !important;
 			.fc-event-main {
 				color: black;
+			}
+			.label-book {
+				color: white !important;
 			}
 		}
 
 		&.custom-color-G {
 			background-color: #88b0f1 !important;
 			border-color: #88b0f1 !important;
+			background-image: none !important;
 			.fc-event-main {
 				color: black;
+			}
+			.label-book {
+				color: black !important;
 			}
 		}
 
 		&.custom-color-H {
 			background-color: #def6da !important;
 			border-color: #def6da !important;
+			background-image: none !important;
 			.fc-event-main {
 				color: black;
 			}
@@ -141,8 +180,24 @@
 		&.custom-color-I {
 			background-color: #ff6fa2 !important;
 			border-color: #ff6fa2 !important;
+			background-image: none !important;
 			.fc-event-main {
 				color: black;
+			}
+		}
+
+		&.custom-color-J {
+			background-color: black !important;
+			border-color: black !important;
+			background-image: none !important;
+			.fc-event-main {
+				color: black;
+			}
+			.fc-list-event-time {
+				color: white;
+			}
+			.label-book {
+				color: white !important;
 			}
 		}
 
@@ -401,6 +456,7 @@
 		right: 10px;
 		border: 1px solid #e1e1e1;
 		border-bottom: 0;
+		display: none;
 	}
 
 	a.fc-col-header-cell-cushion {
@@ -673,4 +729,94 @@
 	max-height: 500px;
 	max-width: 768px;
 	margin: 0 auto;
+}
+
+.modal-content {
+	border-radius: 5px;
+}
+.btnAccept {
+	padding: 5px 5px;
+	background: #ff5b66;
+	border-radius: 5px;
+	color: white;
+	font-weight: bold;
+	width: 80px;
+	display: inline-block;
+	text-align: center;
+	margin: 0 5px;
+	&:hover {
+		background: #e6333f !important;
+		color: white !important;
+	}
+}
+.btnClose {
+	padding: 5px 5px;
+	background: #b1b1b1;
+	border-radius: 5px;
+	color: white;
+	font-weight: bold;
+	width: 80px;
+	display: inline-block;
+	text-align: center;
+	margin: 0 5px;
+	&:hover {
+		background: #969696 !important;
+		color: white !important;
+	}
+}
+
+.box-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 30px;
+}
+.note-color {
+	width: 50%;
+	border: 1px solid gainsboro;
+	border-radius: 10px;
+	padding: 20px;
+
+	.item-note {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		margin-bottom: 5px;
+
+		.box-color {
+			width: 35px;
+			height: 25px;
+			margin-right: 10px;
+		}
+		.text {
+			width: calc(100% - 35px);
+			font-weight: 400;
+			font-size: 14px;
+		}
+	}
+
+	.color-a {
+		background-color: #0026e0;
+	}
+	.color-b {
+		background-color: yellow;
+	}
+	.color-c {
+		background-color: red;
+	}
+	.color-d {
+		background-color: grey;
+	}
+	.color-e {
+		background-color: #1f4e78;
+	}
+
+	.color-f {
+		background-color: purple;
+	}
+	.color-g {
+		background-color: #88b0f1;
+	}
+	.color-h {
+		background-color: #def6da;
+	}
 }

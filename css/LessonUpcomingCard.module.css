@@ -1,0 +1,89 @@
+.cr-item > .media {
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.cr-item > .media .media-body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  padding: 0 !important;
+}
+
+.cr-item > .media .media-body .course-actions {
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  position: static;
+  -webkit-box-pack: unset;
+      -ms-flex-pack: unset;
+          justify-content: unset;
+}
+
+.cr-item > .media .media-body .course-actions .action-left {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.cr-item > .media .media-body .course-actions .action-left a:first-child {
+  width: 180px;
+  margin-right: 10px;
+}
+
+.cr-item > .media .media-body .course-actions .action-left a:last-child {
+  width: 180px;
+  margin-right: 10px;
+}
+
+.cr-item > .media .media-body .course-actions .action-right {
+  width: 180px;
+  text-align: right;
+}
+
+@media screen and (max-width: 1199px) {
+  .cr-item > .media .media-body .course-actions .action-left {
+    width: 100%;
+  }
+  .cr-item > .media .media-body .course-actions .action-left a {
+    width: 100% !important;
+    margin: 5px 0 !important;
+  }
+  .cr-item > .media .media-body .course-actions .action-right {
+    width: 100%;
+    margin: 5px 0;
+  }
+  .cr-item > .media .media-body .course-actions .action-right a {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .cr-item > .media .teacher-information {
+    width: 100%;
+  }
+  .cr-item > .media .teacher-information .teacher-avatar {
+    margin: 0 auto;
+  }
+  .cr-item > .media .media-body {
+    width: 100%;
+    padding-top: 15px;
+    margin-left: 0 !important;
+  }
+  .cr-item > .media .media-body h5 {
+    text-align: center;
+  }
+}
+
+.lesson-info .teacher-avatar .course-teacher {
+  background: transparent;
+  color: #000;
+}

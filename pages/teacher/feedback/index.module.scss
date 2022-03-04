@@ -84,10 +84,11 @@
 		position: sticky;
 		top: 0;
 	}
-	.feedback-container {
-		display: flex;
-		/* margin: 0 -15px; */
-	}
+	// .feedback-container {
+	// 	display: flex;
+	// 	width: 60%;
+
+	// }
 
 	.filter-sidebar {
 		width: 350px;
@@ -112,4 +113,27 @@
 	&:first-child {
 		font-weight: 600;
 	}
+}
+
+.listFeedback {
+	padding-left: 0;
+	li {
+		list-style: none;
+		font-weight: 600;
+		margin-bottom: 7px;
+		span {
+			color: #fa005e;
+		}
+		span.text {
+			color: #616161;
+			width: 135px;
+			display: inline-block;
+		}
+	}
+}
+
+.title-fb {
+	color: #616161;
+	width: 135px;
+	font-weight: 600;
 }

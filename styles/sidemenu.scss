@@ -4,7 +4,7 @@ $link-color: #96adcc;
 $link-hover: #fff;
 $border-color: #405d87;
 .aside-fixed {
-	width: 300px;
+	width: 260px;
 	& + .content {
 		padding: 0;
 	}
@@ -107,6 +107,10 @@ $border-color: #405d87;
 
 @media screen and(min-width:1200px) {
 	.aside-fixed + .content {
-		margin-left: 300px;
+		margin-left: 260px;
 	}
+}
+
+.table-tutor-ds .list-tutor-ds {
+	justify-content: space-between;
 }

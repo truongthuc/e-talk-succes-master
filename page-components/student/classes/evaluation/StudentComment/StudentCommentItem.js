@@ -12,12 +12,14 @@ const StudentCommentItem = ({
 	Note,
 	Rate,
 	LinkDetail,
+	LinkFile,
 	CoursesName,
 	DocumentName,
 	CreatedDate,
 	Evaluation,
 	StudentIMG,
 	StudentName,
+	t,
 }) => {
 	return (
 		<div className="fb-item">
@@ -41,7 +43,7 @@ const StudentCommentItem = ({
 				</div>
 				<div className="wrapCourse">
 					<p style={{ marginBottom: '0' }}>
-						<b>Course Name:</b>{' '}
+						<b>{t('Course Name')}:</b>{' '}
 						<span style={{ color: '#fa005e', fontWeight: 'bold' }}>
 							{CoursesName}
 						</span>
@@ -73,16 +75,13 @@ const StudentCommentItem = ({
 				</div>
 				<div className="actions">
 					{LinkDetail && (
-						<Link
-							href="/student/classes/evaluation/22"
-							as={`/student/classes/evaluation/${LinkDetail}`}
-						>
-							<a href={true} className="btn btn-sm btn-success mg-r-10">
+						<Link href={LinkFile} as={LinkFile}>
+							<a href={LinkFile} className="btn btn-sm btn-info mg-r-10">
 								<FontAwesomeIcon
 									icon="vote-yea"
 									className="fas fa-vote-yea mg-r-5"
 								/>{' '}
-								Xem đánh giá
+								{t('Feedback of teacher')}
 							</a>
 						</Link>
 					)}

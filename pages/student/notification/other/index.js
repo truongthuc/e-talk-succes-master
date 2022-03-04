@@ -182,6 +182,7 @@ const Discount = ({ t }) => {
 			Token: Token,
 			Page: 1,
 		});
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (

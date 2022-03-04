@@ -1,6 +1,8 @@
 import instance, { getAccessToken } from './instanceAPI';
 import { appSettings } from '~/config';
+import dayjs from 'dayjs';
 const path = '/Api/ElearnTeacherApi';
+
 export const teacherDashboard = async (params = {}) => {
 	let result;
 	try {
@@ -39,7 +41,7 @@ export const teacherAllClass = async (params = {}) => {
 		let res = await instance.get(path + '/teacherAllClass', {
 			params: {
 				UID: params.UID,
-				token: params.token,
+				// token: params.token,
 				status: params.status,
 				fromdate: '',
 				todate: '',
@@ -53,13 +55,15 @@ export const teacherAllClass = async (params = {}) => {
 	return result;
 };
 export const teacherGetStudentInfo = async (params = {}) => {
+	console.log('Params detail: ', params);
+
 	let result;
 	try {
 		let res = await instance.get(path + '/teacherGetStudentInfo', {
 			params: {
-				UID: 61230,
-				studentUID: 61215,
-				Token: '',
+				UID: params.UID,
+				studentUID: params.studentUID,
+				Token: params.Token,
 			},
 		});
 		result = res.data;
@@ -69,16 +73,17 @@ export const teacherGetStudentInfo = async (params = {}) => {
 	return result;
 };
 export const teacherAttendanceRecord = async (params = {}) => {
+	console.log('Params trong API: ', params);
 	let result;
 	try {
 		let res = await instance.get(path + '/teacherAttendanceRecord', {
 			params: {
-				studentid: 1071,
-				UID: 61230,
-				fromdate: '',
-				todate: '',
-				Token: '',
-				page: 1,
+				studentid: params.studentid,
+				fromdate: params.fromdate,
+				todate: params.todate,
+				UID: params.UID,
+				Token: params.Token,
+				page: params.page,
 			},
 		});
 		result = res.data;
@@ -94,8 +99,8 @@ export const teacherStudentFeedback = async (params = {}) => {
 			params: {
 				sort: 0,
 				page: 1,
-				UID: 61230,
-				Token: '',
+				UID: params.UID,
+				Token: params.Token,
 			},
 		});
 		result = res.data;
@@ -140,8 +145,8 @@ export const teacherEndOfPackage = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherEndOfPackage', {
 			params: {
-				UID: 61230,
-				Token: '',
+				UID: params.UID,
+				Token: params.Token,
 			},
 		});
 		result = res.data;
@@ -187,9 +192,9 @@ export const teacherGetHolidays = async (params = {}) => {
 	try {
 		let res = await instance.get(path + '/teacherGetHolidays', {
 			params: {
-				UID: 61215,
-				Token: '',
-				Page: 1,
+				UID: params.UID,
+				Token: params.Token,
+				Page: params.Page,
 			},
 		});
 		result = res.data;
@@ -206,6 +211,7 @@ export const getListEventsOfWeek = async (params) => {
 	try {
 		let res = await instance.get(path + '/teacherLoadTeachingSchedule', {
 			params: {
+				sort: params.sort,
 				UID: params.UID,
 				start: params.start,
 				end: params.end,
@@ -831,10 +837,8 @@ export const teacherSaveEvaluation = async (values) => {
 		formdata.append('UID', values.UID);
 		formdata.append('Token', values.Token);
 		formdata.append('CourseStudentID', values.CourseStudentID);
-		formdata.append('TextBook', values.grammar);
-		formdata.append('EnglishLevel', values.pronunciation);
-		formdata.append('GeneralEvaluation', values.speaking);
-		formdata.append('Comment', values.vocabulary);
+		formdata.append('GeneralEvaluation', values.GeneralEvaluation);
+
 		let res = await instance.post(
 			path + '/teacherSaveEvaluation',
 			formdata,
@@ -857,10 +861,7 @@ export const teacherUpdateEvaluation = async (values) => {
 		formdata.append('UID', values.UID);
 		formdata.append('Token', values.Token);
 		formdata.append('EvaluationID', values.EvaluationID);
-		formdata.append('TextBook', values.textBook);
-		formdata.append('EnglishLevel', values.EnglishLevel);
-		formdata.append('GeneralEvaluation', values.generalEvaluation);
-		formdata.append('Comment', values.comment);
+		formdata.append('GeneralEvaluation', values.GeneralEvaluation);
 
 		console.log('form data', formdata);
 		let res = await instance.post(
@@ -881,8 +882,8 @@ export const setEventAvailable = async (params, ...ars) => {
 	let result;
 	try {
 		const formdata = new FormData();
-		formdata.append('UID', 61230);
-		formdata.append('Token', '');
+		formdata.append('UID', params.UID);
+		formdata.append('Token', params.token);
 		formdata.append('Start', params.start);
 		formdata.append('End', params.end);
 		console.log('form data', formdata);
@@ -903,8 +904,8 @@ export const setEventClose = async (params, ...ars) => {
 	let result;
 	try {
 		const formdata = new FormData();
-		formdata.append('UID', '61230');
-		formdata.append('Token', '');
+		formdata.append('UID', params.UID);
+		formdata.append('Token', params.token);
 		formdata.append('OpenID', params.OpenID);
 		let res = await instance.post(
 			path + '/teacherCancelFreeSchedule',
@@ -998,6 +999,65 @@ export const teacherDeleteEvaluation = async (values) => {
 		formdata.append('EvaluationID', values.EvaluationID);
 		let res = await instance.post(
 			path + '/teacherDeleteEvaluation',
+			formdata,
+			{},
+		);
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};
+
+export const UploadFileEvaluation = async (values) => {
+	let result;
+
+	console.log('Values File ben api: ', values);
+	try {
+		const formdata = new FormData();
+		formdata.append('file', values);
+
+		let res = await instance.post(path + '/UploadFileEvaluation', formdata, {});
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};
+
+export const GetDetailAttendanceRecord = async (params) => {
+	let result;
+
+	try {
+		let res = await instance.get(path + '/GetDetailAttendanceRecord', {
+			params: {
+				BookingID: params.BookingID,
+				UID: params.UID,
+				Token: params.Token,
+			},
+			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const ForgotPassword = async (values) => {
+	let result;
+
+	console.log('Values File ben api: ', values);
+	try {
+		const formdata = new FormData();
+		formdata.append('email', values);
+
+		let res = await instance.post(
+			'/Api/AccountApi' + '/ForgotPassword',
 			formdata,
 			{},
 		);

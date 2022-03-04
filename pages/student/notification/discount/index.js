@@ -19,7 +19,11 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
-import ReactHtmlParser from 'react-html-parser';
+import ReactHtmlParser, {
+	processNodes,
+	convertNodeToElement,
+	htmlparser2,
+} from 'react-html-parser';
 
 const useStyles = makeStyles((theme) => ({
 	modal: {
@@ -35,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 		borderRadius: '10px',
 		width: '68%',
 		height: '98%',
-		overflowY: 'auto',
+
 		[theme.breakpoints.down('md')]: {
 			width: '75%',
 		},
@@ -66,6 +70,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const BlogItem = ({
+	PostIMG,
 	NotificationID,
 	NotificationTitle,
 	NotificationIMG,
@@ -87,11 +92,11 @@ const BlogItem = ({
 
 	return (
 		<div className="card card-event">
-			{/* {isLoading ? (
+			{isLoading ? (
 				<Skeleton height={150} />
 			) : (
-				<img src={NotificationIMG} className="card-img-top" alt="" />
-			)} */}
+				<img src={PostIMG} className="card-img-top" alt="" />
+			)}
 
 			<div className="card-body tx-13">
 				<a href="#" onClick={getID}>
@@ -245,6 +250,7 @@ const Discount = ({ t }) => {
 					pathname: '/',
 				});
 			}
+			$('body').removeClass('show-aside');
 		}
 
 		getAPI({
@@ -253,6 +259,12 @@ const Discount = ({ t }) => {
 			Page: pagi.page,
 		});
 	}, [pagi.page]);
+
+	useEffect(() => {
+		Discount.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 
 	return (
 		<>
@@ -270,16 +282,18 @@ const Discount = ({ t }) => {
 			>
 				<Fade in={open}>
 					<div className={classes.paper}>
-						<button className={classes.iconClose} onClick={closeModal}>
-							<CloseIcon />
-						</button>
+						<div className="paper-detail-noti">
+							<button className={classes.iconClose} onClick={closeModal}>
+								<CloseIcon />
+							</button>
 
-						{ReactHtmlParser(dataDetail?.TitlePost)}
-						{ReactHtmlParser(dataDetail?.ContentPost)}
+							{ReactHtmlParser(dataDetail?.TitlePost)}
+							{ReactHtmlParser(dataDetail?.ContentPost)}
+						</div>
 					</div>
 				</Fade>
 			</Modal>
-			<h1 className="main-title-page">{t('tuition-fee-incentives')}</h1>
+			<h1 className="main-title-page">{t('Course Discount')}</h1>
 			<div className="blog__wrapper">
 				<div className="row row-sm mg-b-25 blog-list">
 					{loading ? (
@@ -316,6 +330,7 @@ const Discount = ({ t }) => {
 									isLoading={loading}
 									showDetail={(e) => showDetail(e)}
 									refID={refID}
+									PostIMG={item.PostIMG}
 								/>
 							</div>
 						))
@@ -345,8 +360,5 @@ const Discount = ({ t }) => {
 // export default Discount;
 
 Discount.getLayout = getStudentLayout;
-Discount.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(Discount);

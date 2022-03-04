@@ -1,0 +1,20 @@
+@media screen and (max-width: 768px) {
+  .table.responsive-table td {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    border-bottom: 1px solid #e1e1e1;
+    min-height: 3.55rem;
+  }
+  .table.responsive-table th {
+    background: #ebebeb;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  .table.responsive-table tbody {
+    overflow: hidden;
+    position: relative;
+  }
+}

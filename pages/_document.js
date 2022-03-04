@@ -1,16 +1,17 @@
 import React from 'react';
-import Document, { Head, Main, NextScript } from 'next/document';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 class MyDocument extends Document {
 	render() {
 		return (
-			<html lang="en">
+			<Html lang="en" translate="no">
 				<Head>
 					<meta charSet="utf-8" />
 					<meta name="viewport" content="width=device-width, initial-scale=1" />
 					<meta name="theme-color" content="#1F4069" />
+					<meta name="google" content="notranslate" />
 					<link rel="manifest" href="static/manifest.json" />
-					<link rel="icon" href="/static/logo.png" />
+					<link rel="icon" href="/static/logo.ico" />
 					<link
 						rel="stylesheet"
 						href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
@@ -33,7 +34,7 @@ class MyDocument extends Document {
 					<Main className="main-body" />
 					<NextScript />
 				</body>
-			</html>
+			</Html>
 		);
 	}
 }

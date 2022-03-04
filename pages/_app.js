@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Head from 'next/head';
 import App from 'next/app';
 import Router from 'next/router';
 import { config, library } from '@fortawesome/fontawesome-svg-core';
@@ -13,14 +14,17 @@ import '~/styles/dashforge.scss';
 import '~/styles/styles.scss';
 import '~/components/Layout/layout.scss';
 import '~/styles/responsive.scss';
-import '~/public/static/lib/fontawesome-free-5.15.0-web/css/svg-with-js.css';
 import NProgress from 'nprogress'; //nprogress module
 import 'nprogress/nprogress.css';
 import dynamic from 'next/dynamic';
+import { getLayout } from '~/components/Layout';
 import { appWithTranslation } from '~/i18n';
+import '~/public/static/lib/fontawesome-free-5.15.0-web/css/svg-with-js.css';
+
 config.autoAddCss = false;
 config.autoReplaceSvg = false;
 library.add(fas, far, faSkype, faYoutube);
+//Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());

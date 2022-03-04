@@ -1,0 +1,22 @@
+.slick-slider {
+	width: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.react-slideshow-wrapper.slide .images-wrap .each-slide {
+	height: 100%;
+}
+.boxForm {
+	position: relative;
+}
+.loginWrap .titleForm {
+	z-index: 999;
+	position: relative;
+}
+@media (max-width: 768px) {
+	.each-slide .height-mobile {
+		height: 462px;
+		object-fit: none;
+	}
+}

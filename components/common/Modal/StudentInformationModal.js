@@ -1,66 +1,95 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { teacherGetStudentInfo } from '~/api/teacherAPI';
 import Skeleton from 'react-loading-skeleton';
-import dataInfo from '../../../data/data.json';
+// import dataInfo from '../../../data/data.json';
+import { useRouter } from 'next/router';
 
-function getData() {
-	const andt = dataInfo.InfoModalStudent;
-	return andt;
-}
-const initialState = {
-	stImageUrl: '../assets/img/default-avatar.png',
-	stPhone: '',
-	stEmail: '',
-	stSkypeId: '',
-	stName: '',
-	stSex: '',
-	stCourseLearning: '',
-	stLastLesson: '',
-	stLanguage: '',
-	stIntroduce: '',
-	StudentName: '',
-	stTimeZone: '',
-	stDescription: '',
-};
+// function getData() {
+// 	const andt = dataInfo.InfoModalStudent;
+// 	return andt;
+// }
+// const initialState = {
+// 	stImageUrl: '../assets/img/default-avatar.png',
+// 	stPhone: '',
+// 	stEmail: '',
+// 	stSkypeId: '',
+// 	stName: '',
+// 	stSex: '',
+// 	stCourseLearning: '',
+// 	stLastLesson: '',
+// 	stLanguage: '',
+// 	stIntroduce: '',
+// 	StudentName: '',
+// 	stTimeZone: '',
+// 	stDescription: '',
+// };
 
 const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
-	const [state, setState] = React.useState(initialState);
+	const router = useRouter();
+
+	// const [state, setState] = React.useState(initialState);
 	const [isLoading, setIsloading] = React.useState(true);
-	const getAPI = async (params) => {
-		setIsloading(true);
-		// if (!!!studentId) return;
+	const [dataStudent, setDataStudent] = useState(null);
 
-		const res = await teacherGetStudentInfo(params);
-		// const res = await teacherGetStudentInfo({ params, StudentUID: studentId });
-		if (res.Code !== 200) {
-			setIsloading(false);
-			setState(initialState);
-			return;
-		}
-		setState({
-			...res.data,
-			stImageUrl: res.Data.Avatar,
-			stStudentName: res.Data.StudentName,
-			stSex: res.Data.Gender,
-			stLanguage: res.Data.LanguageString,
-			stTimeZone: res.Data.TimezoneName,
-			stIntroduce: res.Data.Introduce,
-			stSkypeId: res.Data.SkypeID,
-			stEmail: res.Data.Email,
-			stPhone: res.Data.Phone,
-		});
-		setIsloading(false);
-	};
+	// const getAPI = async (params) => {
+	// 	setIsloading(true);
+	// 	// if (!!!studentId) return;
 
-	const hotData = getData();
+	// 	const res = await teacherGetStudentInfo(params);
+	// 	// const res = await teacherGetStudentInfo({ params, StudentUID: studentId });
+	// 	if (res.Code !== 200) {
+	// 		setIsloading(false);
+	// 		setState(initialState);
+	// 		return;
+	// 	}
+	// 	setState({
+	// 		...res.data,
+	// 		stImageUrl: res.Data.Avatar,
+	// 		stStudentName: res.Data.StudentName,
+	// 		stSex: res.Data.Gender,
+	// 		stLanguage: res.Data.LanguageString,
+	// 		stTimeZone: res.Data.TimezoneName,
+	// 		stIntroduce: res.Data.Introduce,
+	// 		stSkypeId: res.Data.SkypeID,
+	// 		stEmail: res.Data.Email,
+	// 		stPhone: res.Data.Phone,
+	// 	});
+	// 	setIsloading(false);
+	// };
+
+	// const hotData = getData();
 
 	React.useEffect(() => {
-		getAPI({
-			UID: 61230,
-			studentUID: 61215,
-			Token: '',
-		});
+		let UID = null;
+		let Token = null;
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+		(async () => {
+			try {
+				const res = await teacherGetStudentInfo({
+					UID: UID,
+					Token: Token,
+					studentUID: studentId,
+				});
+				if (res.Code === 200) {
+					setDataStudent(res.Data);
+				} else if (res.Code === 403) {
+					localStorage.clear();
+					router.push({
+						pathname: '/',
+					});
+				} else {
+					console.log('Lỗi load data');
+				}
+			} catch (error) {
+				console.log('Error: ', error);
+			}
+		})();
 	}, [studentId]);
+
 	return (
 		<>
 			<div
@@ -86,10 +115,10 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 						<div className="modal-body">
 							<div className="d-flex">
 								<div className="flex-shrink-0 mg-r-15">
-									<img
-										src={dataInfo.InfoModalStudent[0].stImageUrl}
+									{/* <img
+										src={}
 										className="avatar-xxl avatar-xl rounded object-fit"
-									/>
+									/> */}
 								</div>
 								<div className="flex-grow-1">
 									<div className="d-flex mg-b-15">
@@ -97,7 +126,7 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 											<span>Full name:</span>
 										</div>
 										<div className="col">
-											<span>{state.stStudentName}</span>
+											<span>{dataStudent?.StudentName}</span>
 										</div>
 									</div>
 									<div className="d-flex mg-b-15">
@@ -105,7 +134,7 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 											<span>SkypeID:</span>
 										</div>
 										<div className="col">
-											<span>{state.stSkypeId}</span>
+											<span>{dataStudent?.SkypeID}</span>
 										</div>
 										{/* <div className="col"> */}
 										{/* <span className="valign-middle mg-r-5 tx-primary"><i className="fa fa-mars" /></span> */}
@@ -133,7 +162,7 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 											<span>Phone:</span>
 										</div>
 										<div className="col">
-											<span>{state.stPhone}</span>
+											<span>{dataStudent?.Phone}</span>
 										</div>
 									</div>
 									<div className="d-flex mg-b-15">
@@ -141,7 +170,7 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 											<span>Email:</span>
 										</div>
 										<div className="col">
-											<span>{state.stEmail}</span>
+											<span>{dataStudent?.Email}</span>
 										</div>
 									</div>
 									{/* <div className="d-flex mg-b-15">
@@ -158,7 +187,7 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 											<span>Timezone:</span>
 										</div>
 										<div className="col">
-											<span>{state.stTimeZone}</span>
+											<span>{dataStudent?.TimezoneName}</span>
 										</div>
 									</div>
 								</div>
@@ -167,9 +196,9 @@ const StudentInformationModal = React.forwardRef(({ studentId }, ref) => {
 								<div className="required-text-box mg-t-15">
 									<label className="tx-medium">
 										<i className="fas fa-info-circle mg-r-5"></i> Student
-										description:
+										introduce:
 									</label>
-									<p>{state.stIntroduce}</p>
+									<p>{dataStudent?.Introduce}</p>
 								</div>
 							</div>
 						</div>

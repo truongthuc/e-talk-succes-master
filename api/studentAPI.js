@@ -1,5 +1,6 @@
 import instance, { getAccessToken } from './instanceAPI';
 import { appSettings } from '~/config';
+import dayjs from 'dayjs';
 const path = '/Api/ElearnStudentApi';
 
 export const getLessons = async () => {
@@ -263,8 +264,6 @@ export const GetScheduleTeacherAPI = async (params) => {
 	return result;
 };
 export const setEventAvailable = async (params, ...ars) => {
-	console.log('StudentBooking', params);
-	console.log('setEventAvailable', params.start);
 	let result;
 	try {
 		const formdata = new FormData();
@@ -273,7 +272,7 @@ export const setEventAvailable = async (params, ...ars) => {
 		formdata.append('Start', params.start);
 		formdata.append('End', params.end);
 		formdata.append('pagekageID', params.packageID);
-		formdata.append('title', '');
+		formdata.append('title', params.title);
 		formdata.append('courseID', params.courseID);
 		formdata.append('teacherID', params.teacher);
 		formdata.append('timeCourse', params.timeCourse);
@@ -651,22 +650,22 @@ export const LessionHistory = async (params) => {
 	}
 	return result;
 };
-export const LoadFeeConfirm = async (params) => {
-	let result;
-	try {
-		let res = await instance.get(path + '/LoadFeeConfirm', {
-			params: {
-				UID: params.UID,
-				FeeConfirmID: params.FeeConfirmID,
-				token: params.token,
-			},
-		});
-		result = res.data;
-	} catch (error) {
-		return error.message ? error.message : (result = '');
-	}
-	return result;
-};
+// export const LoadFeeConfirm = async (params) => {
+// 	let result;
+// 	try {
+// 		let res = await instance.get(path + '/LoadFeeConfirm', {
+// 			params: {
+// 				UID: params.UID,
+// 				FeeConfirmID: params.FeeConfirmID,
+// 				token: params.token,
+// 			},
+// 		});
+// 		result = res.data;
+// 	} catch (error) {
+// 		return error.message ? error.message : (result = '');
+// 	}
+// 	return result;
+// };
 export const GetEvaluationContent = async (params) => {
 	let result;
 	try {
@@ -727,12 +726,31 @@ export const GetListTeacherPage = async (params) => {
 	try {
 		let res = await instance.get(path + '/GetListTeacher', {
 			params: {
-				Search: '',
+				Search: params.Search,
 				UID: params.UID,
 				Token: params.Token,
 				Page: params.Page,
 			},
 			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const LoadCourseStudent = async (params) => {
+	let result;
+
+	console.log('Params in here: ', params);
+
+	try {
+		let res = await instance.get(path + '/LoadCourseStudent', {
+			params: {
+				UID: params.UID,
+				token: params.Token,
+			},
 		});
 		result = res.data;
 	} catch (error) {
@@ -801,6 +819,27 @@ export const StudyProcess = async (params) => {
 	return result;
 };
 
+export const LoadFeeConfirm = async (params) => {
+	let result;
+
+	console.log('Params trong E-Talk: ', params);
+
+	try {
+		let res = await instance.get(path + '/LoadFeeConfirm', {
+			params: {
+				UID: params.UID,
+				Token: params.Token,
+				FeeConfirmID: params.FeeConfirmID,
+			},
+			//Param: int BookingID, int UID ? 0, string Token ? null
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
 export const addEvaluation = async (params) => {
 	console.log('Feed Back', params);
 
@@ -813,10 +852,90 @@ export const addEvaluation = async (params) => {
 		formdata.append('internetRate', params.internetRate);
 		formdata.append('documentRate', params.documentRate);
 		formdata.append('performanceRate', params.performanceRate);
-		formdata.append('satisfiedRate ', params.satisfiedRate);
-		formdata.append('ContentRate', params.ContentRate);
+		formdata.append('satisfiedRate', params.satisfiedRate);
+		formdata.append('contentRate', params.ContentRate);
 		console.log('form data', formdata);
 		let res = await instance.post(path + '/EditFeedback', formdata, {});
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const CreateFeeConfirm = async (params) => {
+	console.log('Feed Back', params);
+
+	let result;
+	try {
+		const formdata = new FormData();
+		formdata.append('UID', params.UID);
+		formdata.append('token', params.Token);
+		formdata.append('CourseStudentID', params.CourseStudentID);
+		formdata.append('PayerName', params.PayerName);
+		formdata.append('RegistedPhone', params.RegistedPhone);
+		formdata.append('Amount', params.Amount);
+		formdata.append(
+			'DayTrading',
+			dayjs(params.DayTrading).format('DD/MM/YYYY HH:mm'),
+		);
+		formdata.append('PaymentType', params.PaymentType);
+		formdata.append('ToBank', params.ToBank);
+		formdata.append('FromBank', params.FromBank);
+		formdata.append('PaymentMethod', params.PaymentMethod);
+		console.log('form data', formdata);
+		let res = await instance.post(path + '/CreateFeeConfirm', formdata, {});
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const UpdateFeeConfirm = async (params) => {
+	console.log('Update', params);
+
+	let result;
+	try {
+		const formdata = new FormData();
+		formdata.append('UID', params.UID);
+		formdata.append('token', params.Token);
+		formdata.append('FeeConfirmID', params.FeeConfirmID);
+
+		formdata.append('PayerName', params.PayerName);
+		formdata.append('RegistedPhone', params.RegistedPhone);
+		formdata.append('Amount', params.Amount);
+		formdata.append(
+			'DayTrading',
+			dayjs(params.DayTrading).format('DD/MM/YYYY HH:mm'),
+		);
+		formdata.append('PaymentType', params.PaymentType);
+		formdata.append('ToBank', params.ToBank);
+		formdata.append('FromBank', params.FromBank);
+		formdata.append('PaymentMethod', params.PaymentMethod);
+		console.log('form data', formdata);
+		let res = await instance.post(path + '/UpdateFeeConfirm', formdata, {});
+		result = res.data;
+	} catch (error) {
+		console.log('Error: ', error);
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const DeleteFeeConfirm = async (params) => {
+	console.log('Delete params', params);
+
+	let result;
+	try {
+		const formdata = new FormData();
+		formdata.append('UID', params.UID);
+		formdata.append('token', params.Token);
+		formdata.append('FeeConfirmID', params.FeeConfirmID);
+
+		let res = await instance.post(path + '/DeleteFeeConfirm', formdata, {});
 		result = res.data;
 	} catch (error) {
 		console.log('Error: ', error);

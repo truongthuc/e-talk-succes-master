@@ -76,6 +76,10 @@ const Referral = ({ t }) => {
 			Page: 1,
 			Token: Token,
 		});
+		$('body').removeClass('show-aside');
+		Referral.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 	return (
 		<>
@@ -148,7 +152,7 @@ const Referral = ({ t }) => {
 							</div>
 							<h5 className="mg-b-15">Danh sách đã mời</h5>
 							<div className="table-responsive ">
-								<table className="table table-500">
+								<table className="table table-fb table-500">
 									<thead>
 										<tr>
 											<th>ID</th>
@@ -158,16 +162,18 @@ const Referral = ({ t }) => {
 										</tr>
 									</thead>
 									<tbody>
-										{dataRefer?.RefferFriend.length > 0
-											? dataRefer.RefferFriend.map((item) => (
-													<tr>
-														<td>{item.ID}</td>
-														<td>{item.FullName}</td>
-														<td>{item.CreatedDate}</td>
-														<td>{item.RewardPoints}</td>
-													</tr>
-											  ))
-											: "<div>There's not have data</div>"}
+										{dataRefer?.RefferFriend.length > 0 ? (
+											dataRefer.RefferFriend.map((item) => (
+												<tr>
+													<td>{item.ID}</td>
+													<td>{item.FullName}</td>
+													<td>{item.CreatedDate}</td>
+													<td>{item.RewardPoints}</td>
+												</tr>
+											))
+										) : (
+											<div>There's not have data</div>
+										)}
 									</tbody>
 								</table>
 							</div>
@@ -183,7 +189,5 @@ const Referral = ({ t }) => {
 // export default Referral;
 
 Referral.getLayout = getStudentLayout;
-Referral.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(Referral);

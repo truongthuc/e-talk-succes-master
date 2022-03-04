@@ -36,6 +36,7 @@ const Faq = ({ t }) => {
 		}
 
 		getAPI();
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (

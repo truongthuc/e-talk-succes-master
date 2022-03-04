@@ -1,0 +1,7 @@
+@media screen and (max-width: 587px) {
+  .media-body .title {
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+  }
+}

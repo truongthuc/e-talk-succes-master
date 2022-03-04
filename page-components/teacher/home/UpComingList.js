@@ -12,99 +12,6 @@ import StudentInformationModal from '~components/common/Modal/StudentInformation
 import Pagination from 'react-js-pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { i18n, withTranslation } from '~/i18n';
-const fakeUpcomming = [
-	{
-		BookingID: 3,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 3,
-		StudentName: 'Tứ Hỷ',
-		ScheduleTimeVN: '29/07/2020 14:00 - 14:25',
-		ScheduleTimeUTC: '29/07/2020 10:00 - 14:25',
-		DocumentName: 'SOLUTION 6 - Grade 6',
-		LessionName: 'Lession 3',
-		LessionMaterial:
-			'https://drive.google.com/file/d/1_84xFBVfdeITWS9IakzeGedPnO4xafM3/view',
-		SkypeID: 'live:.cid.b366199e9d435a40',
-		SpecialRequest: ' want the tutor to proactively correct my mistakes',
-		Status: 1,
-		StatusString: 'Booked',
-		FinishType: 0,
-		FinishTypeString: 'As shedule',
-	},
-	{
-		BookingID: 4,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 4,
-		StudentName: 'Kha Lê',
-		ScheduleTimeVN: '26/06/2020 14:00 - 14:25',
-		ScheduleTimeUTC: '26/06/2020 12:00 - 14:25',
-		DocumentName: 'SOLUTION 6 - Grade 6',
-		LessionName: 'Lession 4',
-		LessionMaterial:
-			'https://drive.google.com/file/d/1_84xFBVfdeITWS9IakzeGedPnO4xafM3/view',
-		SkypeID: 'live:123123',
-		SpecialRequest: ' want the tutor to proactively correct my mistakes',
-		Status: 2,
-		StatusString: 'Finished',
-		FinishType: 0,
-	},
-	{
-		BookingID: 4,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 4,
-		StudentName: 'An Nguyễn',
-		ScheduleTimeVN: '26/06/2020 14:00 - 14:25',
-		ScheduleTimeUTC: '26/06/2020 12:00 - 14:25',
-		DocumentName: 'SOLUTION 6 - Grade 6',
-		LessionName: 'Lession 4',
-		LessionMaterial:
-			'https://drive.google.com/file/d/1_84xFBVfdeITWS9IakzeGedPnO4xafM3/view',
-		SkypeID: 'live:123123',
-		SpecialRequest: ' want the tutor to proactively correct my mistakes',
-		Status: 2,
-		StatusString: 'Finished',
-		FinishType: 0,
-	},
-	{
-		BookingID: 4,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 4,
-		StudentName: 'Nhựt Anh',
-		ScheduleTimeVN: '26/06/2020 14:00 - 14:25',
-		ScheduleTimeUTC: '26/06/2020 12:00 - 14:25',
-		DocumentName: 'SOLUTION 6 - Grade 6',
-		LessionName: 'Lession 4',
-		LessionMaterial:
-			'https://drive.google.com/file/d/1_84xFBVfdeITWS9IakzeGedPnO4xafM3/view',
-		SkypeID: 'live:123123',
-		SpecialRequest: ' want the tutor to proactively correct my mistakes',
-		Status: 2,
-		StatusString: 'Finished',
-		FinishType: 0,
-	},
-	{
-		BookingID: 4,
-		TeacherUID: 1,
-		TeacherName: 'Trương Công Thức',
-		StudentUID: 4,
-		StudentName: 'Hùng Nguyễn',
-		ScheduleTimeVN: '26/06/2020 14:00 - 14:25',
-		ScheduleTimeUTC: '26/06/2020 12:00 - 14:25',
-		DocumentName: 'SOLUTION 6 - Grade 6',
-		LessionName: 'Lession 4',
-		LessionMaterial:
-			'https://drive.google.com/file/d/1_84xFBVfdeITWS9IakzeGedPnO4xafM3/view',
-		SkypeID: 'live:123123',
-		SpecialRequest: ' want the tutor to proactively correct my mistakes',
-		Status: 2,
-		StatusString: 'Finished',
-		FinishType: 0,
-	},
-];
 
 let totalResult = 0;
 let pageSize = 0;
@@ -186,6 +93,10 @@ const UpComingList = ({ itemShow, t }) => {
 			UID: UID,
 			Token: Token,
 		});
+
+		UpComingList.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -193,13 +104,14 @@ const UpComingList = ({ itemShow, t }) => {
 			<div className="course-horizental">
 				<div className="list-wrap ">
 					<div className="table-responsive">
-						<table className="table table-borderless responsive-table">
+						<table className="table table-borderless">
 							<thead>
 								<tr className="tx-gray-600 tx-normal">
-									<th>{t('vn-time')}</th>
-									<th>{t('your-time')}</th>
+									<th>{t('student-code')}</th>
+									<th>{t('student-name')}</th>
 									<th>{t('course')}</th>
 									<th>{t('lesson')}</th>
+									<th>{t('your-time')}</th>
 									{/* <th>{t('student')}</th> */}
 									<th className="tx-right">{t('actions')}</th>
 								</tr>
@@ -238,12 +150,14 @@ const UpComingList = ({ itemShow, t }) => {
 												<tr key={`${index}`}>
 													<td className="clr-time">
 														<div className="mg-b-5">
-															<span className="">{ls.VNTime}</span>
+															<span className="student-code">
+																{ls.StudentCode}
+															</span>
 														</div>
 													</td>
 													<td>
-														<div className="">
-															<span className="">{ls.TimezoneName}</span>
+														<div className="student-name">
+															<span className="">{ls.StudentName}</span>
 														</div>
 													</td>
 													<td className="clr-lesson">
@@ -254,6 +168,11 @@ const UpComingList = ({ itemShow, t }) => {
 													<td>
 														<div className="">
 															<span className="">{ls.LessonName}</span>
+														</div>
+													</td>
+													<td className="clr-lesson">
+														<div className="mg-b-5">
+															<span className="">{ls.TimeZoneName}</span>
 														</div>
 													</td>
 													{/* <td className="lg-valign-middle">
@@ -302,7 +221,7 @@ const UpComingList = ({ itemShow, t }) => {
 													className="wd-200 mg-b-15"
 												/>
 												<p className=" tx-danger tx-medium">
-													You don't have any booked lessons with students
+													{t("There's no have any booked lesson")}
 												</p>
 											</div>
 										</td>
@@ -343,9 +262,5 @@ const UpComingList = ({ itemShow, t }) => {
 };
 
 // export default UpComingList;
-
-UpComingList.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(UpComingList);

@@ -56,21 +56,24 @@ const statusOptions = [
 	},
 ];
 
-const AllClassRow = ({ data, showStudentModal }) => {
+const AllClassRow = ({ data, showStudentModal, Status }) => {
+	console.log('TEST data trong này: ', data);
+
 	const {
-		Status,
 		StatusString,
 		FinishTypeString,
 		VNTime = '',
 		TimeZoneName = '',
 		ScheduleTimeUTC = '',
 		LessionMaterial = '',
+		Curriculumn,
+		StudentCode,
 		StudentName = '',
 		BookingID = '',
 		LessionName = '',
 		CoursesName = '',
 		SkypeID,
-		StudentUID,
+		StudentID,
 		DocumentName = '',
 		GenderID,
 	} = data;
@@ -85,10 +88,28 @@ const AllClassRow = ({ data, showStudentModal }) => {
 		window.location.href = `skype:${SkypeID}?chat`;
 	};
 
+	const returnClass = () => {
+		let cl = '';
+		if (Status === 1) {
+			cl = 'color-a';
+		} else if (Status === 2) {
+			cl = 'color-b';
+		} else if (Status === 3) {
+			cl = 'color-c';
+		} else if (Status === 4) {
+			cl = 'color-d';
+		} else if (Status === 5) {
+			cl = 'color-f';
+		} else {
+			cl = 'color-g';
+		}
+		return cl;
+	};
+
 	return (
 		<tr>
 			<td className="clr-id">
-				<span className="">{data.BookingID}</span>
+				<span className="student-code">{StudentCode}</span>
 			</td>
 			<td className="clr-lesson">
 				<div className="mg-b-5">
@@ -101,28 +122,29 @@ const AllClassRow = ({ data, showStudentModal }) => {
 				</div>
 			</td>
 			<td className="clr-lesson">
-				<a
-					href={true}
-					onClick={(e) => {
-						e.preventDefault();
-						showStudentModal(StudentName);
-					}}
-					className="clrm-studentname"
+				<span
+					// href={true}
+					// onClick={(e) => {
+					// 	e.preventDefault();
+					// 	showStudentModal(StudentID);
+					// }}
+					style={{ cursor: 'inherit' }}
+					className="clrm-studentname student-name"
 				>
 					{data.StudentName}
-					<FontAwesomeIcon
+					{/* <FontAwesomeIcon
 						icon={
 							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
 						}
 						className={`fa fa-${
 							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
 						} mg-l-10 clrm-icon-male`}
-					/>
-				</a>
+					/> */}
+				</span>
 			</td>
 			<td className="clr-time">
 				<div className="mg-b-5">
-					<span className="">{data.VNTime}</span>
+					<span className="">{Curriculumn}</span>
 				</div>
 			</td>
 			<td>
@@ -131,17 +153,9 @@ const AllClassRow = ({ data, showStudentModal }) => {
 				</div>
 			</td>
 			<td className="clr-status">
-				<span
-					className={`badge badge-${
-						Status === 1
-							? 'primary tx-white'
-							: Status === 2
-							? 'success'
-							: 'blue'
-					} pd-10`}
-				>
+				<span className={`btnStatus ${returnClass()}`}>
 					{Status === 1
-						? 'Booked'
+						? 'Student is PRESENT'
 						: Status === 2
 						? 'Teacher is absent'
 						: Status === 3
@@ -150,60 +164,11 @@ const AllClassRow = ({ data, showStudentModal }) => {
 						? 'NO INTERNET/POWER INTERRUPTION'
 						: Status === 5
 						? 'Teacher have not set up status'
-						: 'Student is PRESENT'}
+						: 'Booked'}
 				</span>
 				{/* {Status === 1 && <span className="badge badge-warning pd-5">BOOKED</span>}
                 {Status === 2 && <span className="badge badge-success pd-5">FINISHED</span>} */}
 			</td>
-			{/* <td className="clr-finishType">
-				{Status === 2 && <span className="">{FinishTypeString}</span>}
-
-			</td> */}
-			{/* <td className="clr-actions">
-				{
-					<a
-						href={LessionMaterial}
-						className="btn btn-sm btn-warning rounded-5 mg-5"
-						target="_blank"
-						rel="noreferrer"
-					>
-						<FontAwesomeIcon
-							icon="book-open"
-							className="fa fa-book-open clrm-icon mg-r-5"
-						/>{' '}
-						Material
-					</a>
-				}
-				{Status === 1 && (
-					<a
-						href={`skype:${SkypeID}?chat`}
-						className=" btn btn-sm btn-info rounded-5 mg-5"
-						onClick={handleEnterClass}
-					>
-						<FontAwesomeIcon
-							icon={['fab', 'skype']}
-							className="fab fa-skype clrm-icon mg-r-5"
-						/>{' '}
-						Join class
-					</a>
-				)}
-				{Status === 2 && (
-					<Link href={`/teacher/evaluation/detail/${BookingID}`}>
-						<a
-							href={true}
-							// target="_blank"
-							// rel="noreferrer"
-							className=" btn btn-sm btn-success btn-detail rounded-5 mg-5"
-						>
-							<FontAwesomeIcon
-								icon="vote-yea"
-								className="fas fa-vote-yea mg-r-5"
-							/>{' '}
-							Detail
-						</a>
-					</Link>
-				)}
-			</td> */}
 		</tr>
 	);
 };
@@ -240,7 +205,7 @@ const AllClasses = ({ t }) => {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(true);
 	const [filterStatusAllClass, setFilterStatusAllClass] = useState(
-		statusOptions[0],
+		statusOptions[5],
 	);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [data, setData] = useState([]);
@@ -310,6 +275,26 @@ const AllClasses = ({ t }) => {
 		}
 		setIsLoading(false);
 	};
+	// useEffect(() => {
+	// 	let UID = null;
+	// 	let Token = null;
+
+	// 	// GET UID and Token
+	// 	if (localStorage.getItem('UID')) {
+	// 		UID = localStorage.getItem('UID');
+	// 		Token = localStorage.getItem('token');
+	// 	}
+
+	// 	loadAllClassesData({
+	// 		status: filterStatusAllClass.value,
+	// 		fromdate: '',
+	// 		todate: '',
+	// 		UID: UID,
+	// 		page: 1,
+	// 		token: Token,
+	// 	});
+	// }, [filterStatusAllClass]);
+
 	useEffect(() => {
 		let UID = null;
 		let Token = null;
@@ -321,37 +306,22 @@ const AllClasses = ({ t }) => {
 		}
 
 		loadAllClassesData({
-			status: filterStatusAllClass.value,
-			fromdate: '',
-			todate: '',
-			UID: UID,
-			page: 1,
-			token: Token,
-		});
-	}, [filterStatusAllClass]);
-
-	useEffect(() => {
-		let UID = null;
-		let Token = null;
-
-		// GET UID and Token
-		if (localStorage.getItem('UID')) {
-			UID = localStorage.getItem('UID');
-			Token = localStorage.getItem('token');
-		}
-
-		loadAllClassesData({
-			status: 6,
+			status: filterStatusAllClass?.value,
 			fromdate: '',
 			todate: '',
 			UID: UID,
 			page: state.page,
 		});
-	}, [state.page]);
+
+		$('body').removeClass('show-aside');
+		AllClasses.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, [state.page, filterStatusAllClass]);
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('all-class')}</h1>
+			<h1 className="main-title-page">{t('All Class')}</h1>
 			<div className="d-flex align-items-center justify-content-between mg-b-15 flex-wrap">
 				<div className="wd-300 order-1 mg-t-15 mg-md-t-0 m-g-l-auto">
 					<Select
@@ -373,14 +343,14 @@ const AllClasses = ({ t }) => {
 			<div className="card mg-b-30">
 				<div className="card-body">
 					<div className="table-responsive">
-						<table className="table table-classrooms table-borderless responsive-table table-hover">
+						<table className="table table-classrooms table-borderless  table-hover">
 							<thead>
 								<tr>
-									<th className="clr-id">ID</th>
+									<th className="clr-id">{t('student-code')}</th>
 									<th className="clr-lesson">{t('course')}</th>
 									<th className="clr-lesson">{t('lesson')}</th>
 									<th className="clr-lesson">{t('student')}</th>
-									<th className="clr-lesson">{t('vn-time')}</th>
+									<th className="clr-lesson">{t('curriculum')}</th>
 									<th className="clr-time">{t('your-time')} </th>
 									<th className="clr-status">{t('status')}</th>
 									{/* <th className="clr-finishType">Finish Type</th> */}
@@ -456,6 +426,7 @@ const AllClasses = ({ t }) => {
 										<AllClassRow
 											key={`${item.BookingID}`}
 											data={item}
+											Status={filterStatusAllClass.value}
 											showStudentModal={showStudentModal}
 										/>
 									))
@@ -497,7 +468,5 @@ const AllClasses = ({ t }) => {
 // export default AllClasses;
 
 AllClasses.getLayout = getLayout;
-AllClasses.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(AllClasses);

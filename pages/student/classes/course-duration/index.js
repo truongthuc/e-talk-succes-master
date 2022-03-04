@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import { GetTimeLimiteCourses } from '~/api/studentAPI';
 // import { convertDateFromTo, randomId } from '~/utils';
 import Skeleton from 'react-loading-skeleton';
@@ -12,8 +12,39 @@ import Link from 'next/link';
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
 
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
+
 let start = '',
 	end = '';
+
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
 
 const LessonItem = ({
 	PackageName,
@@ -39,7 +70,7 @@ const LessonItem = ({
 			<td style={{ letterSpacing: '0.5px' }}>{PackageName}</td>
 			<td>{CourseName}</td>
 			<td style={{ whiteSpace: 'pre-line' }}>{StartDate}</td>
-			<td>{EndDate}</td>
+			<td className="text-right">{EndDate}</td>
 		</tr>
 	);
 };
@@ -53,11 +84,13 @@ const CourseDuration = ({ t }) => {
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 	const [loading, setLoading] = useState(true);
+	const [state, dispatch] = useReducer(reducer, initialState);
 
 	const getAPI = async (params) => {
 		setLoading(true);
 		const res = await GetTimeLimiteCourses(params);
 		if (res.Code === 200) {
+			dispatch({ type: 'ADD_PAGE', res });
 			setData(res.Data);
 			setLoading(true);
 			setPageSize(res.PageSize);
@@ -119,7 +152,9 @@ const CourseDuration = ({ t }) => {
 			Page: 1,
 			Token: Token,
 		});
-	}, []);
+
+		$('body').removeClass('show-aside');
+	}, [state.page]);
 	return (
 		console.log('render'),
 		(
@@ -128,7 +163,7 @@ const CourseDuration = ({ t }) => {
 				<div className="card">
 					<div className="card-body">
 						<div className="table-responsive mg-t-20">
-							<table className="table">
+							<table className="table table-fb">
 								<thead className="">
 									<tr>
 										<th>{t('package')}</th>
@@ -250,17 +285,17 @@ const CourseDuration = ({ t }) => {
 								</tbody>
 							</table>
 						</div>
-						{pageSize < totalResult && (
-							<Pagination
-								innerClass="pagination justify-content-end mt-3"
-								activePage={page}
-								itemsCountPerPage={pageSize}
-								totalItemsCount={totalResult}
-								pageRangeDisplayed={3}
-								itemClass="page-item"
-								linkClass="page-link"
-								onChange={handlePageChange.bind(this)}
-							/>
+						{state?.TotalResult > 0 && (
+							<Box display={`flex`} justifyContent={`center`} mt={4}>
+								<Pagination
+									count={Math.ceil(state?.TotalResult / state?.PageSize)}
+									color="secondary"
+									onChange={(obj, page) =>
+										dispatch({ type: 'SELECT_PAGE', page })
+									}
+									c
+								/>
+							</Box>
 						)}
 					</div>
 				</div>

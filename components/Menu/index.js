@@ -4,22 +4,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { withTranslation } from '~/i18n';
 import './index.module.scss';
 import { useAuth } from '~/api/auth.js';
+import { useRouter } from 'next/router';
 
 const TeacherMenu = ({ t }) => {
+	const router = useRouter();
+
+	const url = router.pathname.toString();
+
+	console.log('url: ', url);
+
+	// const returnActive = (url) => {
+	// 	if(url.inc)
+	// };
+
 	return (
 		<ul className="nav nav-aside">
-			<li className="nav-item active">
+			<li className={`nav-item ${url.includes('/home') && 'active'} `}>
 				<Link href="/teacher/home" as={`/teacher/home`}>
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon
 							icon="tachometer-alt"
 							className="fas fa-tachometer-alt"
 						/>
-						<span>{t('dashboard')}</span>
+						<span>{t('Dashboard')}</span>
 					</a>
 				</Link>
 			</li>
-			<li className="nav-item">
+			{/* <li className="nav-item">
 				<Link
 					href="/teacher/monthly-statistics"
 					as={`/teacher/monthly-statistics`}
@@ -32,8 +43,7 @@ const TeacherMenu = ({ t }) => {
 						<span>{t('monthly-statistics')}</span>
 					</a>
 				</Link>
-			</li>
-
+			</li> */}
 			{/* <li className="nav-item">
 		<Link href="/teacher/salary">
 			<a href={true} className="nav-link">
@@ -46,35 +56,16 @@ const TeacherMenu = ({ t }) => {
 		</Link>
 	</li> */}
 
-			<li className="nav-item with-sub">
-				<a href={true} className="nav-link">
-					<FontAwesomeIcon icon="calendar-alt" />
-					<span>{t('label-booking-schedule')}</span>
-				</a>
-				<ul>
-					<li className="">
-						<Link
-							href="/teacher/schedule/manage-slot"
-							as="/teacher/schedule/manage-slot"
-						>
-							<a href={true} className="">
-								<FontAwesomeIcon icon="calendar" className="far fa-calendar" />
-								<span>{t('booking-schedule')}</span>
-							</a>
-						</Link>
-					</li>
-					{/* <li className="">
-						<Link
-							href="/teacher/schedule/schedule-log"
-							as="/teacher/schedule/schedule-log"
-						>
-							<a href={true} className="">
-								<FontAwesomeIcon icon="history" className="fas fa-history" />{' '}
-								<span>{t('schedule-log')}</span>
-							</a>
-						</Link>
-					</li> */}
-				</ul>
+			<li className={`nav-item ${url.includes('/manage-slot') && 'active'} `}>
+				<Link
+					href="/teacher/schedule/manage-slot"
+					as="/teacher/schedule/manage-slot"
+				>
+					<a href={true} className="nav-link">
+						<FontAwesomeIcon icon="calendar" className="far fa-calendar" />
+						<span>{t('Schedule')}</span>
+					</a>
+				</Link>
 			</li>
 			<li className="nav-item with-sub">
 				<a href={true} className="nav-link">
@@ -82,10 +73,10 @@ const TeacherMenu = ({ t }) => {
 						icon="person-booth"
 						className="fas fa-calendar-check"
 					/>
-					<span>{t('label-classrooms')}</span>
+					<span>{t('Classrooms')}</span>
 				</a>
 				<ul>
-					<li className="">
+					<li className={` ${url.includes('/all-class') && 'active'} `}>
 						<Link
 							href="/teacher/classes/all-class"
 							as="/teacher/classes/all-class"
@@ -95,11 +86,11 @@ const TeacherMenu = ({ t }) => {
 									icon="user-friends"
 									className="fas fa-user-friends"
 								/>{' '}
-								<span>{t('all-classes')}</span>
+								<span>{t('All classes')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					{/* <li className={` ${url.includes('/upcoming-class') && 'active'} `}>
 						<Link
 							href="/teacher/classes/upcoming-class"
 							as="/teacher/classes/upcoming-class"
@@ -112,8 +103,10 @@ const TeacherMenu = ({ t }) => {
 								<span>{t('upcoming-classes')}</span>
 							</a>
 						</Link>
-					</li>
-					<li className="">
+					</li> */}
+					<li
+						className={` ${url.includes('/missing-evaluation') && 'active'} `}
+					>
 						<Link
 							href="/teacher/classes/missing-evaluation"
 							as="/teacher/classes/missing-evaluation"
@@ -123,11 +116,11 @@ const TeacherMenu = ({ t }) => {
 									icon="comment-dots"
 									className="fas fa-comment-dots"
 								/>{' '}
-								<span>{t('wait-for-evaluate')}</span>
+								<span>{t('Missing Evaluation')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li className={` ${url.includes('/evaluated-class') && 'active'} `}>
 						<Link
 							href="/teacher/classes/evaluated-class"
 							as="/teacher/classes/evaluated-class"
@@ -137,7 +130,7 @@ const TeacherMenu = ({ t }) => {
 									icon="file-signature"
 									className="fas fa-file-signature"
 								/>{' '}
-								<span>{t('evaluated')}</span>
+								<span>{t('Evaluated')}</span>
 							</a>
 						</Link>
 					</li>
@@ -149,10 +142,10 @@ const TeacherMenu = ({ t }) => {
 						icon="user-graduate"
 						className="fas fa-calendar-check"
 					/>
-					<span>{t('label-students')}</span>
+					<span>{t('Students')}</span>
 				</a>
 				<ul>
-					<li className="">
+					<li className={` ${url.includes('/attendance-record') && 'active'} `}>
 						<Link
 							href="/teacher/attendance-record"
 							as="/teacher/attendance-record"
@@ -166,36 +159,36 @@ const TeacherMenu = ({ t }) => {
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li className={` ${url.includes('/feedback') && 'active'} `}>
 						<Link href="/teacher/feedback" as="/teacher/feedback">
 							<a href={true} className="">
 								<FontAwesomeIcon icon="comments" className="fas fa-comments" />{' '}
-								<span>{t('feedback')}</span>
+								<span>{t('Feedback')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li className={` ${url.includes('/student-package') && 'active'} `}>
 						<Link href="/teacher/student-package" as="/teacher/student-package">
 							<a href={true} className="">
 								<FontAwesomeIcon
 									icon="user-graduate"
 									className="fas fa-user-graduate"
 								/>{' '}
-								<span>{t('end-date-student')}</span>
+								<span>{t('End Date Package')}</span>
 							</a>
 						</Link>
 					</li>
 				</ul>
 			</li>
-			<li className="nav-item">
+			<li className={`nav-item ${url.includes('/notification') && 'active'} `}>
 				<Link href="/teacher/notification" as="/teacher/notification">
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon icon="candy-cane" className="fas fa-candy-cane" />{' '}
-						<span>{t('day-off')}</span>
+						<span>{t('Day off')}</span>
 					</a>
 				</Link>
 			</li>
-			<li className="nav-item">
+			{/* <li className={`nav-item ${url.includes('/support') && 'active'} `}>
 				<Link href="/teacher/support" as="/teacher/support">
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon
@@ -205,7 +198,7 @@ const TeacherMenu = ({ t }) => {
 						<span>{t('ticket-support')}</span>
 					</a>
 				</Link>
-			</li>
+			</li> */}
 			{/* <li className="nav-item">
 		<Link href="/teacher/library">
 			<a href={true} className="nav-link">
@@ -219,6 +212,9 @@ const TeacherMenu = ({ t }) => {
 };
 
 const StudentMenu = ({ t }) => {
+	const router = useRouter();
+
+	const url = router.pathname.toString();
 	return (
 		<ul className="nav nav-aside">
 			{/* <li className="nav-item active">
@@ -359,51 +355,58 @@ const StudentMenu = ({ t }) => {
 					</a>
 				</Link>
 			</li> */}
-			<li className="nav-item active">
+			<li className={`nav-item ${url.includes('/home') && 'active'} `}>
 				<Link href="/student/home" as="/student/home">
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon
 							icon="tachometer-alt"
 							className="fas fa-tachometer-alt"
 						/>
-						<span>{t('menu-student:dashboard')}</span>
+						<span>{t('menu-student:Dashboard')}</span>
 					</a>
 				</Link>
 			</li>
-			<li className="nav-item">
+			<li
+				className={`nav-item ${url.includes('/profile-teacher') && 'active'} `}
+			>
+				<Link href="/student/profile-teacher" as="/student/profile-teacher">
+					<a href={true} className="nav-link">
+						<FontAwesomeIcon icon="copy" className="fas fa-copy" />
+						<span>{t('menu-student:Teacher/Booking')}</span>
+					</a>
+				</Link>
+			</li>
+			<li className={`nav-item ${url.includes('/package') && 'active'} `}>
 				<Link href="/student/package" as="/student/package">
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon icon="cubes" className="fas fa-tachometer-alt" />
-						<span>{t('menu-student:package')}</span>
+						<span>{t('menu-student:My Packages')}</span>
 					</a>
 				</Link>
 			</li>
-			<li className="nav-item">
+			{/* <li
+				className={`nav-item ${
+					url.includes('/schoolarship-feedback') && 'active'
+				} `}
+			>
 				<Link
 					href="/student/schoolarship-feedback"
 					as="/student/schoolarship-feedback"
 				>
 					<a href={true} className="nav-link">
 						<FontAwesomeIcon icon="comments" className="fas fa-comments" />
-						<span>{t('menu-student:scholarship-feedback')}</span>
+						<span>{t('menu-student:Scholarship Feedback')}</span>
 					</a>
 				</Link>
-			</li>
-			<li className="nav-item">
-				<Link href="/student/profile-teacher" as="/student/profile-teacher">
-					<a href={true} className="nav-link">
-						<FontAwesomeIcon icon="copy" className="fas fa-copy" />
-						<span>{t('menu-student:profile-teacher')}</span>
-					</a>
-				</Link>
-			</li>
+			</li> */}
+
 			<li className="nav-item with-sub">
 				<a href={true} className="nav-link">
 					<FontAwesomeIcon
 						icon="calendar-alt"
 						className="fas fa-calendar-check"
 					/>
-					<span>{t('menu-student:schedule')}</span>
+					<span>{t('menu-student:Schedule')}</span>
 				</a>
 				<ul>
 					{/* <li className="">
@@ -421,31 +424,35 @@ const StudentMenu = ({ t }) => {
 						</Link>
 					</li> */}
 					<li className=" with-sub">
-						<a href={true} className="">
+						{/* <a href={true} className="">
 							<FontAwesomeIcon
 								icon="calendar-check"
 								className="fas fa-calendar-check"
 							/>
 							<span>{t('menu-student:booked-schedule')}</span>
-						</a>
+						</a> */}
 						<ul>
-							<li>
+							<li className={`${url.includes('/calendar') && 'active'} `}>
 								<Link
 									href="/student/booked-schedule/calendar"
 									as="/student/booked-schedule/calendar"
 								>
 									<a href={true}>
-										<span>{t('menu-student:calendar-view')}</span>
+										<span>{t('menu-student:Calendar View')}</span>
 									</a>
 								</Link>
 							</li>
-							<li>
+							<li
+								className={`${
+									url.includes('/booked-schedule/table') && 'active'
+								} `}
+							>
 								<Link
 									href="/student/booked-schedule/table"
 									as="/student/booked-schedule/table"
 								>
 									<a href={true}>
-										<span>{t('menu-student:table-view')}</span>
+										<span>{t('menu-student:Table View')}</span>
 									</a>
 								</Link>
 							</li>
@@ -456,10 +463,10 @@ const StudentMenu = ({ t }) => {
 			<li className="nav-item with-sub">
 				<a href={true} className="nav-link">
 					<FontAwesomeIcon icon="users" className="fas fa-calendar-check" />
-					<span>{t('menu-student:classes')}</span>
+					<span>{t('menu-student:Classes')}</span>
 				</a>
 				<ul>
-					<li className="">
+					<li className={`${url.includes('/attendance-record') && 'active'} `}>
 						<Link
 							href="/student/classes/attendance-record"
 							as="/student/classes/attendance-record"
@@ -469,11 +476,26 @@ const StudentMenu = ({ t }) => {
 									icon="user-check"
 									className="fas fa-user-check"
 								/>{' '}
-								<span>{t('attendance-record')}</span>
+								<span>{t('menu-student:Attendance Record')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li
+						className={` ${
+							url.includes('/schoolarship-feedback') && 'active'
+						} `}
+					>
+						<Link
+							href="/student/schoolarship-feedback"
+							as="/student/schoolarship-feedback"
+						>
+							<a href={true}>
+								<FontAwesomeIcon icon="comments" className="fas fa-comments" />
+								<span>{t('menu-student:Scholarship Feedback')}</span>
+							</a>
+						</Link>
+					</li>
+					{/* <li className={`${url.includes('/evaluation') && 'active'} `}>
 						<Link
 							href="/student/classes/evaluation"
 							as="/student/classes/evaluation"
@@ -483,19 +505,19 @@ const StudentMenu = ({ t }) => {
 									icon="file-signature"
 									className="fas fa-file-signature"
 								/>{' '}
-								<span>{t('menu-student:lesson-feedback')}</span>
+								<span>{t('menu-student:Lesson Feedback')}</span>
 							</a>
 						</Link>
-					</li>
-					<li className="">
+					</li> */}
+					<li className={`${url.includes('/history') && 'active'} `}>
 						<Link href="/student/classes/history" as="/student/classes/history">
 							<a href={true} className="">
 								<FontAwesomeIcon icon="history" className="fas fa-history" />{' '}
-								<span>{t('menu-student:lesson-history')}</span>
+								<span>{t('menu-student:Payment History')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li className={`${url.includes('/course-duration') && 'active'} `}>
 						<Link
 							href="/student/classes/course-duration"
 							as="/student/classes/course-duration"
@@ -505,7 +527,7 @@ const StudentMenu = ({ t }) => {
 									icon="graduation-cap"
 									className="fas fa-graduation-cap"
 								/>{' '}
-								<span>{t('menu-student:course-duration')}</span>
+								<span>{t('menu-student:Course Duration')}</span>
 							</a>
 						</Link>
 					</li>
@@ -513,30 +535,30 @@ const StudentMenu = ({ t }) => {
 			</li>
 
 			<li className="nav-item with-sub">
-				<a href={true} className="nav-link">
+				<a href={true} className="nav-link ani-tb">
 					<FontAwesomeIcon icon="bell" className="fas fa-calendar-check" />
-					<span>{t('notification')}</span>
+					<span>{t('menu-student:Notification')}</span>
 				</a>
 				<ul>
-					<li className="">
+					<li className={`${url.includes('/discount') && 'active'} `}>
 						<Link
 							href="/student/notification/discount"
 							as="/student/notification/discount"
 						>
 							<a href={true} className="">
 								<FontAwesomeIcon icon="tags" className="fas fa-tags" />{' '}
-								<span>{t('menu-student:course-discount')}</span>
+								<span>{t('menu-student:Course Discount')}</span>
 							</a>
 						</Link>
 					</li>
-					<li className="">
+					<li className={`${url.includes('/day-off') && 'active'} `}>
 						<Link href="/student/notification/day-off">
 							<a href={true} className="">
 								<FontAwesomeIcon
 									icon="calendar-times"
 									className="fas fa-calendar-times"
 								/>{' '}
-								<span>{t('menu-student:day-off')}</span>
+								<span>{t('menu-student:Day Off')}</span>
 							</a>
 						</Link>
 					</li>
@@ -554,35 +576,14 @@ const StudentMenu = ({ t }) => {
 				</ul>
 			</li>
 
-			<li className="nav-item with-sub">
-				<a href={true} className="nav-link">
-					<FontAwesomeIcon
-						icon="network-wired"
-						className="fas fa-calendar-check"
-					/>
-					<span>{t('menu-student:referral')}</span>
-				</a>
-				<ul>
-					<li className="nav-item">
-						<Link href="/student/referral" as="/student/referral">
-							<a href={true} className="">
-								<FontAwesomeIcon icon="handshake" className="fas fa-file-alt" />{' '}
-								<span>{t('menu-student:referral')}</span>
-							</a>
-						</Link>
-					</li>
-					{/* <li className="nav-item">
-						<Link href="/student/question" as="/student/question">
-							<a href={true} className="">
-								<FontAwesomeIcon
-									icon="question-circle"
-									className="fas fa-file-alt"
-								/>{' '}
-								<span>{t('menu-student:f&a')}</span>
-							</a>
-						</Link>
-					</li> */}
-				</ul>
+			<li className={`nav-item ${url.includes('/referral') && 'active'} `}>
+				<Link href="/student/referral" as="/student/referral">
+					<a href={true} className="nav-link have-new">
+						<FontAwesomeIcon icon="handshake" className="fas fa-file-alt" />{' '}
+						<span>{t('menu-student:Referral')}</span>
+						<span className="item-new">{t('menu-student:New')}</span>
+					</a>
+				</Link>
 			</li>
 		</ul>
 	);
@@ -623,7 +624,7 @@ const Menu = ({ t, isStudent }) => {
 							<div className="d-flex align-items-center justify-content-center">
 								<a href={`#loggedinMenu`} data-toggle="collapse" className="">
 									<img
-										src={linkImg}
+										src={linkImg ? linkImg : '/static/img/user.png'}
 										className="rounded-circle avatar-xl object-fit"
 										alt=""
 									/>
@@ -643,7 +644,9 @@ const Menu = ({ t, isStudent }) => {
 								/>
 							</a>
 							<p className="tx-white tx-12 mg-b-0 mg-t-5">
-								{isStudent ? 'Học viên' : t('role')}
+								{isStudent
+									? t('menu-student:Student')
+									: t('menu-student:Teacher')}
 							</p>
 						</div>
 						<div className="collapse" id="loggedinMenu">
@@ -682,7 +685,7 @@ const Menu = ({ t, isStudent }) => {
 										</a>
 									</Link>
 								</li>
-								<li className="nav-item">
+								{/* <li className="nav-item">
 									<Link
 										href={
 											isStudent
@@ -707,7 +710,7 @@ const Menu = ({ t, isStudent }) => {
 											</span>
 										</a>
 									</Link>
-								</li>
+								</li> */}
 								<li className="nav-item">
 									<a
 										href={true}

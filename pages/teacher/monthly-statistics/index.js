@@ -73,6 +73,7 @@ const MonthlyStatistics = ({ t }) => {
 			UID: UID,
 			Token: Token,
 		});
+		$('body').removeClass('show-aside');
 	}, [select]);
 	return (
 		<>
@@ -80,7 +81,7 @@ const MonthlyStatistics = ({ t }) => {
 				className="d-md-flex align-items-center justify-content-between pos-relative"
 				style={{ zIndex: 1 }}
 			>
-				<h1 className="main-title-page">{t('monthly-statistics')}</h1>
+				{/* <h1 className="main-title-page">{t('monthly-statistics')}</h1> */}
 				<div className="select-wrap mg-t-15 mg-md-t-0 wd-md-150">
 					<Select
 						options={timeOptions}
@@ -136,7 +137,7 @@ const MonthlyStatistics = ({ t }) => {
 										<ul className="feather">
 											<li className="rp-info">
 												<span className="label">
-													{t('teacher-cancellation-slots')}{' '}
+													{t('Teacher booked slot')}{' '}
 												</span>
 												<span className="value">
 													{isLoading ? (

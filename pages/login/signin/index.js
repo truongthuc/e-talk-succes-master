@@ -15,6 +15,15 @@ import { I18nContext } from 'next-i18next';
 import Select, { components } from 'react-select';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { Slide } from 'react-slideshow-image';
+import './signin.module.scss';
+import 'react-slideshow-image/dist/styles.css';
+import { useCookies } from 'react-cookie';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 const LangOptions = [
 	{
@@ -29,6 +38,37 @@ const LangOptions = [
 	},
 ];
 
+const slideImages = [
+	'/static/img/img-1.jpg',
+	'/static/img/img-2.jpg',
+	'/static/img/img-3.jpg',
+];
+const properties = {
+	// duration: 5000,
+	// transitionDuration: 500,
+	autoplay: true,
+	infinite: true,
+	indicators: false,
+	Easing: 'linear',
+	arrows: false,
+	canSwipe: false,
+};
+const Slideshow = () => {
+	return (
+		<Slide {...properties}>
+			<div className="each-slide">
+				<img src={slideImages[0]} className="object-fit height-mobile" alt="" />
+			</div>
+			<div className="each-slide">
+				<img src={slideImages[1]} className="object-fit height-mobile" alt="" />
+			</div>
+			<div className="each-slide">
+				<img src={slideImages[2]} className="object-fit height-mobile" alt="" />
+			</div>
+		</Slide>
+	);
+};
+
 const FlatOption = (props) => {
 	const { data } = props;
 	return (
@@ -40,7 +80,6 @@ const FlatOption = (props) => {
 		</components.Option>
 	);
 };
-
 const useStyles = makeStyles((theme) => ({
 	styleInput: {
 		paddingLeft: '5px',
@@ -179,8 +218,9 @@ const SimpleSlider = () => {
 };
 const Signin = ({ t, isStudent }) => {
 	const { i18n } = useContext(I18nContext);
-	const [lang, setLang] = useState(LangOptions[0]);
+	const [lang, setLang] = useState(LangOptions[1]);
 	const [loadLogin, setLoadLogin] = useState(false);
+	const [cookies, setCookie, removeCookie] = useCookies(['cookie-name']);
 
 	const _handleChangeSelect = (selected) => {
 		setLang(selected);
@@ -192,17 +232,25 @@ const Signin = ({ t, isStudent }) => {
 		setLang(LangOptions.find((item) => item.value === key));
 	};
 
+	const [stateRemember, setStateRemember] = React.useState(false);
+
+	const handleChange_remember = (event) => {
+		setStateRemember(event.target.checked);
+	};
+
 	const checkDefaultLanguage = () => {
 		if (typeof window === 'undefined') return;
 		try {
 			const language = window.localStorage.getItem('language');
 			console.log({ language });
 			language !== null && setSelectLanguage(JSON.parse(language));
-			language === null &&
+			if (language === null) {
+				setSelectLanguage('en');
 				window.localStorage.setItem(
 					'language',
 					JSON.stringify(i18n?.language ?? 'en'),
 				);
+			}
 		} catch (error) {}
 	};
 	useEffect(() => {
@@ -230,6 +278,26 @@ const Signin = ({ t, isStudent }) => {
 		} else {
 			setLoadLogin(true);
 		}
+
+		$('body').removeClass('show-aside');
+		Signin.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+
+		if (cookies.username) {
+			let username = cookies.username;
+			let password = cookies.password;
+
+			setStateRemember(true);
+
+			setStateValues({
+				...stateValues,
+				username: username,
+				password: password,
+			});
+		} else {
+			setStateRemember(false);
+		}
 	}, []);
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -237,7 +305,7 @@ const Signin = ({ t, isStudent }) => {
 		status: false,
 		message: '',
 	});
-
+	const [typePass, setTypePass] = useState(true);
 	const [error, setError] = useState(null);
 	const [resultError, setResultError] = useState({
 		status: false,
@@ -268,6 +336,13 @@ const Signin = ({ t, isStudent }) => {
 		});
 	};
 
+	const returnYear = () => {
+		let d = new Date();
+		let currentYear = d.getFullYear();
+
+		return currentYear;
+	};
+
 	const { handleLogin } = useAuth();
 
 	const handleClick_moveToForget = (e) => {
@@ -277,12 +352,22 @@ const Signin = ({ t, isStudent }) => {
 		});
 	};
 
+	const changeTypePass = () => {
+		if (typePass === false) {
+			setTypePass(true);
+		} else {
+			setTypePass(false);
+		}
+	};
+
 	const handleClick_login = (e) => {
 		e.preventDefault();
-
-		console.log('Check handle login in Page');
-
 		setLoading(true);
+
+		if (stateRemember) {
+			setCookie('username', stateValues.username, { path: '/' });
+			setCookie('password', stateValues.password, { path: '/' });
+		}
 
 		let check = handleLogin(stateValues);
 		check.then(function (value) {
@@ -303,28 +388,6 @@ const Signin = ({ t, isStudent }) => {
 			}
 		});
 	};
-	// handle button click of login form
-	// const handleLogin = async () => {
-	// 	setError(null);
-	// 	setLoading(true);
-
-	// 	try {
-	// 		const res = await LoginAPI(stateValues);
-	// 		setLoading(false);
-	// 		if (res.Code === 1) {
-	// 			localStorage.setItem('TokenUser', res.Data.account.TokenApp);
-	// 			localStorage.setItem('DataUser', JSON.stringify(res.Data.account));
-	// 			router.push('/home');
-	// 		}
-	// 		if (res.Code === 2) {
-	// 			res.Code === 2 && setError(res.Message);
-	// 		}
-	// 	} catch (error) {
-	// 		setLoading(false);
-	// 		setError('Loi khong ket noi');
-	// 		console.log(error);
-	// 	}
-	// };
 
 	const classes = useStyles();
 	return (
@@ -395,6 +458,9 @@ const Signin = ({ t, isStudent }) => {
 						</div>
 					</div>
 					<div className="loginWrap">
+						<div className="slick-slider">
+							<Slideshow></Slideshow>
+						</div>
 						<div className="container">
 							<h2 className="titleForm">{t('LOGIN')}</h2>
 							{/* {loginSuccess.status ? (
@@ -411,37 +477,68 @@ const Signin = ({ t, isStudent }) => {
 									autoComplete="off"
 								>
 									<TextField
+										value={stateValues.username}
 										id="standard-basic"
-										label="Username"
+										label={t('Username')}
 										name="username"
 										className="styleInput"
 										onChange={handleChange}
 										disabled={loading && true}
 									/>
-									<TextField
-										type="password"
-										id="standard-basic"
-										label="Password"
-										name="password"
-										className="styleInput"
-										onChange={handleChange}
-										disabled={loading && true}
-									/>
-									<br />
+									<div className="row-pass">
+										<TextField
+											value={stateValues.password}
+											type={typePass ? 'password' : 'text'}
+											id="standard-basic"
+											label={t('Password')}
+											name="password"
+											className="styleInput"
+											onChange={handleChange}
+											disabled={loading && true}
+										/>
+										<a className="icon-pass" onClick={changeTypePass}>
+											{!typePass ? (
+												<i class="fas fa-eye"></i>
+											) : (
+												<i class="fas fa-eye-slash"></i>
+											)}
+										</a>
+									</div>
+
+									<div className="remember-item">
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={stateRemember}
+													onChange={handleChange_remember}
+													name="checkedA"
+												/>
+											}
+											label={t('Save password')}
+										/>
+									</div>
 									<div
 										className="boxRemember"
 										style={{ justifyContent: 'flex-end' }}
 									>
-										{/* <div className="remember-item">
-										<label className="boxLabel">
-											<input type="checkbox" />
-											{t('remember')}
-											<span class="checkmark"></span>
-										</label>
-									</div> */}
-										<div className="forgotPass">
+										<div
+											className="forgotPass"
+											style={{
+												textAlign: 'center',
+												display: 'flex',
+												width: '100%',
+												justifyContent: 'center',
+											}}
+										>
 											<a href="#" onClick={handleClick_moveToForget}>
-												{t('forgot-password')}
+												{t('Forgot password')}
+											</a>
+											<span style={{ margin: '0 5px' }}>{t('or')}</span>
+											<a
+												style={{ color: '#e61e65' }}
+												href="https://online.e-talk.vn/login/register"
+											>
+												{t('Sign up')}
 											</a>
 										</div>
 									</div>
@@ -498,23 +595,41 @@ const Signin = ({ t, isStudent }) => {
 									<div className="colum">
 										<ul className="listFt padding-left">
 											<li>
-												<a href="#">{t('about-us')}</a>
+												<a href="https://e-talk.vn/">{t('about-us')}</a>
 											</li>
 											<li>
-												<a href="#">Tutor</a>
+												<a href="https://online.e-talk.vn/login/signin/">
+													{t('Tutor')}
+												</a>
 											</li>
 											<li>
-												<a href="#">FAQs</a>
+												<a href="https://e-talk.vn/">FAQs</a>
 											</li>
 										</ul>
 									</div>
 									<div className="colum">
 										<ul className="listFt">
 											<li>
-												<a href="#">{t('sign-up-for-a-free-trial')}</a>
+												<a href="https://online.e-talk.vn/Login/Register">
+													{t('Free trial')}
+												</a>
 											</li>
 											<li>
-												<a href="#">{t('follow-us')}</a>
+												<a href="#">{t('Follow us')}</a>
+												<div className="d-flex align-items-center footer-list-icon">
+													<a
+														href="https://www.facebook.com/EtalkVN/?fref=ts"
+														className="mr-3 bg-fb"
+													>
+														<i class="fab fa-facebook-f"></i>
+													</a>
+													<a
+														href="https://www.youtube.com/channel/UC8jBWQJfB9pBRIJTPCYJVkg"
+														className="bg-youtube"
+													>
+														<i class="fab fa-youtube"></i>
+													</a>
+												</div>
 											</li>
 										</ul>
 									</div>
@@ -538,7 +653,7 @@ const Signin = ({ t, isStudent }) => {
 														icon="envelope"
 														className="fas fa-envelope"
 													/>{' '}
-													hocngoainguquaskype@gmail.com
+													support@e-talk.vn
 												</a>
 											</li>
 											<li>
@@ -556,7 +671,7 @@ const Signin = ({ t, isStudent }) => {
 							</div>
 						</div>
 						<div className="copyRight">
-							<p>Copyright © 2016 E-Talk.vn</p>
+							<p>Copyright © {returnYear()} E-Talk.vn</p>
 						</div>
 					</div>
 				</div>
@@ -567,7 +682,5 @@ const Signin = ({ t, isStudent }) => {
 
 // export default Index;
 Signin.Layout = Layout;
-Signin.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(Signin);

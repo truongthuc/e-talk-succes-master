@@ -192,6 +192,11 @@ const Feedback = ({ t }) => {
 			UID: UID,
 			token: Token,
 		});
+
+		$('body').removeClass('show-aside');
+		Feedback.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -199,7 +204,9 @@ const Feedback = ({ t }) => {
 			{!loading && (
 				<>
 					<div className="d-sm-flex align-items-center justify-content-between mg-b-30">
-						<h1 className="main-title-page mg-b-0-f">{t('Teacher-comment')}</h1>
+						<h1 className="main-title-page mg-b-0-f">
+							{t('Feedback of teacher')}
+						</h1>
 						{overview && Object.keys(overview).length > 0 && (
 							<div className="form-group d-inline-block wd-200 w-full mg-b-0-f mg-t-15 mg-sm-t-0-f">
 								<Select
@@ -313,7 +320,9 @@ const Feedback = ({ t }) => {
 									CreatedDate={item.CreatedDate}
 									Rate={item.Rate}
 									LinkDetail={item.EvaluationID}
+									LinkFile={item.LinkFile}
 									CoursesName={item.CoursesName}
+									t={t}
 								/>
 							))
 						) : (
@@ -361,8 +370,5 @@ const Feedback = ({ t }) => {
 // export default Feedback;
 
 Feedback.getLayout = getStudentLayout;
-Feedback.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(Feedback);

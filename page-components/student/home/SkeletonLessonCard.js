@@ -7,6 +7,7 @@ let styleWrapper = {
 	flexWrap: 'wrap',
 };
 let styleSection = {
+	width: '100%',
 	border: '1px solid #e1e1e1',
 	borderRadius: '10px',
 	padding: '10px',
@@ -16,7 +17,7 @@ const SkeletonLessonCard = () => {
 	return (
 		<section style={styleSection}>
 			<div style={styleWrapper}>
-				<div className="pr-1" style={{ width: '30%' }}>
+				<div className="pr-1" style={{ width: '100%' }}>
 					<Skeleton width={`100%`} height={200} />
 				</div>
 				<div className="pl-1" style={{ width: '70%' }}>

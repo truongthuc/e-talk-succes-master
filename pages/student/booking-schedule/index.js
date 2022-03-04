@@ -115,7 +115,6 @@ const BookingLesson = ({ t }) => {
 	const [totalResult, setTotalResult] = useState(0);
 	const router = useRouter();
 
-
 	const errorToast = () =>
 		toast.error('Đã có lỗi xảy ra, xin vui lòng thử lại', toastInit);
 
@@ -438,6 +437,10 @@ const BookingLesson = ({ t }) => {
 			UID: UID,
 			Token: Token,
 		});
+		$('body').removeClass('show-aside');
+		BookingLesson.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -646,8 +649,5 @@ const BookingLesson = ({ t }) => {
 // export default BookingLesson;
 
 BookingLesson.getLayout = getStudentLayout;
-BookingLesson.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(BookingLesson);

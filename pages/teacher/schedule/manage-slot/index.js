@@ -33,21 +33,22 @@ const ManageSlot = ({ t }) => {
 		}
 
 		getProfile();
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (
 		<>
 			<div className="d-md-flex justify-content-between align-items-center flex-wrap mg-b-30">
 				<h1 className="main-title-page mg-b-15-f mg-md-b-0-f">
-					{t('manage-slot')}
+					{t('Manage Slot')}
 				</h1>
-				<span className="pd-y-10 d-inline-block tx-dark pd-y-10 d-inline-block tx-dark bg-white rounded pd-x-10">
+				{/* <span className="pd-y-10 d-inline-block tx-dark pd-y-10 d-inline-block tx-dark bg-white rounded pd-x-10">
 					<FontAwesomeIcon
 						icon="globe-europe"
 						className="fas fa-globe-europe mg-r-5"
 					/>
 					Timezone: <span className="tx-medium tx-primary">{timeZone}</span>
-				</span>
+				</span> */}
 			</div>
 			<div className="book__container mg-t-5 teacher-custom">
 				<div className="card">

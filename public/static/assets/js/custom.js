@@ -175,6 +175,11 @@ $(document).ready(function () {
 		$(this).css('left', '-100%');
 	});
 
+	// $('html').on('click', '.aside-fixed .nav-aside .nav-link', function () {
+	// 	alert('hello');
+	// 	$('body').removeClass('show-aside');
+	// });
+
 	/* $(window).scroll(function() {
         if (window.innerWidth >= 992) {
             if ($(window).scrollTop() > 0)

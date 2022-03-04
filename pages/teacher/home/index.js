@@ -3,8 +3,11 @@ import './index.module.scss';
 import { teacherDashboard } from '~/api/teacherAPI';
 import Skeleton from 'react-loading-skeleton';
 import UpComingList from '~/page-components/teacher/home/UpComingList';
+import MonthlyStatistics from '~/page-components/teacher/monthly-statistics';
+
 import { ToastContainer } from 'react-toastify';
 import LessonCard from '~/components/common/LessonCard';
+
 import { appSettings } from '~/config';
 import Select from 'react-select';
 import './index.module.scss';
@@ -37,12 +40,15 @@ const SituationBlock = ({
 }) => {
 	return (
 		<div className="card rounded-10 shadow-base bd-0">
-			<div className="card-body d-flex align-items-center justify-content-between bd-0-f pd-20">
-				<div className="flex-shrink-0 d-flex flex-column justify-content-between ">
+			<div className="card-body d-flex align-items-center justify-content-center bd-0-f pd-20">
+				<a
+					href={link ? link : ''}
+					className="hover-colum text-center flex-shrink-0 d-flex flex-column justify-content-center "
+				>
 					{imageUrl ? (
 						<img
 							src={imageUrl}
-							className="wd-75 ht-50 object-fit mg-b-10"
+							className="wd-75 ht-50 object-fit mg-b-10 mar-auto-bottom"
 							alt="hinhne"
 						/>
 					) : (
@@ -54,15 +60,7 @@ const SituationBlock = ({
 					<a className="tx-12" href={link ? link : ''}>
 						{!isLoading ? linkTitle : <Skeleton />}
 					</a>
-				</div>
-				<div className={`tx-center circle-value flex-shrink-0`}>
-					<p className="mg-b-0 tx-20 tx-bold tx-gray-600">
-						{!isLoading ? value : <Skeleton />}
-					</p>
-					<p className="text-center mg-b-0 tx-gray-400">
-						{!isLoading ? unit : <Skeleton />}
-					</p>
-				</div>
+				</a>
 			</div>
 		</div>
 	);
@@ -212,6 +210,10 @@ const Home = ({ t }) => {
 		// 	UID: UID,
 		// 	Token: Token,
 		// });
+		$('body').removeClass('show-aside');
+		Home.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -219,7 +221,8 @@ const Home = ({ t }) => {
 			<h1 className="main-title-page">{t('title')}</h1>
 
 			<div className="sec-container">
-				<div className="gv-situation mg-b-15">
+				<MonthlyStatistics />
+				{/* <div className="gv-situation mg-b-15">
 					<div className="row">
 						<div className="col-12 col-md-4 mg-b-15">
 							<SituationBlock
@@ -255,7 +258,7 @@ const Home = ({ t }) => {
 							/>
 						</div>
 					</div>
-				</div>
+				</div> */}
 				<div className="row">
 					<div className="col-lg-12">
 						<div className="card">
@@ -263,7 +266,7 @@ const Home = ({ t }) => {
 								<div className="align-items-center d-flex justify-content-between pd-b-15">
 									<div className="d-flex align-items-center">
 										<div className="">
-											<h5 className="mg-b-0">{t('upcoming-lessons')}</h5>
+											<h5 className="mg-b-0">{t('Upcoming Lessons')}</h5>
 										</div>
 									</div>
 									{/* <div className="wd-150">
@@ -301,8 +304,5 @@ const Home = ({ t }) => {
 };
 
 Home.getLayout = getLayout;
-Home.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(Home);

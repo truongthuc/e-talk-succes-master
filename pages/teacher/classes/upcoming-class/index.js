@@ -61,6 +61,40 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 	return (
 		<tr>
 			<td className="clr-time">
+				<span className="student-code">{data.StudentCode}</span>
+			</td>
+
+			<td className="clr-student">
+				<p
+					// href={true}
+					// onClick={(e) => {
+					// 	e.preventDefault();
+					// 	showStudentModal(StudentUID);
+					// }}
+					className="clrm-studentname student-name"
+				>
+					{data.StudentName}
+					{/* <FontAwesomeIcon
+						icon={
+							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
+						}
+						className={`fa fa-${
+							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
+						} mg-l-10 clrm-icon-male`}
+					/> */}
+				</p>
+			</td>
+			<td className="clr-lesson">
+				<div className="mg-b-5">
+					<span className=" mg-r-5 tx-medium">Course:</span>
+					<span className="">{data.CourseName}</span>
+				</div>
+				<div className="">
+					<span className=" mg-r-5 tx-medium">Lesson:</span>
+					<span className="">{data.LessonName}</span>
+				</div>
+			</td>
+			<td>
 				<div className="mg-b-5">
 					<span className=" mg-r-5 tx-nowrap wd-80 d-inline-block">
 						<FontAwesomeIcon icon="clock" className="fa fa-clock tx-primary" />{' '}
@@ -75,36 +109,6 @@ const UpcomingRow = ({ data, showStudentModal }) => {
 					</span>
 					<span className="">{data.VNTime}</span>
 				</div>
-			</td>
-			<td className="clr-lesson">
-				<div className="mg-b-5">
-					<span className=" mg-r-5 tx-medium">Course:</span>
-					<span className="">{data.CourseName}</span>
-				</div>
-				<div className="">
-					<span className=" mg-r-5 tx-medium">Lesson:</span>
-					<span className="">{data.LessonName}</span>
-				</div>
-			</td>
-			<td className="clr-student">
-				<a
-					href={true}
-					onClick={(e) => {
-						e.preventDefault();
-						showStudentModal(StudentUID);
-					}}
-					className="clrm-studentname"
-				>
-					{data.StudentName}
-					<FontAwesomeIcon
-						icon={
-							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
-						}
-						className={`fa fa-${
-							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
-						} mg-l-10 clrm-icon-male`}
-					/>
-				</a>
 			</td>
 			<td className="clr-student">
 				<span className="">{data.Title}</span>
@@ -261,6 +265,11 @@ const UpcomingClasses = ({ t }) => {
 			UID: UID,
 			Token: Token,
 		});
+
+		$('body').removeClass('show-aside');
+		UpcomingClasses.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, [state.page]);
 
 	return (
@@ -272,9 +281,10 @@ const UpcomingClasses = ({ t }) => {
 						<table className="table table-classrooms table-borderless responsive-table table-hover">
 							<thead className="">
 								<tr className="">
-									<th className="clr-time">{t('schedule')}</th>
-									<th className="clr-lesson">{t('lesson')}</th>
+									<th className="clr-time">{t('student-code')}</th>
 									<th className="clr-student">{t('student')}</th>
+									<th className="clr-lesson">{t('lesson')}</th>
+									<th className="clr-lesson">{t('time')}</th>
 									<th className="clr-status">{t('status')}</th>
 									<th className="clr-action">{t('actions')}</th>
 								</tr>
@@ -394,7 +404,5 @@ const UpcomingClasses = ({ t }) => {
 // export default UpcomingClasses;
 
 UpcomingClasses.getLayout = getLayout;
-UpcomingClasses.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(UpcomingClasses);

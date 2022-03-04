@@ -14,6 +14,9 @@ import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
 import Router, { useRouter } from 'next/router';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 //api here is an axios instance which has the baseURL set according to the env.
 
 import { LoginAPI } from '~/api/authAPI';
@@ -193,7 +196,7 @@ export const AuthProvider = ({ children, history }) => {
 				localStorage.setItem('RoleID', res.Data.RoleID);
 				localStorage.setItem('dataUser', JSON.stringify(res.Data));
 
-				console.log('RES: ', res);
+				toast.success('Login success');
 
 				setCheckLogin({
 					isLogin: true,
@@ -204,10 +207,10 @@ export const AuthProvider = ({ children, history }) => {
 
 				if (history.length < 1) {
 					if (res.Data.RoleID == 5) {
-						router.push('/student');
+						router.push('/student/home');
 					}
 					if (res.Data.RoleID == 4) {
-						router.push('/teacher');
+						router.push('/teacher/home');
 					}
 				} else {
 					let url = null;
@@ -232,18 +235,10 @@ export const AuthProvider = ({ children, history }) => {
 						}
 					}
 				}
-
-				// setTimeout(() => {
-				// 	if (history.length < 2) {
-				// 		router.push('/home');
-				// 	} else {
-				// 		router.back();
-				// 	}
-				// }, 1000);
 			} else if (res.Code === 201) {
-				alert(res.Message);
+				toast.error('Username or Password wrong!');
 			} else {
-				alert('Đăng nhập không thành công');
+				toast.error(res.Message);
 			}
 		} catch (error) {
 			// setLoading(false);
@@ -269,10 +264,17 @@ export const AuthProvider = ({ children, history }) => {
 		localStorage.clear();
 	};
 
-	const changeDataUser = (linkImg) => {
-		console.log('Link img bên auth: ', linkImg);
+	const changeDataUser = (linkImg, timezoneName, timezoneValue, userName) => {
+		console.log('timezone bên auth: ', timezoneName);
 		let data = JSON.parse(localStorage.getItem('dataUser'));
 		data.AvatarThumnail = linkImg;
+		data.TimeZoneName = timezoneName;
+		data.TimeZoneValue = timezoneValue;
+		if (userName !== '') {
+			data.StudentName = userName;
+		}
+
+		localStorage.setItem('dataUser', JSON.stringify(data));
 
 		setCheckLogin({
 			...checkLogin,
@@ -296,57 +298,67 @@ export const AuthProvider = ({ children, history }) => {
 	};
 
 	return (
-		<AuthContext.Provider
-			value={{
-				isAuthenticated: checkLogin,
-				dataUser: checkLogin.data,
-				dataProfile: dataProfile,
-				checkToken: checkToken,
-				changeIsAuth,
-				loadDataProfile,
-				updateProfile,
-				updateImg,
-				updatePass,
-				handleLogin,
-				handleLogout,
-				changeDataUser,
-			}}
-		>
-			{children}
-			<Modal
-				aria-labelledby="transition-modal-title"
-				aria-describedby="transition-modal-description"
-				className={classes.modal}
-				open={openModal}
-				closeAfterTransition
-				BackdropComponent={Backdrop}
-				BackdropProps={{
-					timeout: 500,
+		<>
+			<ToastContainer
+				position="top-center"
+				autoClose={2000}
+				hideProgressBar={true}
+			/>
+			<AuthContext.Provider
+				value={{
+					isAuthenticated: checkLogin,
+					dataUser: checkLogin.data,
+					dataProfile: dataProfile,
+					checkToken: checkToken,
+					changeIsAuth,
+					loadDataProfile,
+					updateProfile,
+					updateImg,
+					updatePass,
+					handleLogin,
+					handleLogout,
+					changeDataUser,
 				}}
 			>
-				<Fade in={openModal}>
-					<div className={classes.paper}>
-						<h2 id="transition-modal-title" className={classes.titleModal}>
-							Thông báo
-						</h2>
-						<p id="transition-modal-description" className={classes.textModal}>
-							Phiên đăng nhập đã hết hạn <br></br> Vui lòng đăng nhập lại
-						</p>
-
-						<div className={classes.boxBtn}>
-							<Button
-								className={classes.mgBtn}
-								variant="contained"
-								color="primary"
-								onClick={handleClick_MoveToLogin}
+				{children}
+				<Modal
+					aria-labelledby="transition-modal-title"
+					aria-describedby="transition-modal-description"
+					className={classes.modal}
+					open={openModal}
+					closeAfterTransition
+					BackdropComponent={Backdrop}
+					BackdropProps={{
+						timeout: 500,
+					}}
+				>
+					<Fade in={openModal}>
+						<div className={classes.paper}>
+							<h2 id="transition-modal-title" className={classes.titleModal}>
+								Thông báo
+							</h2>
+							<p
+								id="transition-modal-description"
+								className={classes.textModal}
 							>
-								Đăng nhập
-							</Button>
+								Phiên đăng nhập đã hết hạn <br></br> Vui lòng đăng nhập lại
+							</p>
+
+							<div className={classes.boxBtn}>
+								<Button
+									className={classes.mgBtn}
+									variant="contained"
+									color="primary"
+									onClick={handleClick_MoveToLogin}
+								>
+									Đăng nhập
+								</Button>
+							</div>
 						</div>
-					</div>
-				</Fade>
-			</Modal>
-		</AuthContext.Provider>
+					</Fade>
+				</Modal>
+			</AuthContext.Provider>
+		</>
 	);
 };
 

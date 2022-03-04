@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	rowInfo: {
 		display: 'flex',
-		alignItems: 'center',
+		alignItems: 'flex-end',
 		marginBottom: '20px',
 	},
 	styleInput: {
@@ -102,10 +102,16 @@ const useStyles = makeStyles((theme) => ({
 		color: '#fa005e',
 		fontWeight: 'bold',
 		marginRight: '10px',
+		[theme.breakpoints.down('md')]: {
+			display: 'none',
+		},
 	},
 	boxSelect: {
 		marginLeft: '0px',
 		marginBottom: '30px',
+		[theme.breakpoints.down('md')]: {
+			marginBottom: '0',
+		},
 	},
 }));
 
@@ -137,33 +143,20 @@ const BookingCalendar = ({ t }) => {
 	const [activeDate, setActiveDate] = useState(new Date());
 	const [isLoading, setIsLoading] = useState(true);
 
-	const [statusShow, setStatusShow] = useState(1);
+	const [statusShow, setStatusShow] = useState(0);
 
 	let loadingRef = useRef(true);
 
 	const getEventByWeek = async (obj) => {
 		setIsLoading(true);
 
-		// var curr = new Date();
-		// var first = curr.getDate() - curr.getDay();
-		// var last = first + 6;
-
-		// let firstday = new Date(curr.setDate(first + 1)).toUTCString();
-		// let lastday = new Date(curr.setDate(last + 1)).toUTCString();
-
-		// firstday = dayjs(firstday).format('DD/MM/YYYY HH:mm');
-		// lastday = dayjs(lastday).format('DD/MM/YYYY HH:mm');
-
-		// firstday = firstday.split(' ')[0];
-		// lastday = lastday.split(' ')[0];
-
 		var curr = new Date();
 
 		let getMonth = curr.getMonth();
 		let getYear = curr.getFullYear();
 
-		let start = new Date(getYear, getMonth, 1);
-		let end = new Date(getYear, getMonth + 1, 0);
+		let start = new Date(getYear, getMonth - 1, 1);
+		let end = new Date(getYear, getMonth + 2, 0);
 
 		start = dayjs(start).format('DD/MM/YYYY');
 		end = dayjs(end).format('DD/MM/YYYY');
@@ -218,17 +211,22 @@ const BookingCalendar = ({ t }) => {
 	};
 
 	useEffect(() => {
-		if (localStorage.getItem('UID')) {
-			let UID = localStorage.getItem('UID');
-			let Token = localStorage.getItem('token');
+		// if (localStorage.getItem('UID')) {
+		// 	let UID = localStorage.getItem('UID');
+		// 	let Token = localStorage.getItem('token');
 
-			getEventByWeek({
-				UID: UID,
-				start: '01/03/2021',
-				end: '08/03/2021',
-				Token: Token,
-			});
-		}
+		// 	getEventByWeek({
+		// 		UID: UID,
+		// 		start: '01/03/2021',
+		// 		end: '08/03/2021',
+		// 		Token: Token,
+		// 	});
+		// }
+		setIsLoading(true);
+
+		setTimeout(() => {
+			setIsLoading(false);
+		}, 500);
 
 		lottie &&
 			lottie.loadAnimation({
@@ -239,50 +237,124 @@ const BookingCalendar = ({ t }) => {
 				path: '/static/img/calendar-loading.json', // the path to the animation json
 			});
 
+		BookingCalendar.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 		return cleanUp;
 	}, []);
 
 	return (
 		<>
-			<div className={classes.boxSelect}>
-				<p className={classes.titleForm}>Show</p>
-				<FormControl className={`${classes.margin} ${classes.formControl}`}>
-					<NativeSelect
-						style={{ width: '100%' }}
-						id="demo-customized-select-native"
-						value={statusShow}
-						onChange={({ target: { value } }) => setStatusShow(value)}
-						input={<BootstrapInput />}
-					>
-						<option key={1} value={1}>
-							Tất cả
-						</option>
-						<option key={2} value={2}>
-							Available
-						</option>
-						<option key={3} value={3}>
-							Booked
-						</option>
-					</NativeSelect>
-				</FormControl>
+			<div className="box-header">
+				<div className={classes.rowInfo}>
+					<div className={classes.boxSelect}>
+						<p className={classes.titleForm}>{t('Show')}</p>
+						<FormControl className={`${classes.margin} ${classes.formControl}`}>
+							<NativeSelect
+								style={{ width: '100%' }}
+								id="demo-customized-select-native"
+								value={statusShow}
+								onChange={({ target: { value } }) => setStatusShow(value)}
+								input={<BootstrapInput />}
+							>
+								<option key={0} value={0}>
+									{t('All')}
+								</option>
+								<option key={1} value={1}>
+									{t('Available')}
+								</option>
+								<option key={2} value={2}>
+									{t('Booked')}
+								</option>
+							</NativeSelect>
+						</FormControl>
+					</div>
+				</div>
+				<div className="note-color">
+					<div className="container mb-0">
+						<div className="row">
+							<div className="col-md-7 col-12">
+								<h6 className="mb-3">{t('Passed Classes')}</h6>
+								<div className="item-note">
+									<span className="box-color color-a"></span>
+									<span className="text">{t('Student is PRESENT')}</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-b"></span>
+									<span className="text">{t('Teacher is absent')}</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-c"></span>
+									<span className="text">
+										{t('STUDENT IS ABSENT without notice')}
+									</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-d"></span>
+									<span className="text">
+										{t('NO INTERNET/POWER INTERUPTION')}
+									</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-e"></span>
+									<span className="text">
+										{t("Teacher've not set up status")}
+									</span>
+								</div>
+							</div>
+							<div className="col-md-5 col-12 col-note-2">
+								<h6 className="mb-3">{t('Upcoming Classes')}</h6>
+								<div className="item-note">
+									<span className="box-color color-f"></span>
+									<span className="text">{t('Trial class')}</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-g"></span>
+									<span className="text">{t('Regular Class')}</span>
+								</div>
+
+								<div className="item-note">
+									<span className="box-color color-h"></span>
+									<span className="text">{t('Probably book class')}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div className="book__calendar" id="js-book-calendar">
 				{isLoading ? (
 					<div ref={loadingRef} className="loading-lottie"></div>
 				) : (
 					<FullCalendar
-						data={eventSource}
+						// data={eventSource}
 						isLoading={isLoading}
 						statusShow={statusShow}
 					/>
 				)}
+			</div>
+			<div className="note-calendar mt-3">
+				<h5>{t('Note')}:</h5>
+				<p>
+					<b>{t('Open available slot')}:</b>{' '}
+					{t('Click empty item on the calendar to open the available slot')}
+				</p>
+				<p>
+					<b>{t('Close available slot')}:</b>{' '}
+					{t(
+						'Hover the available item and click close button to close the available slot',
+					)}
+				</p>
 			</div>
 		</>
 	);
 };
 
 // export default BookingCalendar;
-BookingCalendar.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(BookingCalendar);

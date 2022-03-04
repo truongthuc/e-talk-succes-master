@@ -56,16 +56,16 @@ const PasswordForm = ({ t }) => {
 		e.preventDefault();
 
 		if (oldPassword === '' || newPassword === '' || confirmPassword === '') {
-			setError(FILL_PASSWORD);
+			setError(t('Password is empty'));
 			return;
 		}
 
 		if (oldPassword === newPassword) {
-			setError(DIFFERENT_PASSWORD);
+			setError(t('The old password is the same as the new one'));
 			return;
 		}
 		if (newPassword !== confirmPassword) {
-			setError(CONFIRM_PASSWORD);
+			setError(t('The confirm password is wrong'));
 			return;
 		}
 		setError(null);
@@ -91,7 +91,7 @@ const PasswordForm = ({ t }) => {
 		setLoadingPassword(false);
 		if (res.Code === 401) {
 			setError(INCORRECT_PASSWORD);
-			alert('Cập nhật mật khẩu không thành công');
+			toast.error('Something wrong!');
 			return;
 		} else if (res.Code === 200) {
 			setError(null);
@@ -99,7 +99,6 @@ const PasswordForm = ({ t }) => {
 			setOldPassword('');
 			setNewPassword('');
 			setConfirmPassword('');
-			alert('Cập nhật mật khẩu thành công');
 		} else updatePassToastFail();
 	};
 
@@ -210,7 +209,7 @@ const PasswordForm = ({ t }) => {
 												{loadingPassword ? (
 													<i className="fa fa-spinner fa-spin"></i>
 												) : (
-													'Đổi Mật Khẩu'
+													t('Update Password')
 												)}
 											</button>
 										</div>

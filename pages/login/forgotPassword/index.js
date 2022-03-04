@@ -14,6 +14,10 @@ import { i18n, withTranslation } from '~/i18n';
 import { I18nContext } from 'next-i18next';
 import Select, { components } from 'react-select';
 import Link from 'next/link';
+import { ForgotPassword } from '~/api/teacherAPI';
+import { toast } from 'react-toastify';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const LangOptions = [
 	{
@@ -132,11 +136,10 @@ const useStyles = makeStyles((theme) => ({
 	},
 
 	styleLoading: {
-		width: '30px!important',
-		height: '30px!important',
-		position: 'absoulte!important',
-		top: '20px!important',
-		right: '20px!important',
+		width: '20px!important',
+		height: '20px!important',
+		marginLeft: '7px',
+		color: 'white!important',
 	},
 	textSuccses: {
 		marginTop: '30px',
@@ -182,7 +185,7 @@ const Index = ({ t, isStudent }) => {
 	const { i18n } = useContext(I18nContext);
 	const [lang, setLang] = useState(LangOptions[0]);
 	const { forgotPassword } = useAuth();
-
+	const [isLoading, setIsLoading] = useState(false);
 	const _handleChangeSelect = (selected) => {
 		setLang(selected);
 		i18n.changeLanguage(selected.value === 'en' ? 'en' : 'vi');
@@ -212,6 +215,10 @@ const Index = ({ t, isStudent }) => {
 
 	useEffect(() => {
 		checkDefaultLanguage();
+		$('body').removeClass('show-aside');
+		Index.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -307,23 +314,24 @@ const Index = ({ t, isStudent }) => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		let check = forgotPassword(stateValues.email);
+		setIsLoading(true);
 
-		check.then(function (value) {
-			if (value) {
-				setSubmitSuccess(true);
-			} else {
-				setSubmitSuccess(false);
+		(async () => {
+			try {
+				const res = await ForgotPassword(stateValues.email);
+				res.Code === 200 ? toast.success('Check your email, please') : '';
+				setIsLoading(false);
+			} catch (error) {
+				console.log(error);
 			}
-		});
+		})();
 	};
 
 	const classes = useStyles();
 	return (
 		<div
-			className="d-flex flex-column align-items-center justify-content-center"
+			className="d-flex flex-column align-items-center  login-page"
 			style={{
-				height: 'var(--app-height)',
 				background:
 					'url(http://mypage.e-talk.vn/Content/form/images/bl1.jpg) no-repeat center center ',
 				backgroundSize: 'cover',
@@ -337,11 +345,11 @@ const Index = ({ t, isStudent }) => {
 				</div>
 				<div className="headerRight">
 					<ul className="listMenu">
+						{/* <li>
+							<a href="/home">{t('home-page')}</a>
+						</li> */}
 						<li>
-							<a href="#">{t('home-page')}</a>
-						</li>
-						<li>
-							<a href="#">{t('log-in')}</a>
+							<a href="/login/signin">{t('log-in')}</a>
 						</li>
 						<li>
 							<Select
@@ -381,7 +389,7 @@ const Index = ({ t, isStudent }) => {
 			</div>
 			<div className="loginWrap">
 				<div className="container">
-					<h2 className="titleForm">{t('Forgot-password')}</h2>
+					<h2 className="titleForm">{t('Forgot Password')}</h2>
 					{loginSuccess.status ? (
 						<h3 className={classes.textSuccses}>{loginSuccess.message}</h3>
 					) : !submitSuccess ? (
@@ -391,11 +399,12 @@ const Index = ({ t, isStudent }) => {
 									onSubmit={handleSubmit}
 									className="formLogin"
 									noValidate
+									disabled={isLoading}
 									autoComplete="off"
 								>
 									<TextField
 										id="standard-basic"
-										label="Your mail address entry"
+										label={t('Your mail address entry')}
 										name="email"
 										className="styleInput"
 										onChange={handleChange}
@@ -407,24 +416,28 @@ const Index = ({ t, isStudent }) => {
 											</span>
 										</div>
 									)}
+
+									<div className="boxBtn">
+										<Button
+											type="submit"
+											variant="contained"
+											value={loading ? 'Loading...' : 'Đăng nhập'}
+											disabled={isLoading}
+											color="primary"
+											className="btnLogin"
+											// onClick={handleClick_login}
+										>
+											<FontAwesomeIcon
+												icon="share-square"
+												className="fas fa-share-square"
+											/>{' '}
+											{t('send')}
+											{isLoading && (
+												<CircularProgress className={classes.styleLoading} />
+											)}
+										</Button>
+									</div>
 								</form>
-								<div className="boxBtn">
-									<Button
-										type="button"
-										variant="contained"
-										value={loading ? 'Loading...' : 'Đăng nhập'}
-										disabled={loading}
-										color="primary"
-										className="btnLogin"
-										onClick={handleClick_login}
-									>
-										<FontAwesomeIcon
-											icon="share-square"
-											className="fas fa-share-square"
-										/>{' '}
-										{t('send')}
-									</Button>
-								</div>
 							</div>
 						</>
 					) : (
@@ -526,7 +539,5 @@ const Index = ({ t, isStudent }) => {
 
 // export default Index;
 Index.Layout = Layout;
-Index.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(Index);

@@ -56,7 +56,7 @@ const ChangePassword = ({ t }) => {
 	return (
 		<>
 			<h1 className="main-title-page">{t('change-password')}</h1>
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form className="form-change-pass" onSubmit={handleSubmit(onSubmit)}>
 				<div className="card">
 					{/* <div className="card-header align-items-center d-flex justify-content-between pd-x-20-f">
 						<div className="d-flex align-items-center">

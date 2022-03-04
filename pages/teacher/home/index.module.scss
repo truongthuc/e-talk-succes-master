@@ -19,7 +19,13 @@
 .svg-icon > svg {
 	color: #cec1b4;
 }
-
+.mar-auto-bottom {
+	margin: 10px auto;
+	transition: 0.3s ease;
+}
+.hover-colum:hover .mar-auto-bottom {
+	transform: translateY(-5px);
+}
 @media (max-width: 768px) {
 	.lg-valign-middle {
 		display: inline-flex !important;

@@ -1,0 +1,290 @@
+#js-book-calendar {
+  position: relative;
+  z-index: 0;
+}
+
+#js-book-calendar .fc-toolbar-title {
+  min-width: 150px;
+  text-align: center;
+}
+
+#js-book-calendar .box-slot {
+  margin-left: 15px;
+  padding: 0 3px;
+  background: #ffff;
+  position: absolute;
+  color: rgba(241, 43, 113, 0.8);
+  bottom: 0;
+  -webkit-box-shadow: 0px 1px 0px 0px #fff;
+          box-shadow: 0px 1px 0px 0px #fff;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  font-weight: 500;
+  right: 10px;
+  border: 1px solid #e1e1e1;
+  border-bottom: 0;
+}
+
+#js-book-calendar a.fc-col-header-cell-cushion {
+  display: block;
+  position: relative;
+}
+
+#js-book-calendar .date-wrap {
+  padding-right: 30px;
+}
+
+#js-book-calendar .header-container {
+  padding: 5px 0;
+}
+
+.book__container .card-custom > .card-body {
+  min-height: calc(100vh - 230px);
+}
+
+@media screen and (max-width: 992px) {
+  .book__container .card-custom > .card-body .tab-navigation-wrap {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: column-reverse;
+            flex-direction: column-reverse;
+  }
+  .book__container .card-custom > .card-body .tab-navigation-wrap .tab-navigation {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .teacher-custom + .tab-navigation-content #js-book-calendar .date-wrap {
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-col-header-cell .fc-col-header-cell-cushion {
+    padding-bottom: 0;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .header-container {
+    padding: 0;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .date-wrap {
+    padding-right: 0;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .box-slot {
+    position: static;
+    margin-left: 0;
+    max-width: 50px;
+    margin: 0 auto;
+    font-size: 10px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-col-header-cell .hd-date {
+    font-size: 14px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-col-header-cell .hd-day {
+    font-size: 12px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-cushion {
+    padding: 0 5px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-cushion .hot-icon {
+    display: none;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-frame {
+    padding-right: 5px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-cushion {
+    padding: 0 5px;
+    font-size: 12px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .label-book {
+    font-size: 0.5rem;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .booking-name {
+    display: none;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fix-btn {
+    display: inline-block;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .teacher-custom + .tab-navigation-content .fc-header-toolbar {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+  }
+  .teacher-custom + .tab-navigation-content .fc-header-toolbar .fc-toolbar-chunk {
+    width: 100%;
+  }
+  .teacher-custom + .tab-navigation-content .fc-header-toolbar .fc-toolbar-chunk:first-child {
+    margin-bottom: 15px;
+  }
+  .teacher-custom + .tab-navigation-content .fc-header-toolbar .fc-toolbar-chunk:last-child {
+    width: auto;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-header-toolbar .fc-toolbar-chunk .fc-toolbar-title {
+    font-size: 12px;
+    padding: 0.6rem;
+    min-width: auto;
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .label-book {
+    display: block;
+    font-size: 9px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .label-book i.fas {
+    margin-bottom: 3px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot {
+    height: 3rem;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-event {
+    min-height: calc(3rem - 1px);
+  }
+  .teacher-custom + .tab-navigation-content .fc-header-toolbar .fc-toolbar-chunk:last-child {
+    width: 100%;
+  }
+  .teacher-custom + .tab-navigation-content .notice ul {
+    padding-left: 1rem;
+  }
+  .teacher-custom + .tab-navigation-content .notice ul li {
+    margin-bottom: 5px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-frame {
+    padding-right: 0;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-timegrid-slot-label-cushion {
+    padding: 0;
+    padding-right: 3px;
+    font-size: 10px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .fc-col-header-cell .hd-date {
+    display: block;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .date-wrap .hd-date {
+    display: block;
+    font-size: 12px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .date-wrap .hd-day {
+    font-size: 10px;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .box-slot {
+    padding: 0;
+    font-size: 10px;
+    padding: 0;
+  }
+  .teacher-custom + .tab-navigation-content #js-book-calendar .box-slot .mg-x-2 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.teacher-custom + .tab-navigation-content .custom-checkbox .custom-control-label::before,
+.teacher-custom + .tab-navigation-content .custom-checkbox .custom-control-label::after,
+.teacher-custom + .tab-navigation-content .custom-radio .custom-control-label::before,
+.teacher-custom + .tab-navigation-content .custom-radio .custom-control-label::after,
+.teacher-custom + .tab-navigation-content .custom-switch .custom-control-label::before,
+.teacher-custom + .tab-navigation-content .custom-switch .custom-control-label::after {
+  top: 50%;
+}
+
+.teacher-custom + .tab-navigation-content .custom-control {
+  padding-left: 2rem;
+}
+
+.teacher-custom + .tab-navigation-content .custom-control-label:before {
+  width: 1.5rem;
+  height: 1.5rem;
+  left: -1.85rem;
+}
+
+.teacher-custom + .tab-navigation-content .custom-control-label:after {
+  left: -1.85rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+  .tooltip.show {
+    display: none;
+  }
+}
+
+.modal-backdrop.show {
+  z-index: 1070;
+}
+
+.flatpickr-wrapper {
+  width: 100%;
+}
+
+.calendar-enter {
+  opacity: 0;
+  -webkit-transform: scale(0.2);
+          transform: scale(0.2);
+}
+
+.calendar-enter-active {
+  opacity: 1;
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+  -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s, -webkit-transform 0.3s;
+}
+
+.calendar-exit {
+  opacity: 1;
+}
+
+.calendar-exit-active {
+  opacity: 0;
+  -webkit-transform: scale(0.2);
+          transform: scale(0.2);
+  -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s, -webkit-transform 0.3s;
+}
+
+@media (min-width: 768px) {
+  #quick-calendar .row .c-left {
+    -ms-flex-preferred-size: 100px;
+        flex-basis: 100px;
+    max-width: 100px;
+  }
+}
+
+#quick-calendar .row .c-left h5 {
+  margin: 0;
+  line-height: 2.5;
+}
+
+@media (min-width: 768px) {
+  #quick-calendar .row .c-right {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    max-width: calc(100% - 100px);
+  }
+}
+
+#quick-calendar .row .c-right .form-group {
+  padding: 5px;
+}
+
+.flatpickr-calendar.noCalendar {
+  max-width: calc(100% - 2px);
+  left: 1px;
+}

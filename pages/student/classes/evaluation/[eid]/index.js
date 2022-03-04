@@ -95,7 +95,7 @@ const LessonDetail = ({ t }) => {
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('Evaluate-the-lesson')}</h1>
+			<h1 className="main-title-page">{t('Detail Feedback')}</h1>
 			{loading ? (
 				<SkeletonLessonDetail />
 			) : (

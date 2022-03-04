@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import { GetAttendanceRecord } from '~/api/studentAPI';
 import StudentInformationModal from '~components/common/Modal/StudentInformationModal';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import Select from 'react-select';
 import { appSettings } from '~/config';
 import { getStudentLayout } from '~/components/Layout';
@@ -14,6 +14,45 @@ import 'react-datepicker/dist/react-datepicker.css';
 import dataHy from '../../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import dayjs from 'dayjs';
+import DetailRecord from './DetailRecord';
+
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import CloseIcon from '@material-ui/icons/Close';
+import Button from '@material-ui/core/Button';
+
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
+
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
+// ------------------------------------
 
 const DateTimeFormat = new Intl.DateTimeFormat('vi-VN', {
 	month: '2-digit',
@@ -47,6 +86,46 @@ const statusOptions = [
 		label: 'IT problem',
 	},
 ];
+
+const useStyles = makeStyles((theme) => ({
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		position: 'relative',
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		borderRadius: '10px',
+		width: '48%!important',
+		height: 'auto!important',
+		overflowY: 'hidden',
+		[theme.breakpoints.down('lg')]: {
+			width: '75%!important',
+			height: '98%!important',
+		},
+		[theme.breakpoints.down('sm')]: {
+			width: '98%!important',
+			padding: '16px 10px 24px 10px',
+		},
+	},
+	btnClose: {
+		position: 'absolute',
+		bottom: '13px',
+		left: '50%',
+		transform: 'translateX(-50%)',
+	},
+	iconClose: {
+		position: 'absolute',
+		top: '0px',
+		right: '0px',
+		padding: '15px',
+		border: 'none',
+		background: 'none',
+	},
+}));
 
 const AllClassRow = ({ data, showStudentModal }) => {
 	const {
@@ -86,27 +165,27 @@ const AllClassRow = ({ data, showStudentModal }) => {
 			<td>{data.Remark}</td>
 			<td>{data.Homework}</td>
 			<td className="clr-actions tx-center">
-				<Link
+				{/* <Link
 					href={`/teacher/evaluation/detail/[eid]`}
 					as={`/teacher/evaluation/detail/${data.EvaluationID}`}
 				>
-					<a
-						href={true}
-						className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
-					>
-						<FontAwesomeIcon
-							icon="vote-yea"
-							className="fas fa-vote-yea mg-r-5"
-						/>{' '}
-						Detail
-					</a>
-				</Link>
+					
+				</Link> */}
+				<a
+					href={true}
+					className="btn btn-sm btn-info rounded-5 mg-sm-r-5-f"
+					onClick={openModal}
+					teacherID={item.StudentCode}
+				>
+					Detail
+				</a>
 			</td>
 		</tr>
 	);
 };
 
 const AttendanceRecord = ({ t }) => {
+	const classes = useStyles();
 	const [isLoading, setIsLoading] = useState(true);
 	const [filterStatusAllClass, setFilterStatusAllClass] = useState(
 		statusOptions[0],
@@ -120,8 +199,33 @@ const AttendanceRecord = ({ t }) => {
 	const [studentId, setStudentId] = useState(null);
 	const mdStudentInfo = useRef(true);
 	const [showAll, setShowAll] = useState(false);
+	const [open, setOpen] = React.useState(false);
+	const [state, dispatch] = useReducer(reducer, initialState);
+	const [dataTeacher, setDataTeacher] = useState(null);
 
 	const [statusSearch, setStatusSearch] = useState(false);
+
+	const closeModal = () => {
+		setOpen(false);
+	};
+
+	const openModal = (e) => {
+		e.preventDefault();
+
+		let teacherID = e.currentTarget.attributes['TeacherID'].value;
+		teacherID = parseInt(teacherID);
+
+		setDataTeacher(teacherID);
+
+		setOpen(true);
+
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+	};
 
 	const showStudentModal = (studentId) => {
 		setStudentId(studentId);
@@ -168,6 +272,7 @@ const AttendanceRecord = ({ t }) => {
 			});
 
 			if (res?.Code && res.Code === 200) {
+				dispatch({ type: 'ADD_PAGE', res });
 				setData(res.Data);
 				setPageSize(res.PageSize);
 				setTotalResult(res.TotalResult);
@@ -227,21 +332,49 @@ const AttendanceRecord = ({ t }) => {
 			Token = localStorage.getItem('token');
 		}
 		loadAllClassesData({
-			fromdate: fromDate,
-			todate: toDate,
+			fromdate: fromDate == '' ? '' : fromDate,
+			todate: toDate == '' ? '' : toDate,
 			UID: UID,
 			Token: Token,
-			Page: 1,
+			Page: state.page,
 		});
 		setStatusSearch(false);
 
 		if (statusSearch) {
 			setStatusSearch(false);
 		}
-	}, [pageNumber, filterStatusAllClass]);
+		$('body').removeClass('show-aside');
+	}, [state.page, filterStatusAllClass]);
+
+	useEffect(() => {
+		AttendanceRecord.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 
 	return (
 		<>
+			<Modal
+				aria-labelledby="transition-modal-title"
+				aria-describedby="transition-modal-description"
+				className={classes.modal}
+				open={open}
+				onClose={closeModal}
+				closeAfterTransition
+				BackdropComponent={Backdrop}
+				BackdropProps={{
+					timeout: 500,
+				}}
+			>
+				<Fade in={open}>
+					<div className={classes.paper}>
+						<button className={classes.iconClose} onClick={closeModal}>
+							<CloseIcon />
+						</button>
+						<DetailRecord dataTeacher={dataTeacher} />
+					</div>
+				</Fade>
+			</Modal>
 			<h1 className="main-title-page">{t('attendance-record')}</h1>
 			<div className="d-flex align-items-center justify-content-between mg-b-15 flex-wrap">
 				<div
@@ -278,22 +411,23 @@ const AttendanceRecord = ({ t }) => {
 							/>
 						</div>
 					</div>
-					<div className="flex-grow-0 tx-right flex-shrink-0 mg-t-30 mg-xs-t-0">
+					<div className="flex-grow-0 tx-right flex-shrink-0  mg-xs-t-0 wrap-btn-attendance">
 						<button
 							type="button"
-							className="btn btn-primary"
+							className="btn btn-pink"
 							onClick={_onFilterDate}
 						>
-							<FontAwesomeIcon icon="search" className="fa fa-search" /> Search
+							<FontAwesomeIcon icon="search" className="fa fa-search" />{' '}
+							{t('Search')}
 						</button>
 
 						<button
 							type="button"
-							className="btn btn-primary"
+							className="btn btn-pink"
 							onClick={showAllData}
 							style={{ marginLeft: '10px' }}
 						>
-							Show all
+							{t('Show all')}
 						</button>
 					</div>
 				</div>
@@ -302,9 +436,10 @@ const AttendanceRecord = ({ t }) => {
 			<div className="card mg-b-30">
 				<div className="card-body">
 					<div className="table-responsive">
-						<table className="table table-classrooms table-borderless responsive-table table-hover">
+						<table className="table table-classrooms table-attendance table-borderless  table-hover">
 							<thead>
 								<tr>
+									<th className="clr-id text-left">{t('student-code')}</th>
 									<th className="clr-id text-left">{t('teacher-name')}</th>
 									<th className="clr-lesson text-left">{t('package')}</th>
 									<th className="clr-student text-left">{t('course')}</th>
@@ -312,7 +447,7 @@ const AttendanceRecord = ({ t }) => {
 									<th className="clr-status text-left">{t('time')}</th>
 									<th className="clr-status text-left">{t('remark')}</th>
 									<th className="clr-status text-left">{t('homework')}</th>
-									<th className="clr-status text-left"></th>
+									<th className="clr-status text-left">{t('Action')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -400,6 +535,7 @@ const AttendanceRecord = ({ t }) => {
 								) : !!data && !!data.length > 0 ? (
 									data.map((item) => (
 										<tr>
+											<td>{item.StudentCode}</td>
 											<td>{item.TeacherName}</td>
 											<td>{item.PackageName}</td>
 											<td>{item.CourseName}</td>
@@ -408,21 +544,20 @@ const AttendanceRecord = ({ t }) => {
 											<td>{item.Remark}</td>
 											<td>{item.HomeWork}</td>
 											<td className="">
-												<Link
+												{/* <Link
 													href={`/student/classes/attendance-record/[edit]${item.ID}`}
 													as={`/student/classes/attendance-record/${item.ID}`}
 												>
-													<a
-														href={true}
-														className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
-													>
-														<FontAwesomeIcon
-															icon="vote-yea"
-															className="fas fa-vote-yea mg-r-5"
-														/>{' '}
-														Detail
-													</a>
-												</Link>
+													
+												</Link> */}
+												<a
+													href={true}
+													className="btn btn-sm btn-info rounded-5 mg-sm-r-5-f"
+													onClick={openModal}
+													teacherID={item.ID}
+												>
+													Detail
+												</a>
 											</td>
 										</tr>
 									))
@@ -439,18 +574,17 @@ const AttendanceRecord = ({ t }) => {
 						</table>
 					</div>
 
-					{totalResult > pageSize && (
-						<Pagination
-							innerClass="pagination mg-t-15"
-							activePage={pageNumber}
-							itemsCountPerPage={pageSize}
-							totalItemsCount={totalResult}
-							pageRangeDisplayed={5}
-							onChange={(page) => setPageNumber(page)}
-							itemClass="page-item"
-							linkClass="page-link"
-							activeClass="active"
-						/>
+					{state?.TotalResult > 0 && (
+						<Box display={`flex`} justifyContent={`center`} mt={4}>
+							<Pagination
+								count={Math.ceil(state?.TotalResult / state?.PageSize)}
+								color="secondary"
+								onChange={(obj, page) =>
+									dispatch({ type: 'SELECT_PAGE', page })
+								}
+								c
+							/>
+						</Box>
 					)}
 				</div>
 			</div>
@@ -464,8 +598,5 @@ const AttendanceRecord = ({ t }) => {
 
 // export default AttendanceRecord;
 AttendanceRecord.getLayout = getStudentLayout;
-AttendanceRecord.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(AttendanceRecord);

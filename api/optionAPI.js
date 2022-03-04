@@ -96,6 +96,7 @@ export const UploadFilePost = async (params) => {
 		let formData = new FormData();
 		if (!!params && params.length > 0) {
 			[...params].map((image) => {
+				console.log('images: ', image);
 				formData.append('file', image);
 			});
 		}
@@ -305,6 +306,24 @@ export const getLocationOptions = async (params) => {
 				...params,
 			},
 		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+	return result;
+};
+
+export const UploadFileEvaluation = async (params) => {
+	let result;
+	let formData = new FormData();
+	console.log('params audio: ', params);
+	formData.append('file', params[0]);
+
+	try {
+		let res = await instance.post(
+			'/Api/ElearnTeacherApi/UploadFileEvaluation',
+			formData,
+		);
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');

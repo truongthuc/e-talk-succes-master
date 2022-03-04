@@ -195,6 +195,7 @@ const RenderSummary = ({ handFilterValue }) => {
 
 	React.useEffect(() => {
 		fetchSummary();
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (

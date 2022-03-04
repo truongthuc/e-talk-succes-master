@@ -40,12 +40,18 @@ const useStyles = makeStyles((theme) => ({
 		top: '-70px',
 		right: '0',
 		borderRadius: '999px',
+		[theme.breakpoints.down('sm')]: {
+			top: '65px!important',
+		},
 	},
 	btnShow: {
 		borderRadius: '999px',
 	},
 	wrapFilter: {
-		right: '110px!important',
+		// right: '110px!important',
+		// [theme.breakpoints.down('sm')]: {
+		// 	right: '0!important',
+		// },
 	},
 }));
 // ----------- PHÂN TRANG ---------------
@@ -153,8 +159,8 @@ const TableView = ({ t }) => {
 		}
 		if (showAll) {
 			getAPI({
-				fromdate: fromDate,
-				todate: toDate,
+				fromdate: '',
+				todate: '',
 				UID: UID,
 				Page: state.page,
 				Token: Token,
@@ -179,15 +185,22 @@ const TableView = ({ t }) => {
 			Page: state.page,
 			Token: Token,
 		});
+		$('body').removeClass('show-aside');
 	}, [state.page]);
+
+	useEffect(() => {
+		TableView.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 
 	return (
 		<>
-			<h1 className="main-title-page color-black">{t('booked-schedule')}</h1>
+			<h1 className="main-title-page color-black">{t('Booked Schedule')}</h1>
 			<div className="card">
 				<div className="card-body bg-white-radius">
 					<div
-						className={`d-flex from-to-group mg-b-15 flex-wrap absoulute-date ${classes.wrapFilter}`}
+						className={`d-flex from-to-group mg-b-15 wrap-filter flex-wrap absoulute-date ${classes.wrapFilter}`}
 						id="filter-time"
 					>
 						<div className="d-flex flex-wrap-0">
@@ -219,42 +232,45 @@ const TableView = ({ t }) => {
 								/>
 							</div>
 						</div>
-						<div className="flex-grow-0 tx-right flex-shrink-0 wd-100p wd-sm-auto tx-left mg-t-10 mg-sm-t-0">
+						<div className="flex-grow-0 wrap-book-search  tx-right flex-shrink-0 wd-100p wd-sm-auto tx-left mg-t-10 mg-sm-t-0 ">
 							<button
 								type="button"
-								className="btn btn-primary wd-100p wd-sm-auto btn-ab"
+								className="btn  wd-100p wd-sm-auto  btn-pink"
 								onClick={_onFilterDate}
 							>
 								<FontAwesomeIcon icon="search" className="fa fa-search" />{' '}
+								Search
+							</button>
+							<button
+								type="button"
+								className={`btn btn-pink   ${classes.btnShow}`}
+								onClick={() => setShowAll(true)}
+								style={{ borderRadius: '0' }}
+							>
+								{t('Show all')}
 							</button>
 						</div>
 					</div>
-					<div className={classes.wrapBtn}>
+					{/* <div className={classes.wrapBtn}>
 						{' '}
-						<button
-							type="button"
-							className={`btn btn-primary  ${classes.btnShow}`}
-							onClick={() => setShowAll(true)}
-						>
-							Show all
-						</button>
-					</div>
-					<div className="table-responsive">
-						<table className="table table-borderless responsive-table">
+					
+					</div> */}
+					<div className="table-responsive table-schedule">
+						<table className="table">
 							<thead>
 								<tr>
 									<th>{t('teacher')}</th>
 									<th>{t('school-package')}</th>
 									<th>{t('course')}</th>
 									<th>{t('curriculum')}</th>
-									<th>{t('time')}</th>
+									{/* <th>{t('time')}</th> */}
 									<th>{t('day')}</th>
 									<th>{t('hour')}</th>
 									<th>{t('class')}</th>
 									<th>{t('status')}</th>
 								</tr>
 							</thead>
-							<PerfectScrollbar component="tbody">
+							<tbody>
 								{isLoading ? (
 									<tr>
 										<td>
@@ -292,11 +308,11 @@ const TableView = ({ t }) => {
 											<td>{ls.PackageName}</td>
 											<td>{ls.DocumentName}</td>
 											<td>{ls.DocumentDetailName}</td>
-											<td>{ls.TimeCourse}</td>
+											{/* <td>{ls.TimeCourse}</td> */}
 											<td>{ls.StartDate}</td>
 											<td>{ls.TimeStudy}</td>
 											<td>{ls.ClassName}</td>
-											<td>{ls.StatusName}</td>
+											<td className="text-right">{ls.StatusName}</td>
 										</tr>
 									))
 								) : (
@@ -315,7 +331,7 @@ const TableView = ({ t }) => {
 										</td>
 									</tr>
 								)}
-							</PerfectScrollbar>
+							</tbody>
 						</table>
 					</div>
 					{/* {totalResult > pageSize && (
@@ -350,8 +366,5 @@ const TableView = ({ t }) => {
 // export default TableView;
 
 TableView.getLayout = getStudentLayout;
-TableView.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(TableView);

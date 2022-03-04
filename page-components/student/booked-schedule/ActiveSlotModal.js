@@ -4,6 +4,8 @@ import { Modal } from 'react-bootstrap';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
+import dayjs from 'dayjs';
+
 const ActiveSlotModal = ({
 	data,
 	handleOpenSlot,
@@ -11,14 +13,22 @@ const ActiveSlotModal = ({
 	closeModal,
 	openModal,
 	modalData,
+	dataUser,
+	statusBook,
+	t,
 }) => {
-	const { start = '', end = '', dataPopup = null } = modalData;
+	const {
+		start = '',
+		end = '',
+		dataPopup = null,
+		Avatar,
+		TeacherName,
+		StudyTime,
+	} = modalData;
 
 	const [onSending, sOnSending] = React.useState(false);
 	const [infoSubmit, setInfoSubmit] = useState({});
 	const [select, setSelect] = useState();
-
-	console.log('Data trong modal: ', modalData);
 
 	const useStyles = makeStyles((theme) => ({
 		root: {
@@ -43,6 +53,36 @@ const ActiveSlotModal = ({
 			marginBottom: '1rem',
 		},
 		rowInfo: {},
+		modalBody: {
+			padding: '1rem 4rem',
+			[theme.breakpoints.down('sm')]: {
+				padding: '1rem 1rem',
+			},
+		},
+		boxInfo: {
+			width: '78%',
+			margin: 'auto',
+			padding: '15px 55px',
+			boxShadow: '1px 1px 12px #0000001a',
+			borderRadius: '10px',
+			border: '2px solid #ffffff21',
+			[theme.breakpoints.down('sm')]: {
+				width: '88%',
+				padding: '15px 7px',
+			},
+		},
+		modalHeader: {
+			background: '#f12b71',
+			backgroundImage:
+				'linear-gradient(to right top, #f12b71, #f2417d, #f25388, #f26293, #f2709e)',
+		},
+		imgUser: {
+			width: '60px',
+			height: '60px',
+			objectFit: 'cover',
+			border: '2px solid #ffffffcf',
+			borderRadius: '50%',
+		},
 	}));
 
 	const convertDate = (time) => {
@@ -82,11 +122,13 @@ const ActiveSlotModal = ({
 		setValue(event.target.value);
 	};
 
-	console.log('ON Sending: ', onSending);
-
 	useEffect(() => {
 		onSending && handleOpenSlot(infoSubmit);
 	}, [onSending]);
+
+	useEffect(() => {
+		sOnSending(false);
+	}, [statusBook]);
 
 	useEffect(() => {
 		setInfoSubmit({
@@ -95,6 +137,7 @@ const ActiveSlotModal = ({
 			courseID: dataPopup?.ListCourse[0].CourseID,
 			start: start,
 			end: end,
+			StudyTime: StudyTime,
 		});
 	}, [dataPopup]);
 
@@ -108,15 +151,28 @@ const ActiveSlotModal = ({
 				animation={false}
 				onHide={closeModal}
 			>
-				<Modal.Header closeButton>
-					<Modal.Title>Confirm active</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<div className={`row ${classes.rowInfo}`}>
-						<div className="col">
-							<p>Program:</p>
+				<Modal.Header closeButton className={classes.modalHeader}>
+					<div className={classes.boxInfo}>
+						<div className="row">
+							<div className="col-3">
+								<img
+									className={classes.imgUser}
+									src={Avatar ? Avatar : '/static/img/user.png'}
+									alt=""
+								/>
+							</div>
+							<div className="col-9 d-flex align-items-center">
+								<h6 style={{ color: 'white' }}>{TeacherName}</h6>
+							</div>
 						</div>
-						<div className="col">
+					</div>
+				</Modal.Header>
+				<Modal.Body className={`modal-body-form ${classes.modalBody}`}>
+					<div className={`row ${classes.rowInfo}`}>
+						<div className="col-4">
+							<p className="label-style">{t('Program')}:</p>
+						</div>
+						<div className="col-8">
 							<input
 								type="text"
 								className={classes.styleInput}
@@ -126,22 +182,23 @@ const ActiveSlotModal = ({
 						</div>
 					</div>
 					<div className={`row ${classes.rowInfo}`}>
-						<div className="col">
-							<p>Time</p>
+						<div className="col-4">
+							<p className="label-style">{t('Time')}</p>
 						</div>
-						<div className="col">
+						<div className="col-8">
 							<p>
 								<span className="tx-medium" id="js-start-time">
-									{timeStart} - {timeEnd}
+									{/* {timeStart} - {timeEnd} */}
+									{StudyTime}
 								</span>
 							</p>
 						</div>
 					</div>
 					<div className={`row ${classes.rowInfo}`}>
-						<div className="col">
-							<p>Date</p>
+						<div className="col-4">
+							<p className="label-style">{t('Date')}</p>
 						</div>
-						<div className="col">
+						<div className="col-8">
 							<p>
 								<span className="tx-medium" id="js-start-time">
 									{dateStart} - {dateEnd}
@@ -152,10 +209,10 @@ const ActiveSlotModal = ({
 					{dataPopup !== null && (
 						<>
 							<div className={`row ${classes.rowInfo}`}>
-								<div className="col">
-									<p>Package</p>
+								<div className="col-4">
+									<p className="label-style">{t('Package')}</p>
 								</div>
-								<div className="col">
+								<div className="col-8">
 									<select className={classes.styleSelect}>
 										<option value={dataPopup?.Package.PackageID}>
 											{dataPopup?.Package.PackageName}
@@ -164,10 +221,10 @@ const ActiveSlotModal = ({
 								</div>
 							</div>
 							<div className={`row ${classes.rowInfo}`}>
-								<div className="col">
-									<p>Course</p>
+								<div className="col-4">
+									<p className="label-style">{t('Course')}</p>
 								</div>
-								<div className="col">
+								<div className="col-8">
 									<select
 										onChange={handleSelect}
 										className={classes.styleSelect}
@@ -179,33 +236,33 @@ const ActiveSlotModal = ({
 									</select>
 								</div>
 							</div>
+							<div className="d-flex justify-content-center mt-3">
+								<button
+									type="button"
+									className="btn btn-default btn-sm tx-primary"
+									onClick={closeModal}
+									style={{ marginRight: '10px' }}
+								>
+									<span>{t('Cancel')}</span>
+								</button>
+								<button
+									type="button"
+									disabled={onSending}
+									className="btn btn-primary btn-sm tx-primary"
+									onClick={() => sOnSending(true)}
+								>
+									{onSending ? (
+										<span>
+											<i class="fas fa-spinner fa-spin"></i> {t('Booking')}
+										</span>
+									) : (
+										<span>{t('Booking')}</span>
+									)}
+								</button>
+							</div>
 						</>
 					)}
 				</Modal.Body>
-				<Modal.Footer>
-					<button
-						type="button"
-						disabled={onSending}
-						className="btn btn-light btn-sm"
-						onClick={closeModal}
-					>
-						Close
-					</button>
-					<button
-						type="button"
-						disabled={onSending}
-						className="btn btn-primary btn-sm tx-primary"
-						onClick={() => sOnSending(true)}
-					>
-						{onSending ? (
-							<span>
-								<i class="fas fa-spinner fa-spin"></i> Open slot
-							</span>
-						) : (
-							<span>Open slot</span>
-						)}
-					</button>
-				</Modal.Footer>
 			</Modal>
 		</>
 	);

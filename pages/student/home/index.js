@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
+
 import styled from 'styled-components';
 import { BookOpen } from '@styled-icons/boxicons-regular/BookOpen';
 import { OpenBook } from '@styled-icons/entypo/OpenBook';
 import { CancelCircle } from '@styled-icons/icomoon/CancelCircle';
 import { TextDocument } from '@styled-icons/entypo/TextDocument';
+
 import LessonHistoryCard from '~/page-components/student/home/LessonHistoryCard';
 import LessonUpcomingCard from '~/page-components/student/home/LessonUpcomingCard';
+
 import RatingLessonModal from '~/components/common/Modal/RatingLessonModal';
 import RequireLessonModal from '~/components/common/Modal/RequireLessonModal';
 import CancelBookingLessonModal from '~/components/common/Modal/CancelBookingLessonModal';
 import PopUpCancelLesson from '~/components/common/Modal/PopUpCancelLesson';
 import SkeletonLessonCard from '~/page-components/student/home/SkeletonLessonCard';
 import { NOT_DATA_FOUND } from '~/components/common/Constant/message';
+
+import { convertDateFromTo, checkCancelTime } from '~/utils.js';
 import {
 	LessionHistory,
+	getCoursesInfoAPI,
 	getUpcomingLessons,
 	StudyProcess,
 } from '~/api/studentAPI';
@@ -22,17 +28,19 @@ import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import 'react-toastify/scss/main.scss';
 import { toastInit } from '~/utils';
-import { FETCH_ERROR } from '~components/common/Constant/toast';
+import {
+	CANCEL_BOOKING_SUCCESS,
+	FETCH_ERROR,
+} from '~components/common/Constant/toast';
 import { getStudentLayout } from '~/components/Layout';
 import { appSettings } from '~/config';
 import './index.module.scss';
+import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import dayjs from 'dayjs';
+import Link from 'next/link';
 import data from '../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
-import { Button, Modal } from 'react-bootstrap';
-
-let isShowNoti = false;
-
 const styledIcon = `
   color: ${appSettings.colors.primary};
   width: 30px;
@@ -79,7 +87,6 @@ const initialRequireLesson = {
 	DocumentName: '',
 	SkypeID: '',
 };
-
 const Home = ({ t }) => {
 	const router = useRouter();
 	const [state, setState] = useState({});
@@ -87,12 +94,15 @@ const Home = ({ t }) => {
 		id: '',
 		lock: false,
 	});
-	const [stateCancelLesson, setStateCancelLesson] =
-		useState(initialCancelLesson);
-	const [stateRatingLesson, setStateRatingLesson] =
-		useState(initialRatingLesson);
-	const [stateRequireLesson, setStateRequireLesson] =
-		useState(initialRequireLesson);
+	const [stateCancelLesson, setStateCancelLesson] = useState(
+		initialCancelLesson,
+	);
+	const [stateRatingLesson, setStateRatingLesson] = useState(
+		initialRatingLesson,
+	);
+	const [stateRequireLesson, setStateRequireLesson] = useState(
+		initialRequireLesson,
+	);
 	const [loading, setLoading] = useState(false);
 
 	const [courseInfo, setCourseInfo] = useState(null);
@@ -307,6 +317,11 @@ const Home = ({ t }) => {
 				console.log(error);
 			}
 		})();
+
+		$('body').removeClass('show-aside');
+		Home.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -316,8 +331,8 @@ const Home = ({ t }) => {
 			) : (
 				<>
 					<div className="lesson mg-t-45 animated fadeInUp am-animation-delay-1">
-						<div className="d-xl-flex align-items-center justify-content-between">
-							<h4 className="title-section">{t('upcoming-lessons')}</h4>
+						<div className="d-xl-flex align-items-center justify-content-between box-title">
+							<h4 className="title-section">{t('Upcoming Lesson')}</h4>
 							{/* <Link href={'/student/upcoming-classes'}>
 								<a
 									href={true}
@@ -329,25 +344,21 @@ const Home = ({ t }) => {
 							</Link> */}
 						</div>
 
-						<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
-							<img
-								src="/static/img/no-data.svg"
-								alt="no-data"
-								className="wd-200 mg-b-15"
-							/>
-							{dataComing?.length === 0 ? (
+						{dataComing?.length === 0 && (
+							<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
+								<img
+									src="/static/img/no-data.svg"
+									alt="no-data"
+									className="wd-200 mg-b-15"
+								/>
 								<p className=" tx-danger tx-medium">
-									{t('You-have-no-upcoming-lessons')}
+									{t("There's no have any upcoming lesson")}
 								</p>
-							) : (
-								<p className=" tx-danger tx-medium">
-									{t(`You have ${dataComing?.length} lesson`)}
-								</p>
-							)}
-							<a href="/student/profile-teacher" className="btn btn-primary">
-								Book a class schedule
-							</a>
-						</div>
+								<a href="/student/profile-teacher" className="btn btn-primary">
+									{t('Book a class schedule')}
+								</a>
+							</div>
+						)}
 
 						<div className="course-horizental mg-t-15">
 							<ul className="list-wrap">
@@ -376,8 +387,8 @@ const Home = ({ t }) => {
 						</div>
 					</div>{' '}
 					<div className="lesson mg-t-45 animated fadeInUp am-animation-delay-2">
-						<div className="d-xl-flex align-items-center justify-content-between ">
-							<h4 className="title-section">{t('completed-lessons')}</h4>
+						<div className="d-xl-flex align-items-center justify-content-between box-title">
+							<h4 className="title-section">{t('Completed Lessons')}</h4>
 							{/* <Link href={'/student/class-history'}>
 								<a
 									href={true}
@@ -389,20 +400,18 @@ const Home = ({ t }) => {
 							</Link> */}
 						</div>{' '}
 						<div className="course-horizental mg-t-15">
-							<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
-								<img
-									src="/static/img/no-data.svg"
-									alt="no-data"
-									className="wd-200 mg-b-15"
-								/>
-								{dataHis?.length > 0 ? (
+							{dataHis?.length === 0 && (
+								<div className="empty-error tx-center mg-y-15 cr-item bg-white bg-f2 rounded-5 pd-15 pd-30 shadow">
+									<img
+										src="/static/img/no-data.svg"
+										alt="no-data"
+										className="wd-200 mg-b-15"
+									/>
 									<p className=" tx-danger tx-medium">
-										{t(`You have ${dataHis.length} lessons`)}.
+										{t(`You don't have any lessons`)}.
 									</p>
-								) : (
-									<p className=" tx-danger tx-medium">{t('no-class-yet')}.</p>
-								)}
-							</div>
+								</div>
+							)}
 							<ul className="list-wrap">
 								{loading ? (
 									<SkeletonLessonCard />
@@ -477,8 +486,5 @@ const Home = ({ t }) => {
 };
 
 Home.getLayout = getStudentLayout;
-Home.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(Home);

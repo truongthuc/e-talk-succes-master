@@ -27,15 +27,22 @@ import DetailTeacher from './DetailTeacher';
 import dayjs from 'dayjs';
 import Swiper from 'swiper';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import Rating from '@material-ui/lab/Rating';
+import Typography from '@material-ui/core/Typography';
+
+import 'react-toastify/dist/ReactToastify.css';
+
 // import data from '../../../data/data.json';
 import { i18n, withTranslation } from '~/i18n';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
-
 import CloseIcon from '@material-ui/icons/Close';
+
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
 	modal: {
@@ -49,14 +56,15 @@ const useStyles = makeStyles((theme) => ({
 		boxShadow: theme.shadows[5],
 		padding: theme.spacing(2, 4, 3),
 		borderRadius: '10px',
-		width: '68%',
-		height: '98%',
+		width: '68%!important',
+		height: '98%!important',
 		overflowY: 'hidden',
-		[theme.breakpoints.down('md')]: {
-			width: '75%',
+		[theme.breakpoints.down('lg')]: {
+			width: '75%!important',
+			height: '98%!important',
 		},
 		[theme.breakpoints.down('sm')]: {
-			width: '98%',
+			width: '98%!important',
 			padding: '16px 10px 24px 10px',
 		},
 	},
@@ -73,6 +81,9 @@ const useStyles = makeStyles((theme) => ({
 		padding: '15px',
 		border: 'none',
 		background: 'none',
+	},
+	btnShowAll: {
+		boxShadow: 'none',
 	},
 }));
 
@@ -168,6 +179,11 @@ const ProfileTeacher = ({ t }) => {
 	const [open, setOpen] = React.useState(false);
 
 	const [dataTeacher, setDataTeacher] = useState(null);
+	const [statusSearch, setStatusSearch] = useState(false);
+
+	const [values, setValues] = useState();
+
+	console.log('Value: ', values);
 
 	const closeModal = () => {
 		setOpen(false);
@@ -204,6 +220,9 @@ const ProfileTeacher = ({ t }) => {
 			setTeacherList(res.Data);
 			setPageSize(res.PageSize);
 			setTotalResult(res.TotalResult);
+		} else if (res.Code === 403) {
+			router.push('login/signin');
+			toast.error('Phiên đăng nhập đã hết hạn');
 		} else errorToast();
 		setLoading(false);
 	};
@@ -252,23 +271,6 @@ const ProfileTeacher = ({ t }) => {
 	const handleChangeDate = (e) => {
 		try {
 			let key = 'date';
-			//let value = $('#date-selected').val().split(', ')[1];
-
-			// if (dayjs(new Date()).format('DD/MM/YYYY') === value) {
-			// 	dispatch({
-			// 		type: 'STATE_CHANGE',
-			// 		payload: {
-			// 			key: 'startTime',
-			// 			value: `${new Date().getHours() + 1}:00`,
-			// 		},
-			// 	});
-			// 	dispatch({
-			// 		type: 'STATE_CHANGE',
-			// 		payload: { key: 'endTime', value: '23:00' },
-			// 	});
-			// }
-
-			//dispatch({ type: 'STATE_CHANGE', payload: { key, value } });
 		} catch (err) {
 			console.log(err);
 		}
@@ -473,6 +475,78 @@ const ProfileTeacher = ({ t }) => {
 		chooseToday();
 	};
 
+	const showAllData = () => {
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
+		getAPI({
+			Search: '',
+			UID: UID,
+			Token: Token,
+			Page: state.page,
+		});
+	};
+
+	const _handleSubmit = async (e) => {
+		e.preventDefault();
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+		// this.keyPress = this.keyPress.bind(this);
+		console.log('Values khi submit: ', values);
+		try {
+			const res = await GetListTeacherPage({
+				Search: values.TeacherName,
+				UID: UID,
+				Token: Token,
+				Page: state.page,
+			});
+			if (res?.Code && res.Code === 200) {
+				setTeacherList(res.Data);
+				setStatusSearch(true);
+				if (res.Data.length === 0) {
+					toast.error('Không có dữ liệu phù hợp với tìm kiếm');
+				}
+				// setPageSize(res.PageSize);
+				// setTotalResult(res.TotalResult);
+			} else {
+				toast.error('Something wrong');
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const handleChange_getValue = (e) => {
+		setValues({
+			...values,
+			TeacherName: e.target.value,
+		});
+	};
+
+	// useEffect(() => {
+	// 	let UID = null;
+	// 	let Token = null;
+	// 	if (localStorage.getItem('UID')) {
+	// 		UID = localStorage.getItem('UID');
+	// 		Token = localStorage.getItem('token');
+	// 	}
+
+	// 	getAPI({
+	// 		Search: '',
+	// 		UID: UID,
+	// 		Token: Token,
+	// 		Page: state.page,
+	// 	});
+	// }, [statusSearch]);
+
 	useEffect(() => {
 		if (!localStorage.getItem('isLogin')) {
 			router.push({
@@ -501,6 +575,8 @@ const ProfileTeacher = ({ t }) => {
 			Token: Token,
 			Page: state.page,
 		});
+
+		$('body').removeClass('show-aside');
 	}, [state.page]);
 
 	// function handlePageClick({ selected: selectedPage }) {
@@ -527,24 +603,40 @@ const ProfileTeacher = ({ t }) => {
 							<CloseIcon />
 						</button>
 						<DetailTeacher dataTeacher={dataTeacher} />
-						{/* <Button
-							className={classes.btnClose}
-							variant="contained"
-							color="secondary"
-							onClick={closeModal}
-						>
-							Close
-						</Button> */}
 					</div>
 				</Fade>
 			</Modal>
-			<h1 className="main-title-page">{t('Profile-teacher')}</h1>
+			<h1 className="main-title-page">{t('Teacher/Booking')}</h1>
 			<div className="media-body-wrap pd-15 shadow">
-				<div className="filter-group pd-t-5 mg-t-15 bd-t" id="list-tutor">
-					<div className="filter-row row">
+				<div className="filter-group pd-t-5" id="list-tutor">
+					{/* <div className="filter-row row">
 						<div className="left col-12">
 							<h5>{t('list-of-teachers')}</h5>
 						</div>
+					</div> */}
+					<div className="row-search">
+						<div className="box-search">
+							<form onSubmit={_handleSubmit} className="search-form">
+								<input
+									className="textarea-custom form-control"
+									onChange={handleChange_getValue}
+								></input>
+								<button
+									className="btn pd-x-15-f btn-search-form text-white"
+									type="submit"
+								>
+									<FontAwesomeIcon icon="search" />
+								</button>
+							</form>
+						</div>
+						<Button
+							variant="contained"
+							className={`btn-show-all ${classes.btnShowAll}`}
+							color="secondary"
+							onClick={showAllData}
+						>
+							{t('Show all')}
+						</Button>
 					</div>
 					<div className="filter-row row pos-relative">
 						<div className="col-sm-12">
@@ -566,10 +658,10 @@ const ProfileTeacher = ({ t }) => {
 												<div className="infomation-content">
 													<div className="infomation-top">
 														<div className="tutor-infomation">
-															<h3 className="infomation-job">Teacher</h3>
-															<p className="infomation-name">
+															{/* <h3 className="infomation-job">Teacher</h3> */}
+															<h6 className="infomation-name">
 																{item.TeacherName}
-															</p>
+															</h6>
 															<p className="infomation-country">
 																{t('nation')}:{' '}
 																<span>{item.AccountNationName}</span>
@@ -597,41 +689,40 @@ const ProfileTeacher = ({ t }) => {
 													</div>
 													<div className="infomation-bottom">
 														<div className="tutor-rating-star">
-															{/* <span className="number-start">1</span> */}
-															{/* <div className="rating-stars">
-																<span className="empty-stars">
-																	<i className="far fa-star"></i>
-																	<i className="far fa-star"></i>
-																	<i className="far fa-star"></i>
-																	<i className="far fa-star"></i>
-																	<i className="far fa-star"></i>
-																</span>
-																<span
-																	className="filled-stars"
-																	style={{ width: `${item.Rate * 20}%` }}
-																>
-																	<i className="star fa fa-star"></i>
-																	<i className="star fa fa-star"></i>
-																	<i className="star fa fa-star"></i>
-																	<i className="star fa fa-star"></i>
-																	<i className="star fa fa-star"></i>
-																</span>
-															</div> */}
+															<Box
+																component="fieldset"
+																borderColor="transparent"
+															>
+																<Rating
+																	name="disabled"
+																	value={item.RateNumber}
+																	disabled
+																/>
+															</Box>
 														</div>
-														<a
-															href="/student/booked-schedule/calendar"
-															className="submit-search btn border-radius-5 btn-block w-100 bg-green"
-														>
-															<i className="fa fa-clone"></i> Đặt lịch học
-														</a>
-														<a
-															href="/teacher/profile"
-															className="submit-search btn border-radius-5 btn-block w-100 bg-blue"
-															onClick={openModal}
-															teacherID={item.TeacherID}
-														>
-															<i className="fa fa-user"></i> Xem thông tin
-														</a>
+														<div className="row-button">
+															<button
+																onClick={() => {
+																	router.push({
+																		pathname: `/student/booked-schedule/calendar`,
+																		query: { idgv: item.TeacherID },
+																	});
+																}}
+																className="submit-search btn border-radius-5 btn-block w-100 btn-info-profile"
+															>
+																<i className="fa fa-clone"></i>{' '}
+																{t('Book schedule')}
+															</button>
+															<a
+																href="/teacher/profile"
+																className="submit-search btn border-radius-5 btn-block w-100 btn-watch"
+																onClick={openModal}
+																teacherID={item.TeacherID}
+															>
+																<i className="fa fa-user"></i>{' '}
+																{t('Information')}
+															</a>
+														</div>
 													</div>
 												</div>
 											</li>
@@ -691,7 +782,6 @@ const ProfileTeacher = ({ t }) => {
 					/>
 
 					{/* <ListNationModal selectNation={onSelectNation} /> */}
-					<ToastContainer />
 				</div>
 			</div>
 		</>

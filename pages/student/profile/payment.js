@@ -169,6 +169,8 @@ const PaymentHistory = ({ t }) => {
 			fromdate: '',
 			todate: '',
 		});
+
+		$('body').removeClass('show-aside');
 	}, []);
 
 	const renderRow = () => {

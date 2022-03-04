@@ -11,7 +11,7 @@
 		background-color: #fff;
 		border-color: $input-border-color;
 		@include border-radius();
-		height: 38px; //38px;
+		height: 38px; //$input-height;
 		outline: none;
 
 		.select2-selection__rendered {
@@ -29,7 +29,7 @@
 
 		.select2-selection__arrow {
 			width: 30px;
-			height: 38px; //38px;
+			height: 38px; //$input-height;
 			line-height: 38px;
 
 			b {
@@ -161,7 +161,7 @@
 
 	.select2-dropdown--below {
 		@include border-bottom-radius(0);
-		top: 0;
+		top: 0; //$input-height - 1.15;
 	}
 }
 

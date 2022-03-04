@@ -26,15 +26,16 @@ const MissingFeedbackRow = ({ data }) => {
 		FurthestClass,
 		ElearnCoursesStudentID,
 		EndDate,
+		ClassBooked,
 	} = data;
 	return (
 		<tr>
 			<td>{data.StudentCode}</td>
 			<td>{data.StudentName}</td>
 			<td>{data.TotalClass}</td>
-			<td>{data.ElearnCoursesStudentID}</td>
+			<td>{data.ClassBooked}</td>
 			<td>{data.FurthestClass}</td>
-			<td>{data.EndDate}</td>
+			<td className="text-right">{data.EndDate}</td>
 		</tr>
 	);
 };
@@ -47,9 +48,9 @@ const StudentPackage = ({ t }) => {
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
 
-	const loadMissingFeedback = async () => {
+	const loadMissingFeedback = async (params) => {
 		try {
-			const res = await teacherEndOfPackage({ Page: pageNumber });
+			const res = await teacherEndOfPackage(params);
 			if (res?.Code && res.Code === 200) {
 				setData(res.Data);
 				setPageSize(res.PageSize);
@@ -80,28 +81,40 @@ const StudentPackage = ({ t }) => {
 			}
 		}
 
+		let UID = null;
+		let Token = null;
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		loadMissingFeedback({
-			UID: 61230,
-			Token: '',
+			UID: UID,
+			Token: Token,
 		});
-	}, [pageNumber]);
+
+		$('body').removeClass('show-aside');
+		StudentPackage.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 
 	return (
 		<>
-			<h1 className="main-title-page">{t('end-of-student-package')}</h1>
+			<h1 className="main-title-page">{t('End Date Package')}</h1>
 			<div className="card">
 				<div className="card-body">
 					<>
 						<div className="table-responsive ">
-							<table className="table table-classrooms table-borderless responsive-table table-hover">
+							<table className="table table-classrooms table-borderless  table-hover">
 								<thead className="">
 									<tr className="">
 										<th>{t('student-code')}</th>
 										<th>{t('student-name')}</th>
-										<th>{t('total-number-of-class')}</th>
-										<th>{t('classes-were-booked')}</th>
+										<th>{t('Total number')}</th>
+										<th>{t('Classes Booked')}</th>
 										<th>{t('furthest-class')}</th>
-										<th>{t('end-date-of-package')}</th>
+										<th>{t('End Date')}</th>
 									</tr>
 								</thead>
 								{/*1 item*/}
@@ -220,7 +233,5 @@ const StudentPackage = ({ t }) => {
 // export default StudentPackage;
 
 StudentPackage.getLayout = getLayout;
-StudentPackage.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(StudentPackage);

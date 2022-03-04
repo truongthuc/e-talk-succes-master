@@ -420,6 +420,9 @@ function TeacherInformation({ t, dataTeacher }) {
 			UID: dataTeacher,
 			Token: Token,
 		});
+		TeacherInformation.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	useEffect(() => {
@@ -758,7 +761,4 @@ function TeacherInformation({ t, dataTeacher }) {
 
 // export default TeacherInformation;
 
-TeacherInformation.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 export default withTranslation('common')(TeacherInformation);

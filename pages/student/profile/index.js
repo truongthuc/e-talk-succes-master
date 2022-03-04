@@ -36,6 +36,7 @@ import {
 import { getStudentLayout } from '~/components/Layout';
 import './index.module.scss';
 import dayjs from 'dayjs';
+import { responsiveFontSizes } from '@material-ui/core';
 
 const schema = Yup.object().shape({
 	Address: Yup.string(),
@@ -43,17 +44,18 @@ const schema = Yup.object().shape({
 	Language: Yup.string().matches(/[^0]+/g, 'Ngôn ngữ không được để trống'),
 	TimeZoneID: Yup.string().matches(/[^0]+/g, 'Múi giờ không được để trống'),
 });
-const RenderTimeZoneList = ({ list }) => {
-	return (
-		!!list &&
-		list.length > 0 &&
-		list.map((item, index) => (
-			<option key={index} value={item.ID}>
-				{item.TimeZoneName}
-			</option>
-		))
-	);
-};
+// const RenderTimeZoneList = ({ list }) => {
+// 	return (
+// 		!!list &&
+// 		list.length > 0 &&
+// 		list.map((item, index) => (
+// 			<option key={index} value={item.ID}>
+// 				{item.TimeZoneName}
+// 			</option>
+// 		))
+// 	);
+// };
+
 const RenderListLanguage = ({ list }) => {
 	return (
 		!!list &&
@@ -103,10 +105,11 @@ const StudentProfile = ({ t }) => {
 	const [selectedTarget, setSelectedTarget] = useState(null);
 	const [avatar, setAvatar] = useState('');
 	const [loadingAvatar, setLoadingAvatar] = useState(false);
-
+	const [countryList, setCountryList] = useState('');
 	const [statusUpdate, setStatusUpdate] = useState(false);
 
 	const [action, setAction] = useState(true);
+	const [getTimeZone, setTimeZone] = useState();
 
 	const updateProfileToastSuccess = () =>
 		toast.success(UPDATE_PROFILE_SUCCESS, toastInit);
@@ -134,8 +137,8 @@ const StudentProfile = ({ t }) => {
 		const newProfile = {
 			UID: UID,
 			Introduce: resProfile.Introduce,
-			Country: resProfile.Country,
-			Timezone: resProfile.TimeZoneID,
+			Country: resProfile.country,
+			Timezone: getTimeZone?.timezoneID,
 			BankName: resProfile.BankName,
 			CardHolder: resProfile.CardHolder,
 			AccountNumber: resProfile.AccountNumber,
@@ -143,8 +146,9 @@ const StudentProfile = ({ t }) => {
 			BankAddress: resProfile.BankAddress,
 			Avatar: avatar,
 			BirthDay: dayjs(resProfile.BirthDay).format('DD/MM/YYYY'),
+			// BirthDay: resProfile.BirthDay,
 		};
-		console.log(newProfile);
+
 		onUpdateProfileAPI(newProfile);
 	};
 
@@ -152,28 +156,33 @@ const StudentProfile = ({ t }) => {
 		console.log(err);
 	};
 
+	console.log('PROFILE: ', profile);
+
 	const getAPI = async (params) => {
 		try {
 			setLoadingProfile(true);
 			const resProfile = await getProfile(params);
-			// const d = resProfile.Data.BirthDay.replace('/', '-').replace('/', '-');
-
-			// const df = new Date('2021-11-22');
-
-			// console.log('date: ', df);
-
 			if (resProfile.Code === 200) {
 				setProfile({
 					...resProfile.Data,
-					BirthDay: new Date(resProfile.Data.BirthDay),
+					// countryName: returnCountry(
+					// 	resProfile.Data.CountryList,
+					// 	resProfile.Data.Country,
+					// ),
+					timezoneName: returnTimezone(
+						resProfile.Data.CountryList,
+						resProfile.Data.Country,
+					),
+					BirthDay: dayjs(resProfile.Data.BirthDay, 'DD/MM/YYYY').toDate(),
 				});
-				setAvatar(resProfile.Data.AvatarThumnail);
-				// reset({
-				// 	...resProfile.Data,
-				// 	BirthDay: new Date(resProfile.Data.BirthDay),
-				// });
 
-				// KHÚC NÀY ĐANG BỊ LỖI NGÀY (YYYY-MM-DD) MỚI CONVERT KIỂU VẬY ĐƯỢC
+				setCountryList(resProfile.Data.CountryList);
+				setAvatar(resProfile.Data.AvatarThumnail);
+
+				reset({
+					...resProfile.Data,
+					BirthDay: dayjs(resProfile.Data.BirthDay, 'DD/MM/YYYY').toDate(),
+				});
 			}
 			setLoadingProfile(false);
 		} catch {}
@@ -205,7 +214,12 @@ const StudentProfile = ({ t }) => {
 			updateProfileToastSuccess();
 			setStatusUpdate(true);
 			setAction(true);
-			changeDataUser(avatar);
+			changeDataUser(
+				avatar,
+				getTimeZone.timezoneName,
+				getTimeZone.timezoneValue,
+				'',
+			);
 		} else {
 			updateProfileToastFail();
 		}
@@ -216,20 +230,94 @@ const StudentProfile = ({ t }) => {
 		return options.map((item) => item.TargetName);
 	};
 
+	const returnCountry = (countryList, id) => {
+		let getCountry = '';
+
+		countryList.forEach((item) => {
+			if (item.ID === id) {
+				getCountry = item.Nation;
+			}
+		});
+		console.log('Name of country: ', getCountry);
+		return getCountry;
+	};
+
+	const returnTimezone = (countryList, id) => {
+		let timezoneID = '';
+		let timezoneName = '';
+
+		countryList.forEach((item) => {
+			if (item.ID === id) {
+				timezoneID = item.TimeZone;
+				timezoneName = item.TimeZoneName;
+			}
+		});
+
+		setTimeZone({
+			timezoneID: timezoneID,
+			timezoneName: timezoneName,
+		});
+		return timezoneName;
+	};
+
+	// const returnTimezone = (timezoneList, id) => {
+	// 	let getTimezone = '';
+
+	// 	timezoneList.forEach((item) => {
+	// 		if (item.ID === id) {
+	// 			getTimezone = item.TimeZoneName;
+	// 		}
+	// 	});
+	// 	return getTimezone;
+	// };
+
+	const handleChange_country = (e) => {
+		let countryID = parseInt(e.target.value);
+		let timezoneID = null;
+		let timezoneName = null;
+		let timezoneValue = null;
+
+		countryList.forEach((item) => {
+			if (item.ID === countryID) {
+				timezoneID = parseInt(item.TimeZone);
+				timezoneName = item.TimeZoneName;
+				timezoneValue = item.TimeZoneValue;
+			}
+		});
+
+		setProfile({
+			...profile,
+			timezoneName: timezoneName,
+			Country: countryID,
+		});
+
+		setTimeZone({
+			timezoneID: timezoneID,
+			timezoneName: timezoneName,
+			timezoneValue: timezoneValue,
+		});
+	};
+
+	useEffect(() => {
+		setValue('Timezone', getTimeZone?.timezoneID);
+
+		return () => {};
+	}, [profile]);
+
 	const handleUploadImage = async (e) => {
 		setLoadingAvatar(true);
 
 		let files = e.target.files;
-		console.log(files);
+
 		if (!files) {
 			setLoadingAvatar(false);
 			return;
 		} else {
 			const res = await UploadFilePost(files);
-			console.log('IMG after up: ', res);
+
 			if (res.rs === true) {
 				setAvatar(res.g);
-				console.log('Run vô đây');
+
 				let output = document.getElementById('avatar');
 				output.src = URL.createObjectURL(files[0]);
 				output.onload = function () {
@@ -238,7 +326,6 @@ const StudentProfile = ({ t }) => {
 			}
 			setLoadingAvatar(false);
 		}
-		console.log('hinh ne', files);
 	};
 	useEffect(() => {
 		let UID = null;
@@ -251,7 +338,11 @@ const StudentProfile = ({ t }) => {
 			UID: UID,
 			Token: Token,
 		});
-		getLanguage();
+
+		$('body').removeClass('show-aside');
+		StudentProfile.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	useEffect(() => {
@@ -285,7 +376,7 @@ const StudentProfile = ({ t }) => {
 								<div className="col-12">
 									<div className="form-row align-items-center ">
 										<div className="form-group col-sm-3 col-label-fixed">
-											<p className="mg-b-0 tx-medium ">{t('avarta')}: </p>
+											<p className="mg-b-0 tx-medium ">{t('Avatar')}: </p>
 										</div>
 										<div className="form-group col-sm-9">
 											<div className="student-avatar">
@@ -312,7 +403,11 @@ const StudentProfile = ({ t }) => {
 														<img
 															id="avatar"
 															alt="Avatar"
-															src={profile.AvatarThumnail}
+															src={
+																profile?.AvatarThumnail
+																	? profile.AvatarThumnail
+																	: '/static/img/user.png'
+															}
 															// onError={(e) => {
 															// 	e.target.onerror = null;
 															// 	e.target.src =
@@ -371,11 +466,10 @@ const StudentProfile = ({ t }) => {
 										<div className="form-group col-sm-9">
 											<Controller
 												control={control}
-												defaultValue={profile.BirthDay}
+												defaultValue={profile?.BirthDay}
 												name="BirthDay"
 												render={({ onChange, value, name }) => (
 													<DatePicker
-														disabled={action}
 														dateFormat="dd/MM/yyyy"
 														className="form-control"
 														placeholderText={`Birthday`}
@@ -393,7 +487,6 @@ const StudentProfile = ({ t }) => {
 																BirthDay: value,
 															});
 														}}
-														selected={value}
 													/>
 												)}
 											/>
@@ -406,39 +499,31 @@ const StudentProfile = ({ t }) => {
 									</div>
 									<div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
-											<p className="mg-b-0 tx-medium">Múi giờ:</p>
+											<p className="mg-b-0 tx-medium">Country:</p>
 										</div>
 										<div className="form-group col-sm-9">
-											{/* {!!TimeZoneList && TimeZoneList.length > 0 && (
+											{!!countryList && countryList.length > 0 && (
 												<select
-													name="TimeZoneID"
+													name="country"
 													ref={register}
-													defaultValue={
-														profile.TimeZoneID ? profile.TimeZoneID : '0'
-													}
+													value={profile.Country}
+													onChange={handleChange_country}
 													className="form-control"
 												>
-													<option value="0">Chọn Múi Giờ</option>
-													<RenderListTimeZone list={TimeZoneList} />
+													{countryList.map((item) => (
+														<option value={item.ID}>{item.Nation}</option>
+													))}
 												</select>
 											)}
 											{errors.TimeZoneID && (
 												<span className="text-danger d-block mt-2">
 													{errors.TimeZoneID.message}
 												</span>
-											)} */}
-											<input
-												type="text"
-												className="form-control"
-												placeholder="TimeZoneID"
-												ref={register}
-												defaultValue={profile.TimeZoneID}
-												name="TimeZoneID"
-												disabled={action}
-											/>
-											{errors.TimeZoneID && (
+											)}
+
+											{errors.Country && (
 												<span className="text-danger d-block mt-2">
-													{errors.TimeZoneID.message}
+													{errors.Country.message}
 												</span>
 											)}
 										</div>
@@ -482,7 +567,6 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.UID}
 												name="FullName"
-												disabled={action}
 											/>
 											{errors.UID && (
 												<span className="text-danger d-block mt-2">
@@ -524,7 +608,6 @@ const StudentProfile = ({ t }) => {
 												ref={register}
 												defaultValue={profile.Avatar}
 												placeholder="Ex:example@domain.com"
-												disabled={action}
 											/>
 											{errors.Email && (
 												<span className="text-danger d-block mt-2">
@@ -533,7 +616,7 @@ const StudentProfile = ({ t }) => {
 											)}
 										</div>
 									</div>
-									<div className="form-row align-items-center">
+									{/* <div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
 											<p className="mg-b-0 tx-medium">{t('sex')}:</p>
 										</div>
@@ -550,42 +633,25 @@ const StudentProfile = ({ t }) => {
 												<option value="3">Khác</option>
 											</select>
 										</div>
-									</div>
+									</div> */}
+
 									<div className="form-row align-items-center">
 										<div className="form-group col-sm-3 col-label-fixed">
-											<p className="mg-b-0 tx-medium">Country:</p>
+											<p className="mg-b-0 tx-medium">{t('Timezone')}:</p>
 										</div>
 										<div className="form-group col-sm-9">
-											{/* {!!TimeZoneList && TimeZoneList.length > 0 && (
-												<select
-													name="TimeZoneID"
-													ref={register}
-													defaultValue={
-														profile.TimeZoneID ? profile.TimeZoneID : '0'
-													}
-													className="form-control"
-												>
-													<option value="0">Chọn Múi Giờ</option>
-													<RenderListTimeZone list={TimeZoneList} />
-												</select>
-											)}
-											{errors.TimeZoneID && (
-												<span className="text-danger d-block mt-2">
-													{errors.TimeZoneID.message}
-												</span>
-											)} */}
 											<input
 												type="text"
 												className="form-control"
-												placeholder="Country"
+												placeholder="TimeZoneID"
 												ref={register}
-												defaultValue={profile.Country}
-												name="Country"
-												disabled={action}
+												defaultValue={profile.timezoneName}
+												name="timezoneName"
+												disabled
 											/>
-											{errors.Country && (
+											{errors.TimeZoneID && (
 												<span className="text-danger d-block mt-2">
-													{errors.Country.message}
+													{errors.TimeZoneID.message}
 												</span>
 											)}
 										</div>
@@ -604,7 +670,6 @@ const StudentProfile = ({ t }) => {
 												name="CardHolder"
 												ref={register}
 												defaultValue={profile.CardHolder}
-												disabled={action}
 											/>
 											{errors.CardHolder && (
 												<span className="text-danger d-block mt-2">
@@ -627,7 +692,6 @@ const StudentProfile = ({ t }) => {
 												name="BankName"
 												ref={register}
 												defaultValue={profile.BankName}
-												disabled={action}
 											/>
 											{errors.BankName && (
 												<span className="text-danger d-block mt-2">
@@ -650,7 +714,6 @@ const StudentProfile = ({ t }) => {
 												name="BankAddress"
 												ref={register}
 												defaultValue={profile.BankAddress}
-												disabled={action}
 											/>
 											{errors.BankAddress && (
 												<span className="text-danger d-block mt-2">
@@ -673,7 +736,6 @@ const StudentProfile = ({ t }) => {
 												name="Branch"
 												ref={register}
 												defaultValue={profile.Branch}
-												disabled={action}
 											/>
 											{errors.Branch && (
 												<span className="text-danger d-block mt-2">
@@ -696,7 +758,6 @@ const StudentProfile = ({ t }) => {
 												name="AccountNumber"
 												ref={register}
 												defaultValue={profile.AccountNumber}
-												disabled={action}
 											/>
 											{errors.AccountNumber && (
 												<span className="text-danger d-block mt-2">
@@ -719,7 +780,7 @@ const StudentProfile = ({ t }) => {
 												name="SkypeID"
 												ref={register}
 												defaultValue={profile.SkypeID}
-												disabled={action}
+												disabled
 											/>
 											{errors.SkypeID && (
 												<span className="text-danger d-block mt-2">
@@ -742,7 +803,6 @@ const StudentProfile = ({ t }) => {
 												name="SRegisterLink"
 												ref={register}
 												defaultValue={profile.RegisterLink}
-												disabled={action}
 											/>
 											{errors.RegisterLink && (
 												<span className="text-danger d-block mt-2">
@@ -765,7 +825,6 @@ const StudentProfile = ({ t }) => {
 												name="Introduce"
 												ref={register}
 												defaultValue={profile.Introduce}
-												disabled={action}
 											/>
 											{errors.Introduce && (
 												<span className="text-danger d-block mt-2">
@@ -778,36 +837,22 @@ const StudentProfile = ({ t }) => {
 								<div className="col-12">
 									<div className="form-row  align-items-center ">
 										<div className="form-group col-sm-3 col-label-fixed"></div>
-										<div className="form-group col-sm-9 mg-b-0-f">
-											{!action ? (
-												<button
-													type="submit"
-													disabled={loadingUpdateProfile ? true : ''}
-													className="btn btn-primary rounded"
-													style={{
-														width: loadingUpdateProfile ? '120px' : 'auto',
-														color: '#fff',
-													}}
-												>
-													{loadingUpdateProfile ? (
-														<i className="fa fa-spinner fa-spin"></i>
-													) : (
-														'Save'
-													)}
-												</button>
-											) : (
-												<button
-													type="button"
-													onClick={startFix}
-													className="btn btn-primary rounded"
-													style={{
-														width: loadingUpdateProfile ? '120px' : 'auto',
-														color: '#fff',
-													}}
-												>
-													Fix profile
-												</button>
-											)}
+										<div className="form-group col-sm-9 mg-b-0-f text-center">
+											<button
+												type="submit"
+												disabled={loadingUpdateProfile ? true : ''}
+												className="btn btn-primary rounded"
+												style={{
+													width: loadingUpdateProfile ? '120px' : 'auto',
+													color: '#fff',
+												}}
+											>
+												{loadingUpdateProfile ? (
+													<i className="fa fa-spinner fa-spin"></i>
+												) : (
+													'Update'
+												)}
+											</button>
 										</div>
 									</div>
 									<ToastContainer
@@ -836,8 +881,5 @@ const StudentProfile = ({ t }) => {
 // export default StudentProfile;
 
 StudentProfile.getLayout = getStudentLayout;
-StudentProfile.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(StudentProfile);

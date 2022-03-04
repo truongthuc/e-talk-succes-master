@@ -8,22 +8,74 @@ import {
 	teacherEvaluatedClasses,
 	addScheduleLog,
 	teacherDeleteEvaluation,
+	UploadFileEvaluation,
+	teacherUpdateEvaluation,
 } from '~/api/teacherAPI';
 import { Popover, OverlayTrigger, Overlay } from 'react-bootstrap';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import dataHy from '../../../../data/data.json';
+
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
 import Box from '@material-ui/core/Box';
 import Pagination from '@material-ui/lab/Pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import { toastInit } from '~/utils';
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import EditIcon from '@material-ui/icons/Edit';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import DeleteIcon from '@material-ui/icons/Delete';
 
-function getData() {
-	const andt = dataHy.evaluationClass;
-	return andt;
-}
+const useStyles = makeStyles((theme) => ({
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		border: 'none',
+		borderRadius: '5px',
+		padding: '22px 25px',
+		width: '400px',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		outline: 'none!important',
+	},
+	paperContent: {
+		width: '100%',
+		textAlign: 'center',
+		background: '#f3f3f3',
+		padding: '20px',
+		borderRadius: '5px',
+	},
+	styleFile: {
+		margin: 'auto',
+		width: '190px',
+		display: 'block',
+	},
+	btnSubmit: {
+		position: 'relative',
+	},
+	loading: {
+		width: '20px!important',
+		height: '20px!important',
+		color: 'white!important',
+		marginRight: '10px!important',
+	},
+	boxFile: {
+		border: '1px solid #dadada',
+		padding: '10px',
+		borderRadius: '5px',
+	},
+}));
 
 // ----------- PHÂN TRANG ---------------
 
@@ -57,12 +109,11 @@ const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 	const {
 		EvaluationID,
 		BookingID,
-		ScheduleTimeVN,
-		ScheduleTimeUTC,
+
 		StudentName,
 		StudentUID,
 		LessonName,
-		CourseName,
+		CoursesName,
 		DocumentName,
 		TimeZoneName,
 		VNTime,
@@ -77,8 +128,12 @@ const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 		GenderID,
 		SpecialRequest,
 	} = data;
+	const classes = useStyles();
+	const [fileRating, setFileRating] = useState();
+	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 
-	console.log('IDDDD: ', EvaluationID);
+	console.log('file Rating: ', fileRating);
 
 	const handleEnterClass = async (e) => {
 		e.preventDefault();
@@ -88,6 +143,79 @@ const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 			console.log(error?.message ?? `Can't add schedule log !!`);
 		}
 		window.location.href = `skype:${SkypeID}?chat`;
+	};
+
+	// ---- modal ----
+	const [open, setOpen] = React.useState(false);
+
+	const openModal = (e) => {
+		e.preventDefault();
+		setOpen(true);
+	};
+
+	const closeModal = () => {
+		setOpen(false);
+	};
+
+	// ---- ----- ----
+
+	// ----- GET FILE AND SUBMIT ------
+
+	const getFile = (e) => {
+		let file = e.target.files[0];
+
+		(async () => {
+			try {
+				const res = await UploadFileEvaluation(file);
+				if (res.Code === 200) {
+					setFileRating(res.Data.toString());
+				} else if (res.Code === 403) {
+					router.push('/login/signin');
+				} else {
+					toast.error('Somethings wrong!');
+				}
+			} catch (error) {
+				console.log('Error: ', error);
+			}
+		})();
+	};
+
+	const onSubmit = () => {
+		// let fileChange = fileRating?.toString();
+
+		let UID = null;
+		let Token = null;
+
+		// GET UID and Token
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+		setIsLoading(true);
+		(async () => {
+			try {
+				const res = await teacherUpdateEvaluation({
+					UID: UID,
+					Token: Token,
+					EvaluationID: EvaluationID,
+					GeneralEvaluation: fileRating,
+				});
+				if (res.Code === 200) {
+					toast.success('Update Success');
+					statusDelete();
+				} else if (res.Code === 403) {
+					localStorage.clear();
+					router.push('/login/signin');
+				} else {
+					toast.error('Somethings wrong!');
+				}
+			} catch (error) {
+				console.log('Error: ', error);
+			}
+			setIsLoading(false);
+
+			setOpen(false);
+		})();
 	};
 
 	const deleteItem = (e) => {
@@ -112,7 +240,7 @@ const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 
 				if (res.Code === 200) {
 					statusDelete();
-					toast.success('Update feedback success!', {
+					toast.success('Delete feedback success!', {
 						position: toast.POSITION.TOP_CENTER,
 						autoClose: 2000,
 					});
@@ -124,94 +252,99 @@ const FinishedRow = ({ data, showStudentModal, statusDelete }) => {
 	};
 
 	return (
-		<tr>
-			<ToastContainer
-				position="top-right"
-				autoClose={2000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-			/>
-			<td className="clr-time">
-				<div className="mg-b-5">
-					<span className="">{data.StudentCode}</span>
-				</div>
-			</td>
-			<td className="clr-lesson">
-				<div className="mg-b-5">
-					<span className=" mg-r-5 tx-medium">Course:</span>
-					<span className="">{data.CoursesName}</span>
-				</div>
-				<div className="">
-					<span className=" mg-r-5 tx-medium">Lesson:</span>
-					<span className="">{data.LessonName}</span>
-				</div>
-			</td>
-			<td className="clr-student">
-				<a
-					href={true}
-					onClick={(e) => {
-						e.preventDefault();
-						showStudentModal(StudentUID);
-					}}
-					className="clrm-studentname tx-info"
-				>
-					{StudentName}
-					<FontAwesomeIcon
-						icon={
-							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
-						}
-						className={`fa fa-${
-							GenderID === 1 ? 'mars' : GenderID === 2 ? 'venus' : 'genderless'
-						} mg-l-10 clrm-icon-male`}
-					/>
-				</a>
-			</td>
+		<>
+			<Modal
+				aria-labelledby="transition-modal-title"
+				aria-describedby="transition-modal-description"
+				className={classes.modal}
+				open={open}
+				onClose={closeModal}
+				closeAfterTransition
+				BackdropComponent={Backdrop}
+				BackdropProps={{
+					timeout: 500,
+				}}
+			>
+				<Fade in={open}>
+					<div className={classes.paper}>
+						<div className={classes.paperContent}>
+							<h5 id="transition-modal-title" style={{ marginBottom: '20px' }}>
+								Upload file here
+							</h5>
+							<div className={classes.boxFile}>
+								<input
+									type="file"
+									className={classes.styleFile}
+									onChange={getFile}
+								></input>
+							</div>
+							<Button
+								variant="contained"
+								style={{ marginTop: '15px', marginRight: '10px' }}
+								onClick={closeModal}
+							>
+								Close
+							</Button>
+							<Button
+								variant="contained"
+								color="secondary"
+								style={{ marginTop: '15px' }}
+								className={classes.btnSubmit}
+								onClick={onSubmit}
+								disable={isLoading}
+							>
+								{isLoading && <CircularProgress className={classes.loading} />}
+								Send
+							</Button>
+						</div>
+					</div>
+				</Fade>
+			</Modal>
+			<tr>
+				<td>
+					<div className="mg-b-5">
+						<span className="">{StudentCode}</span>
+					</div>
+				</td>
+				<td style={{ textAlign: 'left' }}>
+					<span> {StudentName}</span>
+				</td>
 
-			<td className="clr-status tx-center">
-				<span className={`badge badge-secondary pd-5 tx-12`}>
-					{StatusString && StatusString.toString().toUpperCase()}
-				</span>
-				{<span className="badge badge-success pd-5">{data.FinishedType}</span>}
-			</td>
-			<td className="clr-actions tx-center">
-				<Link
-					href={`/teacher/evaluation/detail/[eid]`}
-					as={`/teacher/evaluation/detail/${data.EvaluationID}`}
+				<td>
+					<span className="">{CoursesName}</span>
+				</td>
+				<td style={{ width: '38%' }}>
+					<p className="">{LessonName}</p>
+				</td>
+
+				<td
+					className="clr-actions tx-center"
+					style={{ width: '21%', textAlign: 'right' }}
 				>
 					<a
 						href={true}
-						className="btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
+						className="d-inline-block btn btn-sm btn-secondary rounded-5 mg-sm-r-5-f"
+						onClick={openModal}
 					>
-						<FontAwesomeIcon
-							icon="vote-yea"
-							className="fas fa-vote-yea mg-r-5"
-						/>{' '}
-						Detail
+						<EditIcon />
 					</a>
-				</Link>
-				<Link
-					href={`/teacher/evaluation/detail/[eid]`}
-					as={`/teacher/evaluation/detail/${BookingID}`}
-				>
+					<a
+						href={data.LinkFile}
+						className="d-inline-block btn btn-sm btn-success rounded-5 mg-sm-r-5-f"
+						target="_blank"
+					>
+						<GetAppIcon />
+					</a>
 					<a
 						href={true}
+						className="d-inline-block btn btn-sm btn-danger rounded-5 mg-sm-r-5-f"
 						onClick={deleteItem}
-						className="btn btn-sm btn-danger rounded-5"
 					>
-						<FontAwesomeIcon
-							icon="trash-alt"
-							className="fas fa-trash-alt mg-r-5"
-						/>{' '}
-						Delete
+						<DeleteIcon />
 					</a>
-				</Link>
-			</td>
-		</tr>
+				</td>
+			</tr>
+		</>
 	);
 };
 
@@ -228,12 +361,10 @@ const EvaluatedClasses = ({ t }) => {
 
 	const [statusDelete, setStatusDelete] = useState(false);
 
-	const showStudentModal = (studentId) => {
-		setStudentId(studentId);
+	const showStudentModal = (StudentID) => {
+		setStudentId(StudentID);
 		$(mdStudentInfo.current).modal('show');
 	};
-
-	const layData = getData();
 
 	const unMountComponents = () => {
 		mdStudentInfo.current = false;
@@ -295,6 +426,8 @@ const EvaluatedClasses = ({ t }) => {
 				page: state.page,
 				UID: UID,
 			});
+
+			setStatusDelete(false);
 		}
 	}, [statusDelete]);
 
@@ -312,6 +445,11 @@ const EvaluatedClasses = ({ t }) => {
 			page: state.page,
 			UID: UID,
 		});
+
+		$('body').removeClass('show-aside');
+		EvaluatedClasses.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, [state.page, statusDelete]);
 
 	return (
@@ -320,14 +458,14 @@ const EvaluatedClasses = ({ t }) => {
 			<div className="card">
 				<div className="card-body">
 					<div className="table-responsive">
-						<table className="table table-classrooms table-borderless responsive-table table-hover">
+						<table className="table table-adt  table-borderless table-hover">
 							<thead className="">
 								<tr className="">
-									<th className="clr-time">Student Code</th>
-									<th className="clr-lesson">{t('lesson')}</th>
-									<th className="clr-student">{t('student')}</th>
-									<th className="clr-status tx-center">{t('finished-type')}</th>
-									<th className="clr-action tx-center">{t('actions')}</th>
+									<th>{t('student-code')}</th>
+									<th>{t('student')}</th>
+									<th>{t('course')}</th>
+									<th className="text-left">{t('lesson')}</th>
+									<th>{t('Action')}</th>
 								</tr>
 							</thead>
 							{/*1 item*/}
@@ -393,7 +531,9 @@ const EvaluatedClasses = ({ t }) => {
 										<FinishedRow
 											key={`${item.BookingID}`}
 											data={item}
-											showStudentModal={showStudentModal}
+											showStudentModal={(StudentID) =>
+												showStudentModal(StudentID)
+											}
 											statusDelete={() => setStatusDelete(true)}
 										/>
 									))
@@ -440,7 +580,5 @@ const EvaluatedClasses = ({ t }) => {
 // export default EvaluatedClasses;
 
 EvaluatedClasses.getLayout = getLayout;
-EvaluatedClasses.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(EvaluatedClasses);

@@ -33,26 +33,24 @@ const CalendarView = ({ t }) => {
 			}
 		}
 		getProfile();
+
+		CalendarView.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+		$('body').removeClass('show-aside');
 	}, []);
 
 	return (
 		<>
 			<div className="d-md-flex justify-content-between align-items-center flex-wrap mg-b-30">
 				<h1 className="main-title-page mg-b-15-f mg-md-b-0-f">
-					{t('Booked-schedule')}{' '}
+					{t('Booked Schedule')}{' '}
 				</h1>
-				<span className="pd-y-10 d-inline-block tx-dark pd-y-10 d-inline-block tx-dark bg-white rounded pd-x-10">
-					<FontAwesomeIcon
-						icon="globe-europe"
-						className="fas fa-globe-europe mg-r-5"
-					/>
-					Timezone: <span className="tx-medium tx-primary">{timeZone}</span>
-				</span>
 			</div>
 			<div className="book__container mg-t-5 teacher-custom">
 				<div className="card">
 					<div className="card-body">
-						<BookingCalendar />
+						<BookingCalendar idgv={router.query.idgv} />
 					</div>
 				</div>
 			</div>
@@ -77,8 +75,5 @@ const CalendarView = ({ t }) => {
 // export default CalendarView;
 
 CalendarView.getLayout = getStudentLayout;
-CalendarView.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(CalendarView);

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import styles from './LessonUpcomingCard.module.scss';
 import Link from 'next/link';
+import { i18n, withTranslation } from '~/i18n';
+
 const LessonUpcomingCard = ({
 	Avatar,
 	BookingID,
@@ -13,22 +15,27 @@ const LessonUpcomingCard = ({
 	TeacherName,
 	TeacherSkype,
 	TimeStudy,
+	t,
 }) => {
 	// const handleCancelBooking = (e, BookingID, LessionName, date, start, end) => {
 	// 	e.preventDefault();
 	// 	onHandleCancelBooking(BookingID, LessionName, date, start, end);
 	// };
 
-	// useEffect(() => {
-	// 	feather.replace();
-	// }, []);
+	useEffect(() => {
+		// feather.replace();
+		LessonUpcomingCard.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, []);
 	const handleEnterClass = async (lesson) => {
 		// try {
 		// 	const res = addScheduleLog({ BookingID: lesson.BookingID });
 		// } catch (error) {
 		// 	console.log(error?.message ?? `Can't add schedule log !!`);
 		// }
-		window.location.href = `skype:${lesson.skypeId}?chat`;
+		console.log('LESSON: ', lesson);
+		window.location.href = `skype:${lesson}?chat`;
 	};
 
 	return (
@@ -38,25 +45,24 @@ const LessonUpcomingCard = ({
 			></div>
 			<div className="media">
 				<div className="teacher-information">
-					<Link
-						href={`/student/teacher-profile/[tid]`}
-						as={`/student/teacher-profile/${TeacherID}`}
-					>
-						<a href={true} className="teacher-avatar">
-							<img
-								src={Avatar === null ? `/static/assets/img/${Avatar}` : Avatar}
-								className="teacher-image"
-								alt="Avatar"
-								onError={(e) => {
-									e.target.onerror = null;
-									e.target.src = '/static/assets/img/default-avatar.png';
-								}}
-							/>
-							<p className="course-teacher tx-14 tx-gray-800 tx-normal mg-b-0 tx-center mg-t-5 d-block">
-								{TeacherName}
-							</p>
-						</a>
-					</Link>
+					<div className="teacher-avatar">
+						<img
+							src={
+								Avatar === null
+									? `/static/assets/img/default-avatar.png`
+									: Avatar
+							}
+							className="teacher-image"
+							alt="Avatar"
+							onError={(e) => {
+								e.target.onerror = null;
+								e.target.src = '/static/assets/img/default-avatar.png';
+							}}
+						/>
+						<p className="course-teacher tx-14 tx-gray-800 tx-normal mg-b-0 tx-center mg-t-5 d-block">
+							{TeacherName}
+						</p>
+					</div>
 				</div>
 				<div className="media-body mg-l-20 pos-relative">
 					<div>
@@ -65,17 +71,20 @@ const LessonUpcomingCard = ({
 							<span className="no-hl course-name tx-bold">{CourseName}</span>
 						</h5>
 						<div className="course-information tx-14">
-							<span className="mg-r-15 tx-gray-500 d-inline-block">
+							<span
+								className="mg-r-15 tx-gray-500 d-block"
+								style={{ marginBottom: '10px' }}
+							>
 								<i className="feather-16 mg-r-5" data-feather="calendar"></i>
 								{TimeStudy}
 							</span>
 							<span className="mg-r-15 tx-gray-500 d-inline-block">
 								<i className="feather-16 mg-r-5" data-feather="clock"></i>
-								{`Bắt đầu: ${StartTime}`}
+								{`${t('Start')}: ${StartTime}`}
 							</span>
 							<span className="mg-r-15 tx-gray-500 d-inline-block">
 								<i className="feather-16 mg-r-5" data-feather="clock"></i>
-								{`Kết thúc: ${EndTime}`}
+								{`${t('End')}: ${EndTime}`}
 							</span>
 						</div>
 						{/* {SpecialRequest && (
@@ -114,7 +123,7 @@ const LessonUpcomingCard = ({
 									handleEnterClass(TeacherSkype);
 								}}
 							>
-								VÀO HỌC
+								{t('Join Class')}
 							</a>
 							{/* <a
 								style={{ cursor: 'pointer' }}
@@ -172,4 +181,4 @@ const LessonUpcomingCard = ({
 	);
 };
 
-export default LessonUpcomingCard;
+export default withTranslation('common')(LessonUpcomingCard);

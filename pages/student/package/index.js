@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import Pagination from 'react-js-pagination';
+// import Pagination from 'react-js-pagination';
 import Skeleton from 'react-loading-skeleton';
 import { GetPackageHistory } from '~/api/studentAPI';
 import { appSettings } from '~/config';
@@ -11,32 +11,35 @@ import Router, { useRouter } from 'next/router';
 // 	const data = GetListPackage;
 // 	return data;
 // }
-const fakeData = [
-	{
-		PlanName: 'Tiếng Anh giao tiếp cơ bản trong 10 ngày',
-		TotalLesson: 20,
-		BookedLesson: 15,
-		StartDate: '10/06/2020 10:30 - 20:30',
-		EndDate: '10/12/2020 10:30 - 20:30',
-		Status: 1,
-	},
-	{
-		PlanName: 'Tiếng Anh nói như người Anh trong 20 ngày',
-		TotalLesson: 30,
-		BookedLesson: 20,
-		StartDate: '10/06/2020 10:30 - 20:30',
-		EndDate: '10/12/2020 10:30 - 20:30',
-		Status: 1,
-	},
-	{
-		PlanName: 'Dành riêng cho người Việt sang Anh du học',
-		TotalLesson: 40,
-		BookedLesson: 25,
-		StartDate: '10/06/2020 10:30 - 20:30',
-		EndDate: '10/12/2020 10:30 - 20:30',
-		Status: 1,
-	},
-];
+
+import Box from '@material-ui/core/Box';
+import Pagination from '@material-ui/lab/Pagination';
+// ----------- PHÂN TRANG ---------------
+
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
 // const data = {
 // 	ID: '',
 // 	CoursesName: '',
@@ -47,28 +50,28 @@ const fakeData = [
 // 	TypeCourse: '',
 // 	TotalRow: '',
 // };
-const reducer = (prevState, { type, payload }) => {
-	switch (type) {
-		case 'STATE_CHANGE': {
-			return {
-				...prevState,
-				[payload.key]: payload.value,
-			};
-		}
-		default:
-			return prevState;
-			break;
-	}
-};
+// const reducer = (prevState, { type, payload }) => {
+// 	switch (type) {
+// 		case 'STATE_CHANGE': {
+// 			return {
+// 				...prevState,
+// 				[payload.key]: payload.value,
+// 			};
+// 		}
+// 		default:
+// 			return prevState;
+// 			break;
+// 	}
+// };
 const Package = ({ t }) => {
 	const router = useRouter();
-	const [state, setState] = useState();
+	const [state, dispatch] = useReducer(reducer, initialState);
 	const [loading, setLoading] = useState(false);
 	const [data, setData] = useState();
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(0);
 	const [totalResult, setTotalResult] = useState(0);
-	const [searchInput, dispatch] = useReducer(reducer);
+	// const [searchInput, dispatch] = useReducer(reducer);
 	const handlePageChange = (pageNumber) => {
 		if (page !== pageNumber) {
 			setPage(pageNumber);
@@ -77,8 +80,8 @@ const Package = ({ t }) => {
 			});
 		}
 	};
-	console.log(data);
-	const [initialState, setinitialState] = useState(initialState);
+
+	// const [initialState, setinitialState] = useState(initialState);
 
 	// const returnStatus = {
 	// 	1: 'Chưa hoàn thành',
@@ -110,6 +113,7 @@ const Package = ({ t }) => {
 			setData(res.Data);
 			setPageSize(res.PageSize);
 			setTotalResult(res.TotalResult);
+			dispatch({ type: 'ADD_PAGE', res });
 		} else {
 			setData({});
 		}
@@ -140,10 +144,15 @@ const Package = ({ t }) => {
 		getAPI({
 			Search: '',
 			UID: UID,
-			Page: 1,
+			Page: state.page,
 			Token: Token,
 		});
-	}, []);
+
+		$('body').removeClass('show-aside');
+		Package.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
+	}, [state.page]);
 
 	return (
 		<>
@@ -152,12 +161,14 @@ const Package = ({ t }) => {
 				<div className="card-body">
 					<div className="table-tiket">
 						<div className="table-responsive">
-							<table className="table tx-center tx-nowrap table-mobile">
+							<table className="table table-fb">
 								<thead className="">
 									<tr>
-										<th className="mw-200 tx-left">{t('course')}</th>
+										<th className=" tx-left">{t('course')}</th>
 										<th>{t('number-of-sessions')}</th>
 										<th>{t('number-of-extra-sessions')} </th>
+										<th>{t('Booked')}</th>
+										<th>{t('Remain')}</th>
 										<th>{t('start')}</th>
 										<th>{t('end')}</th>
 										<th>{t('status')}</th>
@@ -240,6 +251,8 @@ const Package = ({ t }) => {
 												</td>
 												<td>{item.StudyDay}</td>
 												<td>{item.BonusStudyDay}</td>
+												<td>{item.Booked}</td>
+												<td>{item.Remain}</td>
 												<td>
 													<span className="d-block tx-normal">
 														<span className="mg-l-5">{`${
@@ -255,7 +268,7 @@ const Package = ({ t }) => {
 													</span>
 												</td>
 
-												<td>
+												<td className="text-right">
 													<span className="badge badge-warning badge-beauty">
 														{
 															// item.Status == 1 && "Chưa hoàn thành"
@@ -296,17 +309,17 @@ const Package = ({ t }) => {
 								</tbody>
 							</table>
 						</div>
-						{pageSize < totalResult && (
-							<Pagination
-								innerClass="pagination justify-content-center mt-3"
-								activePage={page}
-								itemsCountPerPage={pageSize}
-								totalItemsCount={totalResult}
-								pageRangeDisplayed={3}
-								itemClass="page-item"
-								linkClass="page-link"
-								onChange={handlePageChange.bind(this)}
-							/>
+						{state?.TotalResult > 0 && (
+							<Box display={`flex`} justifyContent={`center`} mt={4}>
+								<Pagination
+									count={Math.ceil(state?.TotalResult / state?.PageSize)}
+									color="secondary"
+									onChange={(obj, page) =>
+										dispatch({ type: 'SELECT_PAGE', page })
+									}
+									c
+								/>
+							</Box>
 						)}
 					</div>
 				</div>
@@ -319,8 +332,5 @@ const Package = ({ t }) => {
 
 // export default Package;
 Package.getLayout = getStudentLayout;
-Package.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(Package);

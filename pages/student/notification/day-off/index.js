@@ -55,6 +55,11 @@ const DayOff = ({ t }) => {
 			Page: 1,
 			Token: Token,
 		});
+
+		$('body').removeClass('show-aside');
+		DayOff.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 	return (
 		<>
@@ -62,7 +67,7 @@ const DayOff = ({ t }) => {
 			<div className="card">
 				<div className="card-body">
 					<div className="table-responsive">
-						<table className="table">
+						<table className="table table-fb table-dayof">
 							<thead>
 								<tr>
 									<th>{t('title-eva')}</th>
@@ -139,7 +144,7 @@ const DayOff = ({ t }) => {
 										<tr key={index}>
 											<td>{item.HolidayName}</td>
 											<td>{item.StartDate}</td>
-											<td>{item.EndDate}</td>
+											<td className="text-right">{item.EndDate}</td>
 										</tr>
 									))
 								) : !data ? (
@@ -185,8 +190,5 @@ const DayOff = ({ t }) => {
 // export default DayOff;
 
 DayOff.getLayout = getStudentLayout;
-DayOff.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 
 export default withTranslation('common')(DayOff);

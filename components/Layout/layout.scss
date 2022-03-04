@@ -1,7 +1,7 @@
 @import '../../styles/variable';
 
 .aside-fixed {
-	width: 300px;
+	width: 260px;
 	.aside-header {
 		.aside-menu-link {
 			display: inline-flex;
@@ -162,7 +162,7 @@
 }
 @media screen and (min-width: 1200px) {
 	.aside-fixed + .content {
-		margin-left: 300px;
+		margin-left: 260px;
 	}
 }
 
@@ -643,5 +643,12 @@
 	}
 	.justify-content {
 		width: 100%;
+	}
+}
+.modal-message-noti {
+	background: #000;
+	padding: 10px;
+	.close span {
+		color: rgb(0, 0, 0) !important;
 	}
 }

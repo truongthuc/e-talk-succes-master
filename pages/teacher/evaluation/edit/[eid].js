@@ -285,6 +285,9 @@ const EvaluateClass = ({ t }) => {
 			Token: '',
 		});
 		// return cleanUpComponent;
+		EvaluateClass.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	useEffect(() => {
@@ -570,7 +573,5 @@ const EvaluateClass = ({ t }) => {
 // export default EvaluateClass;
 
 EvaluateClass.getLayout = getLayout;
-EvaluateClass.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(EvaluateClass);

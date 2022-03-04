@@ -78,6 +78,7 @@ const ScheduleLog = ({ t }) => {
 
 	useEffect(() => {
 		loadScheduleLogData();
+		$('body').removeClass('show-aside');
 	}, [pageNumber]);
 	return (
 		<>

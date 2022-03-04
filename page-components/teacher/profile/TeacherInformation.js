@@ -17,13 +17,17 @@ import {
 } from '~/api/teacherAPI';
 import { toast } from 'react-toastify';
 import { Context as ProfileContext } from '~/context/ProfileContext';
-import { UploadFilePost } from '~/api/optionAPI';
+import { UploadFilePost, UploadFileEvaluation } from '~/api/optionAPI';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { i18n, withTranslation } from '~/i18n';
+import { useAuth } from '~/api/auth.js';
+
+import ProfileAvatar from './ProfileAvatar.js';
 
 const Schema = Yup.object().shape({
 	fullName: Yup.string().required('Full name is required'),
 	skypeId: Yup.string().required('Skype id is required'),
+	birthday: Yup.string().required('BirthDay is required'),
 	phoneNumber: Yup.number()
 		.typeError('Invalid phone number')
 		.integer('Invalid phone number')
@@ -63,6 +67,8 @@ const initialState = {
 	major: '',
 	// englishProficien: null,
 	loadOption: false,
+	LinkVideoIntroduce: '',
+	LinkAudio: '',
 };
 
 const reducer = (prevState, { type, payload }) => {
@@ -76,11 +82,30 @@ const reducer = (prevState, { type, payload }) => {
 			break;
 	}
 };
-const ProfileVideo = React.forwardRef((props, ref) => {
-	const [isLoading, setIsLoading] = useState(false);
-	// const [myAvatar, setAvatar] = useState();
+
+function TeacherInformation({ t }) {
+	const { changeDataUser } = useAuth();
+	const [state, dispatch] = useReducer(reducer, optionState);
+	const [submitLoading, setSubmitLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [optionLoaded, setOptionLoaded] = useState(false);
+	const { state: profileState, updateUserInfo } = useContext(ProfileContext);
+	// ----- avatar ------
+
+	// const [isLoading, setIsLoading] = useState(false);
+	const [myAvatar, setAvatar] = useState();
+	const [myVideo, setVideo] = useState();
+	const [myAudio, setAudio] = useState();
 
 	const inputFileRef = useRef(true);
+	const inputFileVideo = useRef(true);
+	const inputFileAudio = useRef(true);
+
+	const getVideoLink = (e) => {
+		let value = e.target.value;
+		setVideo(value);
+	};
+
 	const handleUploadImage = async () => {
 		setIsLoading(true);
 		try {
@@ -88,7 +113,8 @@ const ProfileVideo = React.forwardRef((props, ref) => {
 			if (input.files && input.files[0]) {
 				const res = await UploadFilePost(input.files);
 				if (!!res && res?.rs) {
-					props.updateVideo('linkVideoIntroduce', res?.g ?? '');
+					setValue('avatar', res?.g ?? '');
+					setAvatar(res.g);
 				}
 			}
 		} catch (error) {
@@ -96,82 +122,35 @@ const ProfileVideo = React.forwardRef((props, ref) => {
 		}
 		setIsLoading(false);
 	};
-	const checkValidURL = () => {
-		try {
-			const urltmp = props?.getValues('linkVideoIntroduce');
-			if (!!urltmp) {
-				return urltmp.toString().trim().replace(/\//g, '').length > 0;
-			} else {
-				return false;
-			}
-		} catch (error) {
-			console.log('checkValidURL error:', error);
-		}
-		return false;
-	};
-	return (
-		<div className="uploadvideo-wrap">
-			<div
-				className={`teacher-video ${
-					isLoading ? 'loading-style' : ''
-				} mg-x-auto`}
-			>
-				<div className="upload-container ">
-					<div className="lds-ellipsis">
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-					</div>
-					<label
-						className={`upload-avatar ${checkValidURL() ? 'renewVideo' : ''} `}
-					>
-						<input
-							ref={inputFileRef}
-							type="file"
-							accept="video/*"
-							className="upload-box hidden d-none upload-file"
-							onChange={handleUploadImage}
-						/>
-						{checkValidURL() && <span className="btn">Upload video khác</span>}
-						{!checkValidURL() && (
-							<span className="calltoupload">
-								Chưa có video giới thiệu bấm vào đây để upload video
-							</span>
-						)}
-					</label>
-					{checkValidURL() && (
-						<CardMedia
-							component="iframe"
-							height="320"
-							image={
-								checkValidURL() ? props?.getValues('linkVideoIntroduce') : ''
-							}
-							src={
-								checkValidURL() ? props?.getValues('linkVideoIntroduce') : ''
-							}
-							title="linkVideoIntroduce"
-							autoPlay={false}
-						/>
-					)}
-				</div>
-			</div>
-		</div>
-	);
-});
-const ProfileAvatar = React.forwardRef((props, ref) => {
-	const [isLoading, setIsLoading] = useState(false);
-	// const [myAvatar, setAvatar] = useState();
 
-	const inputFileRef = useRef(true);
-	const handleUploadImage = async () => {
+	const handleUploadAudio = async () => {
+		console.log('start up audio');
 		setIsLoading(true);
 		try {
-			const input = inputFileRef.current;
+			const input = inputFileAudio.current;
+			console.log('file audio: ', inputFileAudio);
+			if (input.files && input.files[0]) {
+				const res = await UploadFileEvaluation(input.files);
+				console.log('res audio: ', res);
+				if (res.Code == 200) {
+					setValue('LinkAudio', res?.Data ?? '');
+					setAudio(res.Data);
+				}
+			}
+		} catch (error) {
+			console.log(error?.message ?? 'Lỗi gọi api');
+		}
+		setIsLoading(false);
+	};
+
+	const handleUploadVideo = async () => {
+		setIsLoading(true);
+		try {
+			const input = inputFileVideo.current;
 			if (input.files && input.files[0]) {
 				const res = await UploadFilePost(input.files);
 				if (!!res && res?.rs) {
-					props.updateAvatar('avatar', res?.g ?? '');
+					setVideo(res.g);
 				}
 			}
 		} catch (error) {
@@ -179,58 +158,17 @@ const ProfileAvatar = React.forwardRef((props, ref) => {
 		}
 		setIsLoading(false);
 	};
-	const checkValidURL = () => {
-		const urltmp = props?.getValues('avatar');
+
+	const checkValidURL = (url) => {
+		const urltmp = url;
 		if (!!urltmp) {
 			return urltmp.toString().trim().replace(/\//g, '').length > 0;
 		} else {
 			return false;
 		}
 	};
-	return (
-		<>
-			<div
-				className={`teacher-avatar ${
-					isLoading ? 'loading-style' : ''
-				} mg-x-auto`}
-			>
-				<div className="lds-ellipsis">
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
-				</div>
-				<div className="upload-container wd-100 ht-100">
-					<label className="upload-avatar">
-						<input
-							ref={inputFileRef}
-							type="file"
-							accept="image/*"
-							className="upload-box hidden d-none upload-file"
-							onChange={handleUploadImage}
-						/>
-						<img
-							src={
-								checkValidURL()
-									? props?.getValues('avatar')
-									: '/static/assets/img/default-avatar.png'
-							}
-							alt="avatar"
-							className="image-holder  object-fit"
-						/>
-					</label>
-				</div>
-			</div>
-		</>
-	);
-});
+	// --------------
 
-function TeacherInformation({ t }) {
-	const [state, dispatch] = useReducer(reducer, optionState);
-	const [submitLoading, setSubmitLoading] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [optionLoaded, setOptionLoaded] = useState(false);
-	const { state: profileState, updateUserInfo } = useContext(ProfileContext);
 	const {
 		errors,
 		register,
@@ -263,6 +201,10 @@ function TeacherInformation({ t }) {
 			setOptionLoaded(true);
 			if (res.Code === 200) {
 				console.log('loadTeacherInfo res.Data', res.Data);
+				setAvatar(res.Data?.TeacherIMG);
+				setVideo(res.Data?.LinkVideoIntroduce);
+				setAudio(res.Data?.LinkAudio);
+
 				const obj = {
 					avatar: res.Data?.TeacherIMG ?? '',
 					linkVideoIntroduce: res.Data?.LinkVideoIntroduce ?? '',
@@ -295,17 +237,12 @@ function TeacherInformation({ t }) {
 					experience: res.Data?.Experience ?? '',
 					description: res.Data?.Description ?? '',
 					biography: res.Data?.Biography ?? '',
+					LinkAudio: res.Data?.LinkAudio ?? '',
 				};
 
 				console.log('loadTeacherInfo', obj);
 				updateUserInfo({ ...res.Data, Avatar: res.Data?.TeacherIMG ?? '' });
-				// updateState('timeZoneOptions', res.Data?.TimezoneList ?? []);
 				updateState('locationOptions', res.Data?.NationList ?? []);
-				// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
-				// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
-				// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
-				// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
-				// 	updateState('locationOptions', locationRes.Data ?? []);
 
 				setMultipleValue(obj);
 			}
@@ -314,49 +251,6 @@ function TeacherInformation({ t }) {
 		}
 		setIsLoading(false);
 	};
-
-	// const loadSelectOptionAPI = async () => {
-	// try {
-	// 	const [
-	// 		proficienRes,
-	// 		educationRes,
-	// 		purposeRes,
-	// 		timezoneRes,
-	// 		locationRes,
-	// 	] = await Promise.all([
-	// 		getEnglishProficiencyOptions(),
-	// 		getLevelOfEducationOptions(),
-	// 		getListLevelPurpose(),
-	// 		getTimeZone(),
-	// 		getLocationOptions(),
-	// 	]);
-	// 	updateState('englishProficienOptions', proficienRes.Data ?? []);
-	// 	updateState('levelOfEducationOptions', educationRes.Data ?? []);
-	// 	updateState('levelOfPurposeOptions', purposeRes.Data ?? []);
-	// 	updateState('timeZoneOptions', timezoneRes.Data ?? []);
-	// 	updateState('locationOptions', locationRes.Data ?? []);
-	// } catch (err) {
-	// 	console.log(
-	// 		err?.message ?? 'Call Promise all failed, check params again...',
-	// 	);
-	// }
-	// };
-
-	// const loadStateOptions = async (LocationID) => {
-	// 	try {
-	// 		const res = await getStateOptions({
-	// 			LocationID,
-	// 		});
-	// 		if (res.Code === 1) {
-	// 			updateState('stateOptions', res.Data);
-	// 		}
-	// 	} catch (err) {
-	// 		console.log(
-	// 			err?.message ??
-	// 				'Call api getLocationOptions failed, check params again...',
-	// 		);
-	// 	}
-	// };
 
 	const _onSubmitInformation = async (data, e) => {
 		e.preventDefault();
@@ -385,15 +279,25 @@ function TeacherInformation({ t }) {
 				Course: data?.major ?? '',
 				Description: data?.description ?? '',
 				Biography: data?.biography ?? '',
-				TeacherIMG: data?.avatar ?? '',
-				LinkVideoIntroduce: data?.linkVideoIntroduce ?? '',
+				TeacherIMG: myAvatar ?? '',
+				LinkVideoIntroduce: myVideo ?? '',
 				TeacherSchool: data?.schoolName ?? '', // str
+				LinkAudio: myAudio ?? '',
 			});
-			res.Code === 200 &&
+
+			if (res.Code === 200) {
 				toast.success('Information updated successfully !!', {
 					position: toast.POSITION.TOP_CENTER,
 					autoClose: 2000,
 				});
+				changeDataUser(
+					myAvatar,
+					data?.location?.TimeZoneName.toString(),
+					data?.location?.TimeZoneValue,
+					data?.fullName,
+				);
+			}
+
 			// res.Code === 200 &&
 			// 	updateUserInfo({
 			// 		...profileState,
@@ -421,6 +325,9 @@ function TeacherInformation({ t }) {
 
 	useEffect(() => {
 		loadTeacherInfo();
+		TeacherInformation.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	useEffect(() => {
@@ -431,12 +338,43 @@ function TeacherInformation({ t }) {
 		<>
 			<div className="teacher__detail">
 				<form onSubmit={handleSubmitInformation(_onSubmitInformation)}>
-					<Controller
+					{/* <Controller
 						as={<ProfileAvatar getValues={getValues} updateAvatar={setValue} />}
 						control={control}
 						name="avatar"
-					/>
-					{/* <ProfileAvatar ref={register} name="avatar" avatar={getValues('avatar')} updateAvatar={setValue} /> */}
+					/> */}
+					<div
+						className={`teacher-avatar ${
+							isLoading ? 'loading-style' : ''
+						} mg-x-auto`}
+					>
+						<div className="lds-ellipsis">
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
+						<div className="upload-container wd-100 ht-100">
+							<label className="upload-avatar">
+								<input
+									ref={inputFileRef}
+									type="file"
+									accept="image/*"
+									className="upload-box hidden d-none upload-file"
+									onChange={handleUploadImage}
+								/>
+								<img
+									src={
+										checkValidURL(myAvatar)
+											? myAvatar
+											: '/static/assets/img/default-avatar.png'
+									}
+									alt="avatar"
+									className="image-holder  object-fit"
+								/>
+							</label>
+						</div>
+					</div>
 					<div className="teacher-info mg-l-0-f mg-t-30">
 						<h5 className="mg-b-20">
 							<FontAwesomeIcon icon="user" className="fas fa-user mg-r-5" />
@@ -498,7 +436,6 @@ function TeacherInformation({ t }) {
 										name="email"
 										ref={register}
 										required
-										readOnly
 										id="email"
 									/>
 									<label htmlFor="email">Email</label>
@@ -540,9 +477,9 @@ function TeacherInformation({ t }) {
 									/>
 									<label htmlFor="birthday">BirthDay *</label>
 								</div>
-								{!!errors && !!errors.skypeId && (
+								{!!errors && !!errors.birthday && (
 									<span className="tx-danger mg-t-5 d-block">
-										{errors.skypeId?.message}
+										{errors.birthday?.message}
 									</span>
 								)}
 							</div>
@@ -612,6 +549,36 @@ function TeacherInformation({ t }) {
 										{errors.timeZone?.message}
 									</span>
 								)}
+							</div>
+
+							<div className="form-group col-12 col-sm-12 d-flex align-items-center">
+								<div className="input-float mr-2">
+									<input
+										ref={inputFileAudio}
+										type="file"
+										className={`form-control ${
+											!!errors && errors.audio ? 'error-form' : ''
+										}`}
+										placeholder="Audio *"
+										name="audio"
+										required
+										id="audio"
+										onChange={handleUploadAudio}
+									/>
+									<label htmlFor="birthday">Audio *</label>
+								</div>
+
+								{!!errors && !!errors.audio && (
+									<span className="tx-danger mg-t-5 d-block">
+										{errors.audio?.message}
+									</span>
+								)}
+
+								<audio
+									src={myAudio ? myAudio : ''}
+									controls
+									type="audio/mpeg"
+								/>
 							</div>
 							{/* <div className="form-group col-12 col-sm-12">
 								<div className="input-float">
@@ -786,7 +753,7 @@ function TeacherInformation({ t }) {
 								icon="info-circle"
 								className="fas fa-circle mg-r-5"
 							/>
-							{t('introduce-attainment')}
+							{t('Introduce')}
 						</h5>
 						<div className="row group-float-label">
 							<div className="form-group col-12 col-sm-12">
@@ -820,17 +787,70 @@ function TeacherInformation({ t }) {
 								</div>
 							</div>
 							<div className="form-group col-12 col-sm-12">
-								<Controller
-									as={
-										<ProfileVideo
-											getValues={getValues}
-											updateVideo={setValue}
-										/>
-									}
-									control={control}
-									name="linkVideoIntroduce"
-								/>
+								<div className="input-float">
+									<input
+										type="text"
+										className={`form-control`}
+										placeholder="Description"
+										name="LinkVideoIntroduce"
+										ref={register}
+										id="LinkVideoIntroduce"
+										value={myVideo}
+										onChange={getVideoLink}
+									/>
+									<label htmlFor="LinkVideoIntroduce">LinkVideoIntroduce</label>
+								</div>
 							</div>
+							{/* <div className="form-group col-12 col-sm-12">
+							
+								<div className="uploadvideo-wrap">
+									<div
+										className={`teacher-video ${
+											isLoading ? 'loading-style' : ''
+										} mg-x-auto`}
+									>
+										<div className="upload-container ">
+											<div className="lds-ellipsis">
+												<div></div>
+												<div></div>
+												<div></div>
+												<div></div>
+											</div>
+											<label
+												className={`upload-avatar ${
+													checkValidURL(myVideo) ? 'renewVideo' : ''
+												} `}
+											>
+												<input
+													ref={inputFileVideo}
+													type="file"
+													accept="video/*"
+													className="upload-box hidden d-none upload-file"
+													onChange={handleUploadVideo}
+												/>
+												{checkValidURL(myVideo) && (
+													<span className="btn">Upload video khác</span>
+												)}
+												{!checkValidURL(myVideo) && (
+													<span className="calltoupload">
+														Chưa có video giới thiệu bấm vào đây để upload video
+													</span>
+												)}
+											</label>
+											{checkValidURL(myVideo) && (
+												<CardMedia
+													component="iframe"
+													height="320"
+													image={checkValidURL(myVideo) ? myVideo : ''}
+													src={checkValidURL(myVideo) ? myVideo : ''}
+													title="linkVideoIntroduce"
+													autoPlay={false}
+												/>
+											)}
+										</div>
+									</div>
+								</div>
+							</div> */}
 						</div>
 					</div>
 
@@ -863,7 +883,4 @@ function TeacherInformation({ t }) {
 
 // export default TeacherInformation;
 
-TeacherInformation.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
 export default withTranslation('common')(TeacherInformation);

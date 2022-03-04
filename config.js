@@ -11,7 +11,7 @@ export const colors = {
 };
 
 export const appSettings = {
-	baseURL: 'https://online.e-talk.vn', //https://e-talk.monamedia.net
+	baseURL: 'https://online.e-talk.vn',
 	key: 'VnVOQG0zODlNb25hRGV2',
 	colors: {
 		second: '#d9ecf2',

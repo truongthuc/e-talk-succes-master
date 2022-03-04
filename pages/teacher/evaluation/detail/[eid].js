@@ -222,6 +222,9 @@ const EvaluationDetail = ({ t }) => {
 		if (statusEdit) {
 			setStatusEdit(false);
 		}
+		EvaluationDetail.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, [statusEdit]);
 
 	return (
@@ -454,7 +457,5 @@ const EvaluationDetail = ({ t }) => {
 // export default EvaluationDetail;
 
 EvaluationDetail.getLayout = getLayout;
-EvaluationDetail.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(EvaluationDetail);

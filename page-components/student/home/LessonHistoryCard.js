@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import './LessonHistoryCard.module.scss';
+import { i18n, withTranslation } from '~/i18n';
 
 const LessonHistoryCard = ({
 	onHandleRatingLesson,
@@ -16,12 +17,17 @@ const LessonHistoryCard = ({
 	end,
 	date,
 	Rate,
+	TimeStudy,
+	t,
 }) => {
 	const handleRatingLesson = (BookingID, TeacherUID, TeacherName) => {
 		onHandleRatingLesson(BookingID, TeacherUID, TeacherName);
 	};
 
 	useEffect(() => {
+		LessonHistoryCard.getInitialProps = async () => ({
+			LessonHistoryCard: ['common'],
+		});
 		feather.replace();
 	}, []);
 
@@ -30,14 +36,11 @@ const LessonHistoryCard = ({
 			<li className="cr-item lesson-history lesson-info">
 				<div className="media">
 					<div className="teacher-information">
-						<a
-							className="teacher-avatar"
-							href={`/ElearnStudent/teacherDetail?ID=${TeacherUID}`}
-						>
+						<div className="teacher-avatar">
 							<img
 								src={
-									avatar === '/static/assets/img/default-avatar.png'
-										? `/static/assets/img/${avatar}`
+									avatar === null
+										? `/static/assets/img/default-avatar.png`
 										: avatar
 								}
 								className="teacher-image"
@@ -50,31 +53,29 @@ const LessonHistoryCard = ({
 							<p className="course-teacher tx-14 tx-gray-800 tx-normal mg-b-0 tx-center mg-t-5 d-block">
 								{TeacherName}
 							</p>
-						</a>
+						</div>
 					</div>
 					<div className="media-body mg-l-20 pos-relative">
 						<div>
 							<h5 className="mg-b-10 mg-t-10 mg-sm-t-0">
 								<span className="badge badge-success">Finished</span>{' '}
-								<a
-									href={`/ElearnStudent/lessonDetail?ID=${BookingID}`}
-									className="no-hl course-name tx-bold"
-								>
-									{CourseName}
-								</a>
+								{CourseName}
 							</h5>
 							<div className="course-information tx-14">
-								<span className="mg-r-15 tx-gray-500 d-inline-block">
+								<span
+									className="mg-r-15 tx-gray-500 d-block"
+									style={{ marginBottom: '10px' }}
+								>
 									<i className="feather-16 mg-r-5" data-feather="calendar"></i>
-									{date}
+									{TimeStudy}
 								</span>
 								<span className="mg-r-15 tx-gray-500 d-inline-block">
 									<i className="feather-16 mg-r-5" data-feather="clock"></i>
-									{`Bắt đầu: ${start}`}
+									{`${t('Start')}: ${start}`}
 								</span>
 								<span className="mg-r-15 tx-gray-500 d-inline-block">
 									<i className="feather-16 mg-r-5" data-feather="clock"></i>
-									{`Kết thúc: ${end}`}
+									{`${t('End')}: ${end}`}
 								</span>
 							</div>
 							{note && (
@@ -133,4 +134,4 @@ const LessonHistoryCard = ({
 	);
 };
 
-export default LessonHistoryCard;
+export default withTranslation('common')(LessonHistoryCard);

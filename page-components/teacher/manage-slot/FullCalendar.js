@@ -23,6 +23,8 @@ import { getDifferentMinBetweenTime, convertDDMMYYYYtoMMDDYYYY } from '~/utils';
 import { randomId } from '~/utils';
 import dayjs from 'dayjs';
 import ModalUpdate from './ModalUpdate';
+import { useRouter } from 'next/router';
+import { i18n, withTranslation } from '~/i18n';
 
 // import '@fortawesome/fontawesome-free';
 const customParseFormat = require('dayjs/plugin/customParseFormat');
@@ -62,19 +64,25 @@ const initEvents = [];
 
 let calendar = null;
 
-const FullCalendar = ({ data = [], statusShow }) => {
+const FullCalendar = ({ statusShow, t }) => {
+	const router = useRouter();
+
 	const [eventSource, setEventSource] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [showErrorBook, setShowErrorBook] = useState(false);
 	const [showActiveModal, setShowActiveModal] = useState(false);
 	const [showCancelModal, setShowCancelModal] = useState(false);
 	const [modalData, setModalData] = useState(null);
+	const [sureBook, setSureBook] = useState(false);
+	const [dateCalendar, setDateCalendar] = useState();
+	const [infoNeedCancel, setInfoNeedCancel] = useState();
+	const [startChange, setStartChange] = useState(false);
+
+	const [dataCal, setDataCal] = useState();
 
 	const [dataUser, setDataUser] = useState();
 
 	statusShow = parseInt(statusShow);
-
-	console.log('Status Show: ', statusShow);
 
 	const loadingRef = useRef(true);
 
@@ -86,6 +94,25 @@ const FullCalendar = ({ data = [], statusShow }) => {
 
 	// console.log('GET data API: ', getDataAPI);
 
+	const checkSlotEmpty = (data) => {
+		let timeEmpty = null;
+		let getTime = null;
+
+		for (const [index, item] of data.entries()) {
+			if (item.BookingID === 0) {
+				timeEmpty = item.StartDate;
+				break;
+			}
+		}
+
+		if (timeEmpty !== null) {
+			timeEmpty = timeEmpty.split(' ');
+			getTime = timeEmpty[1];
+		}
+
+		return getTime;
+	};
+
 	const fetchEventByDate = async (obj) => {
 		setIsLoading(true);
 
@@ -95,10 +122,10 @@ const FullCalendar = ({ data = [], statusShow }) => {
 				start: obj.start,
 				end: obj.end,
 				Token: obj.Token,
-			}); // @string date dd/mm/yyyyBookingStatusBookingStatus
-			if (res.Code === 200 && res.Data.length > 0) {
+			});
+			if (res.Code === 200) {
 				setDataAPI(res.Data);
-
+				let arrOff = findDayOff(res.Data);
 				// calendar.addEventSource(showData());
 				// Hồi nãy nó có filter nữa nên nó chỉ lấy mấy cái empty, nên cái có data k showw
 				const newEvents = res.Data.map((event, i) => {
@@ -154,33 +181,9 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					}
 				});
 
-				let cloneNewArr = cloneArr(newEvents);
-
-				// const newEvents = res.Data.map((event, i) => {
-				// 	return {
-				// 		...event,
-				// 		id: i,
-				// 		title: event.Title || '',
-				// 		OpenID: event.OpenID,
-				// 		start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-				// 		end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-				// 		eventType: event.eventType,
-				// 		bookStatus: event.BookingStatus,
-				// 		bookInfo: event.bookInfo,
-				// 		available: event.available,
-				// 		isEmptySlot: event.isEmptySlot,
-				// 		loading: false,
-				// 	};
-				// 	console.log(event);
-				// });
+				let cloneNewArr = cloneArr(newEvents, arrOff);
 
 				const sources = calendar.getEventSources();
-
-				// if (sources.length > 0) {
-				// 	sources[0].remove();
-				// 	console.log('SOURCE nè: ', sources);
-				// 	calendar.addEventSource(newEvents);
-				// }
 
 				if (sources.length > 0) {
 					sources.forEach((item) => {
@@ -188,47 +191,26 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					});
 
 					calendar.addEventSource(cloneNewArr);
+					calendar.render();
 				}
 			}
 		} catch (error) {
 			console.log('Error: ', error);
 		}
 		setIsLoading(false);
-
-		// console.log('After save: ', calendar.getEventSources());
 	};
 
 	const callFetchEvent = (date) => {
+		// GET UID and Token
 		let UID = null;
 		let Token = null;
-
-		// GET UID and Token
 		if (localStorage.getItem('UID')) {
 			UID = localStorage.getItem('UID');
 			Token = localStorage.getItem('token');
 		}
 
-		// GET DATE
-		// let cur = new Date();
-
-		// console.log('CUR DAY: ', cur);
-
-		// let getDate = date.getDate();
-		// let testDate = new Date(cur.setDate(getDate + 6)).toUTCString();
-
-		// let start = dayjs(date).format('DD/MM/YYYY');
-		// let end = dayjs(testDate).format('DD/MM/YYYY');
-
-		let getMonth = date.getMonth();
-		let getYear = date.getFullYear();
-
-		let start = new Date(getYear, getMonth, 1);
-		let end = new Date(getYear, getMonth + 1, 0);
-
-		start = dayjs(start).format('DD/MM/YYYY');
-		end = dayjs(end).format('DD/MM/YYYY');
-
-		// ----
+		let start = dayjs(dateCalendar?.start).format('DD/MM/YYYY');
+		let end = dayjs(dateCalendar?.end).format('DD/MM/YYYY');
 
 		fetchEventByDate({
 			UID: UID,
@@ -239,54 +221,23 @@ const FullCalendar = ({ data = [], statusShow }) => {
 	};
 
 	const triggerNextCalendar = () => {
-		calendar.refetchEvents();
-
-		if (!calendar) return;
-		try {
-			const currentDate = calendar.getDate();
-
-			callFetchEvent(currentDate);
-		} catch (error) {}
+		initCalendar(statusShow);
 	};
 
 	const triggerPrevCalendar = () => {
-		calendar.refetchEvents();
-		if (!calendar) return;
-		try {
-			const currentDate = calendar.getDate();
-
-			callFetchEvent(currentDate);
-		} catch (error) {}
+		initCalendar(statusShow);
 	};
 
 	const triggerWeek = () => {
-		calendar.refetchEvents();
-		if (!calendar) return;
-		try {
-			const currentDate = calendar.getDate();
-
-			callFetchEvent(currentDate);
-		} catch (error) {}
+		initCalendar(statusShow);
 	};
 
 	const triggerMonth = () => {
-		calendar.refetchEvents();
-		if (!calendar) return;
-		try {
-			const currentDate = calendar.getDate();
-
-			callFetchEvent(currentDate);
-		} catch (error) {}
+		initCalendar(statusShow);
 	};
 
 	const triggerTodayCalendar = () => {
-		calendar.refetchEvents();
-		if (!calendar) return;
-		try {
-			const currentDate = calendar.getDate();
-
-			callFetchEvent(currentDate);
-		} catch (error) {}
+		initCalendar(statusShow);
 	};
 
 	const closeAvailableEvent = (newProps, eventsArray) => {
@@ -326,11 +277,13 @@ const FullCalendar = ({ data = [], statusShow }) => {
 
 	const funcGetOpenID = async (obj) => {
 		let rs = null;
-		console.log('Obj in func', obj);
+
 		try {
 			const res = await setEventAvailable({
 				start: obj.start,
 				end: obj.end,
+				token: dataUser?.token,
+				UID: dataUser?.UID,
 			});
 			if (res.Code === 200) {
 				rs = res.Data;
@@ -343,31 +296,29 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		return rs;
 	};
 
+	const [loadingSlot, setLoadingSlot] = useState(false);
+
 	const _openSlot = async () => {
+		setLoadingSlot(true);
+
 		let start = dayjs(modalData.start).toDate();
 		let end = dayjs(modalData.end).toDate();
 
 		start = dayjs(start).format('DD/MM/YYYY HH:mm');
 		end = dayjs(end).format('DD/MM/YYYY HH:mm');
 
-		console.log('Start nè: ', start);
-		console.log('End nè: ', end);
-
 		let getOpenID = null;
 		let openID = funcGetOpenID({ start, end });
 		openID.then(function (value) {
-			console.log('VALUEEE: ', value);
-
-			// let getTime = dayjs(value[0].start, 'DD/MM/YYYY HH:mm').toDate();
-			// getTime.setHours(getTime.getHours() + 8);
-
 			try {
 				value.forEach((item) => {
 					let startTime = dayjs(item.start, 'DD/MM/YYYY HH:mm').toDate();
 					let endTime = dayjs(item.end, 'DD/MM/YYYY HH:mm').toDate();
 
-					startTime.setHours(startTime.getHours() + 10);
-					endTime.setHours(endTime.getHours() + 10);
+					startTime.setHours(startTime.getHours() + dataUser?.timeValue);
+					endTime.setHours(endTime.getHours() + dataUser?.timeValue);
+
+					setLoadingSlot(false);
 
 					calendar.addEvent(
 						{
@@ -387,7 +338,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 							eventType: 0,
 							isEmptySlot: false,
 							title: null,
-							loading: true,
+							loading: false,
 						},
 
 						true,
@@ -417,16 +368,11 @@ const FullCalendar = ({ data = [], statusShow }) => {
 	const afterEventAdded = async (eventInfo) => {
 		let event = eventInfo.event;
 
-		console.log('event range', event.start, event.end);
-
 		let start = dayjs(event.start).toDate();
 		let end = dayjs(event.end).toDate();
 
 		start = dayjs(start).format('DD/MM/YYYY HH:mm');
 		end = dayjs(end).format('DD/MM/YYYY HH:mm');
-
-		console.log('Start nè: ', start);
-		console.log('End nè: ', end);
 
 		const res = await setEventAvailable({
 			start: start,
@@ -451,7 +397,6 @@ const FullCalendar = ({ data = [], statusShow }) => {
 	// 	eventInstance.remove();
 	// };
 	const showCancelReasonModal = (event) => {
-		console.log(showCancelReasonModal);
 		try {
 			event.preventDefault();
 			const cancelBtn = event.target;
@@ -497,38 +442,40 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		console.log('VIEW: ', view);
 	};
 
-	const updateStatus = (infoSubmit) => {
-		console.log('Info Submit: ', infoSubmit);
+	const updateStatus = async (infoSubmit) => {
+		let check = false;
 		setOpenUpdate(false);
 		const currentDate = calendar.getDate();
 
-		(async () => {
-			try {
-				const res = await teacherUpdateTeachingSchedule({
-					UID: dataUser.UID,
-					Token: dataUser.Token,
-					BookingID: infoSubmit.BookingID,
-					ClassStatus: infoSubmit.ClassStatus,
-					Remark: infoSubmit.Rating,
-					Homework: infoSubmit.Homework,
+		try {
+			const res = await teacherUpdateTeachingSchedule({
+				UID: dataUser.UID,
+				Token: dataUser.token,
+				BookingID: infoSubmit.BookingID,
+				ClassStatus: infoSubmit.ClassStatus,
+				Remark: infoSubmit.Rating,
+				Homework: infoSubmit.Homework,
+			});
+			check = true;
+			if (res.Code === 200) {
+				toast.success('Update Success', {
+					position: toast.POSITION.TOP_CENTER,
+					autoClose: 1000,
 				});
-
-				if (res.Code === 200) {
-					toast.success('Update Success', {
-						position: toast.POSITION.TOP_CENTER,
-						autoClose: 1000,
-					});
-					callFetchEvent(currentDate);
-				} else {
-					toast.warning('Update Not Success', {
-						position: toast.POSITION.TOP_CENTER,
-						autoClose: 1000,
-					});
-				}
-			} catch (error) {
-				console.log(error);
+				// callFetchEvent(currentDate);
+				// initCalendar(0);
+				calendar.refetchEvents();
+			} else {
+				toast.warning('Update Not Success', {
+					position: toast.POSITION.TOP_CENTER,
+					autoClose: 1000,
+				});
 			}
-		})();
+		} catch (error) {
+			console.log(error);
+		}
+
+		return check;
 	};
 
 	const emptyCellSelect = (selection) => {
@@ -574,9 +521,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 
 	const [dataUpdate, setDataUpdate] = useState(null);
 
-	// console.log('Data Update: ', dataUpdate);
-
-	const initCalendar = () => {
+	const initCalendar = (statusShow) => {
 		//const createEventSlots
 		const calendarEl = document.getElementById('js-book-calendar');
 
@@ -584,10 +529,9 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		const $cancelModal = $('#md-cancel-slot');
 
 		const eventDidMount = (args) => {
-			// console.log('eventDidMount', args);
 			const { event, el } = args;
 
-			// console.log('Event in eventdidmount: ', event);
+			console.log('eventDidMount', event);
 
 			const data = {
 				...event.extendedProps,
@@ -602,6 +546,9 @@ const FullCalendar = ({ data = [], statusShow }) => {
 				homeWork: event.HomeWork,
 				studentSkype: event.StudentSkype,
 			};
+			const studentSkype = event.extendedProps.StudentSkype;
+
+			console.log('Student Skype: ', studentSkype);
 
 			// console.log('Start day: ', data.start);
 
@@ -651,63 +598,69 @@ const FullCalendar = ({ data = [], statusShow }) => {
 			popWhitelist.a.push('disabled');
 			const cancelable = diff > 60 ? true : false;
 			!!el &&
-				[...el.classList].includes('custom-color-E') &&
+				[...el.classList].includes('haveFinish') &&
 				$(el).click(function () {
 					setDataUpdate(event.extendedProps);
 					setOpenUpdate(true);
 				});
-			// $(el)
-			// 	.popover({
-			// 		html: true,
-			// 		container: 'body',
-			// 		trigger: 'focus',
-			// 		title: event.extendedProps.bookInfo?.timeZone ?? 'GTM + 7',
-			// 		content: `
-			// 				<p class="mg-b-5 tx-light"><span class="mg-r-5">Teacher Name:</span><span class="tx-medium">${
-			// 					event.extendedProps.TeacherName ?? ''
-			// 				}</span></p>
-			// 				<p class="mg-b-5 tx-light"><span class="mg-r-5">Student:</span><span class="tx-medium">${
-			// 					event.extendedProps.StudentName ?? ''
-			// 				}</span></p>
-			// 				<p class="mg-b-5 tx-light"><span class="mg-r-5">ClassName:</span><span class="tx-medium">${
-			// 					event.extendedProps.ClassName ?? ''
-			// 				}</span></p>
-			//         <p class="mg-b-5 tx-light"><span class="mg-r-5">Student Code:</span><span class="tx-medium">${
-			// 					event.extendedProps.StudentCode ?? ''
-			// 				}</span></p>
-			//         <p class="mg-b-5 tx-light"><span class="mg-r-5">Program:</span><span class="tx-medium">${
-			// 					event.extendedProps.Program ?? ''
-			// 				}</span></p>
-			// 				<p class="mg-b-5 tx-light"><span class="mg-r-5">HomeWork:</span><span class="tx-medium">${
-			// 					event.extendedProps.HomeWork ?? ''
-			// 				}</span></p>
-			//         <p class="mg-b-5 tx-light"><span class="mg-r-5">Start Date:</span><span class="tx-medium">${dayjs(
-			// 					event.extendedProps.StartDate,
-			// 				).format('DD/MM/YYYY hh:mm A')}</span></p>
-			//         <p class="mg-b-5 tx-light"><span class="mg-r-5">End Date:</span><span class="tx-medium">${dayjs(
-			// 					event.extendedProps.EndDate,
-			// 				).format('DD/MM/YYYY hh:mm A')}</span></p>
-			// 				${
-			// 					!args.isPast &&
-			// 					`
-			// 				<p class="mg-b-0 tx-light"><span class="mg-r-5">Skype ID:</span><span class="tx-medium">${
-			// 					event.extendedProps.StudentSkype ?? ''
-			// 				}</span></p>
-			//         				<div class="action mg-t-15">
-			// 					<a href="#" data-schedule='${JSON.stringify(
-			// 						data,
-			// 					)}' class="btn btn-sm btn-info btn-block tx-white-f mg-b-10 join-class-skype" target="_blank" rel="noreferrer"><i class="fab fa-skype"></i> Join class</a>
-			// 					${cancelable ? `` : ``}
-			// 					${cancelable ? '' : ''}
-			// 				</div>
-			// 				`
-			// 				}
+			$(el)
+				.popover({
+					html: true,
+					container: 'body',
+					trigger: 'focus',
+					title: 'Class Information',
+					content: `
+					<p class="mg-b-5 tx-light"><span class="tx-medium text-uppercase color-primary">${
+						event.extendedProps.Title ?? ''
+					}</span></p>
+							<p class="mg-b-5 tx-light"><span class="mg-r-5">Teacher Name:</span><span class="tx-medium">${
+								event.extendedProps.TeacherName ?? ''
+							}</span></p>
+							<p class="mg-b-5 tx-light"><span class="mg-r-5">Student:</span><span class="tx-medium">${
+								event.extendedProps.StudentName ?? ''
+							}</span></p>
+							<p class="mg-b-5 tx-light"><span class="mg-r-5">ClassName:</span><span class="tx-medium">${
+								event.extendedProps.ClassName ?? ''
+							}</span></p>
+			        <p class="mg-b-5 tx-light"><span class="mg-r-5">Student Code:</span><span class="tx-medium">${
+								event.extendedProps.StudentCode ?? ''
+							}</span></p>
+			        <p class="mg-b-5 tx-light"><span class="mg-r-5">Program:</span><span class="tx-medium">${
+								event.extendedProps.Program ?? ''
+							}</span></p>
+							<p class="mg-b-5 tx-light"><span class="mg-r-5">HomeWork:</span><span class="tx-medium">${
+								event.extendedProps.HomeWork ?? ''
+							}</span></p>
+			        <p class="mg-b-5 tx-light"><span class="mg-r-5">Start Date:</span><span class="tx-medium">${
+								event.extendedProps.StartDate
+							}</span></p>
+			        <p class="mg-b-5 tx-light"><span class="mg-r-5">End Date:</span><span class="tx-medium">${
+								event.extendedProps.EndDate
+							}</span></p>
+							${
+								!args.isPast &&
+								`
+							<p class="mg-b-0 tx-light"><span class="mg-r-5">Skype ID:</span><span class="tx-medium">${
+								event.extendedProps.StudentSkype ?? ''
+							}</span></p>
+							<p class="mg-b-0 tx-light"><span class="mg-r-5">Zoom ID:</span><span class="tx-medium">${
+								event.extendedProps.StudentZoom ?? ''
+							}</span></p>
+			        				<div class="action mg-t-15">
+								<a href="#" rel='${studentSkype}' class="btn btn-sm btn-info btn-block tx-white-f mg-b-10 join-class-skype" target="_blank" rel="noreferrer"><i class="fab fa-skype"></i> Join class</a>
+								${cancelable ? `` : ``}
+								${cancelable ? '' : ''}
+							</div>
+							`
+							}
 
-			//         `,
-			// 	})
-			// 	.on('click', function () {
-			// 		$(this).popover('show');
-			// 	});
+			        `,
+				})
+				.on('click', function () {
+					if ($(this).is('.custom-color-G, .custom-color-F ')) {
+						$(this).popover('toggle');
+					}
+				});
 			$(document).on('click', function (event) {
 				let $el = $(el);
 				if (
@@ -748,8 +701,11 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		};
 
 		const eventClick = (args) => {
-			const element = args.el;
 			const { start, end, id, extendedProps } = args.event;
+			const diff = getDifferentMinBetweenTime(new Date(), start);
+
+			const element = args.el;
+
 			if (extendedProps.available) return;
 			if (
 				!!$toggleCheckbox &&
@@ -770,26 +726,73 @@ const FullCalendar = ({ data = [], statusShow }) => {
 				![...element.classList].includes('empty-slot')
 			)
 				return;
-			const diff = getDifferentMinBetweenTime(new Date(), start);
-			if (diff < 60) {
-				setShowErrorBook(true);
-				return;
-			}
+
+			// if (diff < 60) {
+			// 	setShowErrorBook(true);
+			// 	return;
+			// }
 		};
 
 		calendar = new Calendar(calendarEl, {
 			plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
 			timeZone: 'local',
 			height: 550,
+
 			expandRows: true,
 			slotMinTime: '00:00',
 			slotMaxTime: '24:00',
 
-			events: data?.map((y) => ({
-				...y,
-				id: randomId(),
-				loading: true,
-			})),
+			events: function (info, successCallback) {
+				setDateCalendar(info);
+
+				(async () => {
+					let UID = null;
+					let Token = null;
+					if (localStorage.getItem('UID')) {
+						UID = localStorage.getItem('UID');
+						Token = localStorage.getItem('token');
+					}
+
+					let start = dayjs(info.start).format('DD/MM/YYYY');
+					let end = dayjs(info.end).format('DD/MM/YYYY');
+
+					try {
+						const res = await getListEventsOfWeek({
+							sort: statusShow,
+							UID: UID,
+							start: start,
+							end: end,
+							Token: Token,
+						});
+
+						if (res.Code === 200) {
+							successCallback(
+								res.Data.map((event, i) => {
+									return {
+										...event,
+										id: i,
+										title: event.Title || '',
+										OpenID: event.OpenID,
+										start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
+										end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
+										eventType: event.eventType,
+										bookStatus: event.BookingStatus,
+										bookInfo: event.bookInfo,
+										available: event.available,
+										isEmptySlot: event.isEmptySlot,
+										loading: false,
+									};
+								}),
+							);
+							// let timeEmpty = checkSlotEmpty(res.Data);
+
+							// calendar.scrollToTime(timeEmpty);
+						}
+					} catch (error) {
+						console.log('Error: ', error);
+					}
+				})();
+			},
 
 			headerToolbar: {
 				start: 'timeGridDay,timeGridWeek,dayGridMonth,listWeek', // will normally be on the left. if RTL, will be on the right
@@ -868,6 +871,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					DateOff,
 					isEmptySlot,
 					loading,
+					BookingStatus,
 				} = event.extendedProps;
 				// let classLists =
 				// 	DateOff === 'false'
@@ -880,9 +884,11 @@ const FullCalendar = ({ data = [], statusShow }) => {
 				classLists += eventType === 1 ? ' hot-slot ' : '';
 				classLists += isEmptySlot ? ' empty-slot' : '';
 				classLists += loading ? ' is-loading' : '';
+				classLists += BookingStatus === 2 ? ' haveFinish' : '';
 				return classLists;
 			},
 			eventContent: function (args) {
+				console.log('ARG: ', args);
 				let templateEl = document.createElement('div');
 				const { event, isPast, isStart } = args;
 				const {
@@ -894,6 +900,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					DateOff,
 					isEmptySlot,
 					loading,
+					Title,
 				} = event.extendedProps;
 				const data = {
 					...event.extendedProps,
@@ -902,8 +909,6 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					end: event.end,
 					title: event.Title,
 				};
-
-				console.log('DATE OFF: ', DateOff);
 
 				const html = `
 										${
@@ -921,7 +926,7 @@ const FullCalendar = ({ data = [], statusShow }) => {
 															  </span>
 																`
 															: `<span class="label-book"><i class="fas fa-copyright"></i>AVAILABLE</span>`
-														: `<span class="label-book"><i class="far fa-calendar-times"></i>OFF DAY</span>`
+														: `<span class="label-book"><i class="far fa-calendar-times"></i>${Title}</span>`
 												}
 												${
 													DateOff === 'true'
@@ -961,7 +966,6 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		});
 
 		calendar.render();
-		console.log('source event', calendar.getEventSources());
 
 		$('body').on('click', '.cancel-schedule', showCancelReasonModal);
 
@@ -969,13 +973,14 @@ const FullCalendar = ({ data = [], statusShow }) => {
 
 		$('body').on('click', '.join-class-skype', async function (e) {
 			e.preventDefault();
-			const eventData = JSON.parse(this.getAttribute('data-schedule'));
-			try {
-				addScheduleLog({ BookingID: eventData.BookingID });
-			} catch (error) {
-				console.log(error?.message ?? `Can't add schedule log !!`);
-			}
-			window.location.href = `skype:${eventData?.bookInfo?.SkypeID ?? ''}?chat`;
+			const studentSkype = $(this).attr('rel');
+
+			// try {
+			// 	addScheduleLog({ BookingID: eventData.BookingID });
+			// } catch (error) {
+			// 	console.log(error?.message ?? `Can't add schedule log !!`);
+			// }
+			window.location.href = `skype:${studentSkype ?? ''}?call`;
 		});
 
 		// function calendar() {
@@ -993,34 +998,34 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		// 	});
 		// }
 
-		$('body').on(
-			'click',
-			'#js-book-calendar .fc-next-button',
-			triggerNextCalendar,
-		);
-		$('body').on(
-			'click',
-			'#js-book-calendar .fc-prev-button',
-			triggerPrevCalendar,
-		);
+		// $('body').on(
+		// 	'click',
+		// 	'#js-book-calendar .fc-next-button',
+		// 	triggerNextCalendar,
+		// );
+		// $('body').on(
+		// 	'click',
+		// 	'#js-book-calendar .fc-prev-button',
+		// 	triggerPrevCalendar,
+		// );
 
-		$('body').on(
-			'click',
-			'#js-book-calendar .fc-timeGridWeek-button',
-			triggerWeek,
-		);
+		// $('body').on(
+		// 	'click',
+		// 	'#js-book-calendar .fc-timeGridWeek-button',
+		// 	triggerWeek,
+		// );
 
-		$('body').on(
-			'click',
-			'#js-book-calendar .fc-dayGridMonth-button',
-			triggerTodayCalendar,
-		);
+		// $('body').on(
+		// 	'click',
+		// 	'#js-book-calendar .fc-dayGridMonth-button',
+		// 	triggerTodayCalendar,
+		// );
 
-		$('body').on(
-			'click',
-			'#js-book-calendar .fc-today-button',
-			triggerTodayCalendar,
-		);
+		// $('body').on(
+		// 	'click',
+		// 	'#js-book-calendar .fc-today-button',
+		// 	triggerTodayCalendar,
+		// );
 
 		$toggleCheckbox = $('#student-toggle-checkbox');
 
@@ -1037,28 +1042,34 @@ const FullCalendar = ({ data = [], statusShow }) => {
 
 	// ------------ END INIT CALENDAR ---------------
 
-	const _closeSlot = async (event) => {
+	const acceptCloseSlot = async (event) => {
 		try {
 			event.preventDefault();
-			const closeBtn = event.target;
-			const eventId = JSON.parse(closeBtn.getAttribute('data-schedule'));
-			const eventInstance = calendar.getEventById(eventId.id);
+			// const closeBtn = event.target;
+			// console.log('CLOSE BTN: ', closeBtn);
+			// const eventId = JSON.parse(closeBtn.getAttribute('data-schedule'));
+			// console.log('eventID: ', eventId);
 
+			const eventInstance = calendar.getEventById(infoNeedCancel.id);
+			let UID = null;
+			let Token = null;
+			if (localStorage.getItem('UID')) {
+				UID = localStorage.getItem('UID');
+				Token = localStorage.getItem('token');
+			}
 			const res = await setEventClose({
-				OpenID: eventId.OpenID,
+				OpenID: infoNeedCancel.OpenID,
+				token: Token,
+				UID: UID,
 			});
-
-			let openDate = dayjs(eventId.start, 'DD/MM/YYYY HH:mm').toDate();
-
-			console.log('event Id:  ', eventId);
-			console.log(
-				'openDate:  ',
-				dayjs(eventId.TeacherStart, 'DD/MM/YYYY HH:mm').toDate(),
-			);
+			let openDate = dayjs(infoNeedCancel.start, 'DD/MM/YYYY HH:mm').toDate();
 
 			if (res.Code === 200) {
 				eventInstance.remove();
 				calendar.render();
+			} else if (res.Code === 403) {
+				localStorage.clear();
+				router.push('/login/signin');
 			} else {
 				toast.error('Close slot failed', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -1068,6 +1079,16 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		} catch (error) {
 			console.log(error);
 		}
+		setSureBook(false);
+	};
+
+	const _closeSlot = (event) => {
+		setSureBook(true);
+		const closeBtn = event.target;
+
+		const eventId = JSON.parse(closeBtn.getAttribute('data-schedule'));
+
+		setInfoNeedCancel(eventId);
 	};
 
 	const checkHaveDayOf = (arr) => {
@@ -1082,8 +1103,6 @@ const FullCalendar = ({ data = [], statusShow }) => {
 	};
 
 	const cloneArr = (oldArr, arrOff) => {
-		console.log('Arr OFF trong này: ', arrOff);
-
 		let arr = [];
 		for (const [index, value] of oldArr.entries()) {
 			if (value) {
@@ -1114,167 +1133,118 @@ const FullCalendar = ({ data = [], statusShow }) => {
 		return arrOff;
 	};
 
+	// useEffect(() => {
+	// 	if (openUpdate) {
+	// 		const currentDate = calendar.getDate();
+
+	// 		callFetchEvent(currentDate);
+	// 	}
+
+	// 	lottie &&
+	// 		lottie.loadAnimation({
+	// 			container: loadingRef.current,
+	// 			renderer: 'svg',
+	// 			loop: true,
+	// 			autoplay: true,
+	// 			path: '/static/img/loading.json',
+	// 		});
+
+	// 	return () => {
+	// 		loadingRef.current = false;
+	// 	};
+	// }, [openUpdate]);
+
 	useEffect(() => {
-		// getSpaceDate();
-		initCalendar();
-
-		if (data) {
-			console.log('Data trong này: ', data);
+		if (startChange) {
+			// const currentDate = calendar.getDate();
+			// callFetchEvent(currentDate);
+			initCalendar(statusShow);
 		}
+	}, [statusShow]);
 
-		if (data?.length > 0) {
-			let arrOff = findDayOff(data);
-
-			console.log('Arr OFF: ', arrOff);
-
-			const newArr = [...data].map((event, i) => {
-				if (statusShow === 1) {
-					return {
-						...event,
-						id: i,
-						title: event.Title || '',
-						start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-						end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-						eventType: event.eventType,
-						bookStatus: event.BookingStatus,
-						bookInfo: event.bookInfo,
-						available: event.available,
-						isEmptySlot: event.isEmptySlot,
-						loading: false,
-					};
-				} else if (statusShow === 2) {
-					if (event.BookingID === 0) {
-						return {
-							...event,
-							id: i,
-							title: event.Title || '',
-							start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-							end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-							eventType: event.eventType,
-							bookStatus: event.BookingStatus,
-							bookInfo: event.bookInfo,
-							available: event.available,
-							isEmptySlot: event.isEmptySlot,
-							loading: false,
-						};
-					}
-				} else if (statusShow === 3) {
-					if (event.OpenID === 0) {
-						return {
-							...event,
-							id: i,
-							title: event.Title || '',
-							start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-							end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-							eventType: event.eventType,
-							bookStatus: event.BookingStatus,
-							bookInfo: event.bookInfo,
-							available: event.available,
-							isEmptySlot: event.isEmptySlot,
-							loading: false,
-						};
-					}
-				}
-			});
-
-			let cloneNewArr = cloneArr(newArr, arrOff);
-
-			console.log('News arr in first load: ', cloneNewArr);
-
-			calendar.addEventSource(cloneNewArr);
-		}
-
-		lottie &&
-			lottie.loadAnimation({
-				container: loadingRef.current, // the dom element that will contain the animation
-				renderer: 'svg',
-				loop: true,
-				autoplay: true,
-				path: '/static/img/loading.json', // the path to the animation json
-			});
-
-		return () => {
-			loadingRef.current = false;
-		};
-	}, [openUpdate]);
+	// useEffect(() => {
+	// 	calendar?.addEventSource(dataCal);
+	// }, [dataCal]);
 
 	useEffect(() => {
 		if (localStorage.getItem('isLogin')) {
 			let UID = localStorage.getItem('UID');
 			let token = localStorage.getItem('token');
+			let dataProfile = localStorage.getItem('dataUser');
+			dataProfile = JSON.parse(dataProfile);
+
+			let timeValue = dataProfile.TimeZoneValue;
+			timeValue = parseInt(timeValue);
+
 			setDataUser({
-				UID: UID,
+				UID: parseInt(UID),
 				token: token,
+				timeValue: timeValue / 60,
 			});
 		}
 
-		// getSpaceDate();
-		initCalendar();
+		initCalendar(statusShow);
+		setStartChange(true);
 
-		if (data) {
-			console.log('Data trong này: ', data);
-		}
-
-		if (data?.length > 0) {
-			let arrOff = findDayOff(data);
-
-			console.log('Arr OFF: ', arrOff);
-
-			const newArr = [...data].map((event, i) => {
-				if (statusShow === 1) {
-					return {
-						...event,
-						id: i,
-						title: event.Title || '',
-						start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-						end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-						eventType: event.eventType,
-						bookStatus: event.BookingStatus,
-						bookInfo: event.bookInfo,
-						available: event.available,
-						isEmptySlot: event.isEmptySlot,
-						loading: false,
-					};
-				} else if (statusShow === 2) {
-					if (event.BookingID === 0) {
-						return {
-							...event,
-							id: i,
-							title: event.Title || '',
-							start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-							end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-							eventType: event.eventType,
-							bookStatus: event.BookingStatus,
-							bookInfo: event.bookInfo,
-							available: event.available,
-							isEmptySlot: event.isEmptySlot,
-							loading: false,
-						};
-					}
-				} else if (statusShow === 3) {
-					if (event.OpenID === 0) {
-						return {
-							...event,
-							id: i,
-							title: event.Title || '',
-							start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
-							end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
-							eventType: event.eventType,
-							bookStatus: event.BookingStatus,
-							bookInfo: event.bookInfo,
-							available: event.available,
-							isEmptySlot: event.isEmptySlot,
-							loading: false,
-						};
-					}
-				}
-			});
-
-			let cloneNewArr = cloneArr(newArr, arrOff);
-
-			console.log('News arr in first load: ', cloneNewArr);
-
-			calendar.addEventSource(cloneNewArr);
+		if (!openUpdate) {
+			// const currentDate = calendar.getDate();
+			// callFetchEvent(currentDate);
+			// if (data?.length > 0) {
+			// 	let arrOff = findDayOff(data);
+			// 	console.log('Arr OFF: ', arrOff);
+			// 	const newArr = [...data].map((event, i) => {
+			// 		if (statusShow === 1) {
+			// 			return {
+			// 				...event,
+			// 				id: i,
+			// 				title: event.Title || '',
+			// 				start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 				end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 				eventType: event.eventType,
+			// 				bookStatus: event.BookingStatus,
+			// 				bookInfo: event.bookInfo,
+			// 				available: event.available,
+			// 				isEmptySlot: event.isEmptySlot,
+			// 				loading: false,
+			// 			};
+			// 		} else if (statusShow === 2) {
+			// 			if (event.BookingID === 0) {
+			// 				return {
+			// 					...event,
+			// 					id: i,
+			// 					title: event.Title || '',
+			// 					start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 					end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 					eventType: event.eventType,
+			// 					bookStatus: event.BookingStatus,
+			// 					bookInfo: event.bookInfo,
+			// 					available: event.available,
+			// 					isEmptySlot: event.isEmptySlot,
+			// 					loading: false,
+			// 				};
+			// 			}
+			// 		} else if (statusShow === 3) {
+			// 			if (event.OpenID === 0) {
+			// 				return {
+			// 					...event,
+			// 					id: i,
+			// 					title: event.Title || '',
+			// 					start: dayjs(event.StartDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 					end: dayjs(event.EndDate, 'DD/MM/YYYY HH:mm').toDate(),
+			// 					eventType: event.eventType,
+			// 					bookStatus: event.BookingStatus,
+			// 					bookInfo: event.bookInfo,
+			// 					available: event.available,
+			// 					isEmptySlot: event.isEmptySlot,
+			// 					loading: false,
+			// 				};
+			// 			}
+			// 		}
+			// 	});
+			// 	let cloneNewArr = cloneArr(newArr, arrOff);
+			// 	calendar.addEventSource(cloneNewArr);
+			// 	setStartChange(true);
+			// }
 		}
 
 		lottie &&
@@ -1286,10 +1256,13 @@ const FullCalendar = ({ data = [], statusShow }) => {
 				path: '/static/img/loading.json', // the path to the animation json
 			});
 
+		FullCalendar.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 		return () => {
 			loadingRef.current = false;
 		};
-	}, [statusShow]);
+	}, []);
 
 	return (
 		<>
@@ -1302,6 +1275,43 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					)}
 				</>
 				<div id="js-book-calendar" className="fc fc-unthemed fc-ltr"></div>
+				<Modal
+					show={sureBook}
+					onHide={() => setSureBook(false)}
+					size="sm"
+					centered
+					bsPrefix="modal"
+					animation={false}
+				>
+					<Modal.Header bsPrefix="modal-header bg-danger tx-white pd-10">
+						<Modal.Title bsPrefix="modal-title tx-white">
+							{t('Noted')} !
+						</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<p className="mg-b-0">
+							{t('Do you really want to cancel this slot?')}
+						</p>
+						<div className="tx-center mg-t-15">
+							<a
+								className="btnClose"
+								size="sm"
+								variant="primary"
+								onClick={() => setSureBook(false)}
+							>
+								{t('Close')}
+							</a>
+							<a
+								className="btnAccept"
+								size="sm"
+								variant="primary"
+								onClick={acceptCloseSlot}
+							>
+								OK
+							</a>
+						</div>
+					</Modal.Body>
+				</Modal>
 
 				<Modal
 					show={showErrorBook}
@@ -1345,19 +1355,20 @@ const FullCalendar = ({ data = [], statusShow }) => {
 					showModal={showActiveModal}
 					closeModal={() => setShowActiveModal(false)}
 					handleOpenSlot={_openSlot}
+					t={t}
+					loadingSlot={loadingSlot}
 				/>
 
-				{openUpdate && (
-					<ModalUpdate
-						dataUpdate={dataUpdate && dataUpdate}
-						onShow={openUpdate}
-						onClose={() => setOpenUpdate(false)}
-						updateStatus={(infoSubmit) => updateStatus(infoSubmit)}
-					/>
-				)}
+				<ModalUpdate
+					dataUpdate={!!dataUpdate && dataUpdate}
+					onShow={openUpdate}
+					onClose={() => setOpenUpdate(false)}
+					updateStatus={(infoSubmit) => updateStatus(infoSubmit)}
+					t={t}
+				/>
 			</div>
 		</>
 	);
 };
 
-export default FullCalendar;
+export default withTranslation('common')(FullCalendar);

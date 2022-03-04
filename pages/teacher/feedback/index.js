@@ -7,65 +7,12 @@ import Pagination from 'react-js-pagination';
 import { getLayout } from '~/components/Layout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
-import dataHy from '../../../data/data.json';
+
 import { i18n, withTranslation } from '~/i18n';
 import Router, { useRouter } from 'next/router';
-
-function getData() {
-	const andt = dataHy.StudentFeedback;
-	return andt;
-}
-
-const feedbackDemo = [
-	{
-		id: randomId(),
-		stName: 'Truong Van Lam',
-		stAvatar: null,
-		stFeedback: '',
-		lessonTime: '12/06/2020 10:30AM (Vietnam Time)',
-		lessonName: 'Lesson 6: ReactJS application',
-		rating: '5',
-	},
-	{
-		id: randomId(),
-		stName: 'Truong Van Lam',
-		stAvatar:
-			'https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg',
-		stFeedback:
-			'Buổi học rất tốt, giảng viên nhiệt tình. Giảng viên phát âm rất chuẩn chỉnh',
-		lessonTime: '12/06/2020 10:30AM (Vietnam Time)',
-		lessonName: 'Lesson 6: ReactJS application',
-		rating: '3',
-	},
-];
-
-const commentDemo = [
-	{
-		id: randomId(),
-		dateTime: new Date(),
-		teacherName: 'Kelly Clarkson',
-		teacherAvatar:
-			'https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg',
-		content: `Lorem ipsum dolor sit, amet consectetur adipisicing elit. Error earum
-        molestias consequatur, iusto accusantium minima est saepe porro id odit nam, numquam
-        voluptates quis repudiandae veniam. Provident illum et voluptate. Lorem ipsum dolor sit,
-        amet consectetur adipisicing elit. Quaerat aliquam magni impedit vitae sit expedita totam
-        labore neque, dolores eos veritatis? Qui nisi, ipsa nostrum nulla labore esse dicta.
-        Aspernatur`,
-		editted: false,
-	},
-	{
-		id: randomId(),
-		dateTime: new Date(),
-		teacherName: 'Holy Breaker',
-		teacherAvatar:
-			'https://i.pinimg.com/236x/aa/84/88/aa8488c0bdc927ac836586c004c7cb12.jpg',
-		content: `Lorem ipsum dolor sit, amet consectetur adipisicing elit. Error earum
-        molestias consequatur, iusto accusantium minima est saepe porro id odit nam, numquam
-        voluptates.`,
-		editted: false,
-	},
-];
+import Rating from '@material-ui/lab/Rating';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 
 const FeedbackRow = ({
 	data: {
@@ -79,8 +26,13 @@ const FeedbackRow = ({
 		ClassTime,
 		LessonName,
 		rating,
+		DocumentRate,
+		InternetRate,
+		SatisfiedRate,
 		FeedbackLink,
+		PerformanceRate,
 	},
+	t,
 	isLoading = false,
 }) => {
 	return (
@@ -90,7 +42,7 @@ const FeedbackRow = ({
 					<Skeleton circle={true} className="avatar" />
 				) : (
 					<img
-						src={Avatar || '/static/assets/img/default-avatar.png'}
+						src={Avatar ? Avatar : '/static/assets/img/user.png'}
 						alt="avatar"
 						className="avatar"
 					/>
@@ -101,29 +53,6 @@ const FeedbackRow = ({
 					<p className="name">
 						{isLoading ? <Skeleton width={200} /> : StudentName}
 					</p>
-					<div className="rating-wrap">
-						<div className="rating tx-warning">
-							{isLoading ? (
-								<Skeleton width={100} height={24} />
-							) : (
-								[...Array(5)].map((el, index) =>
-									5 - index <= Rating ? (
-										<FontAwesomeIcon
-											icon="star"
-											key={`${index}`}
-											className="fas fa-star"
-										/>
-									) : (
-										<FontAwesomeIcon
-											icon={['far', 'star']}
-											key={`${index}`}
-											className="far fa-star"
-										/>
-									),
-								)
-							)}
-						</div>
-					</div>
 				</div>
 
 				<div className="metas mg-b-10-f">
@@ -135,7 +64,8 @@ const FeedbackRow = ({
 						/>
 					) : (
 						<div className="meta">
-							<span className="tx-medium">Class time:</span>{' '}
+							<span className="tx-medium">{t('Class time')}:</span>
+							{''}
 							<span className="tx-normal">{ClassTime}</span>
 						</div>
 					)}
@@ -143,20 +73,41 @@ const FeedbackRow = ({
 						<Skeleton width={100} height={15} />
 					) : (
 						<div className="meta">
-							<span className="tx-medium">Lesson:</span>{' '}
+							<span className="tx-medium">{t('Lesson')}:</span>{' '}
 							<span className="tx-normal">{LessonName}</span>
 						</div>
 					)}
 				</div>
 				<div className="feedback-comment mg-b-15-f">
+					<ul className="listFeedback">
+						<li>
+							<span className="text">Document rate:</span>{' '}
+							<span>{DocumentRate}</span>{' '}
+							<FontAwesomeIcon icon="star" className="fa fa-star tx-warning" />
+						</li>
+						<li>
+							<span className="text">Internet rate:</span>{' '}
+							<span>{InternetRate}</span>{' '}
+							<FontAwesomeIcon icon="star" className="fa fa-star tx-warning" />
+						</li>
+						<li>
+							<span className="text">Satisfied rate:</span>{' '}
+							<span>{SatisfiedRate}</span>{' '}
+							<FontAwesomeIcon icon="star" className="fa fa-star tx-warning" />
+						</li>
+						<li>
+							<span className="text">Performance rate:</span>{' '}
+							<span>{PerformanceRate}</span>{' '}
+							<FontAwesomeIcon icon="star" className="fa fa-star tx-warning" />
+						</li>
+					</ul>
+					<p className="title-fb">Content feedback:</p>
 					{isLoading ? (
 						<Skeleton count={3} />
-					) : !!ContentFeedBack && ContentFeedBack !== '' ? (
+					) : ContentFeedBack !== '' ? (
 						<p className="word-break">{ContentFeedBack}</p>
 					) : (
-						<p className="tx-danger tx-medium">
-							The student didn't leave any feedback for this class
-						</p>
+						'...'
 					)}
 				</div>
 				{/* <div className="actions">
@@ -221,6 +172,9 @@ const RenderSummary = ({ handFilterValue, t }) => {
 			}
 		}
 		fetchSummary();
+		RenderSummary.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, []);
 
 	return (
@@ -455,23 +409,35 @@ const StudentFeedback = ({ t }) => {
 	};
 
 	React.useEffect(() => {
-		console.log(feedbacks);
+		StudentFeedback.getInitialProps = async () => ({
+			namespacesRequired: ['common'],
+		});
 	}, [feedbacks]);
 
 	React.useEffect(() => {
+		let UID = null;
+		let Token = null;
+
+		if (localStorage.getItem('UID')) {
+			UID = localStorage.getItem('UID');
+			Token = localStorage.getItem('token');
+		}
+
 		getAPI({
 			sort: 0,
 			page: 1,
-			UID: 61230,
-			Token: '',
+			UID: parseInt(UID),
+			Token: Token,
 		});
+
+		$('body').removeClass('show-aside');
 	}, [filterValue]);
 
 	return (
 		<>
 			<h1 className="main-title-page">{t('student-feedback')}</h1>
 			<div className="mg-t-30 feedback-container">
-				<RenderSummary handFilterValue={setFilterValue} />
+				{/* <RenderSummary handFilterValue={setFilterValue} /> */}
 				<div className="fb-list">
 					{isLoading ? (
 						<>
@@ -488,14 +454,18 @@ const StudentFeedback = ({ t }) => {
 										data={{
 											id: fb.id,
 											StudentName: fb?.StudentName ?? '',
-											Avatar:
-												fb?.Avatar ?? '/static/assets/img/default-avatar.png',
+											Avatar: fb?.Avatar,
 											ContentFeedBack: fb?.ContentFeedBack ?? '',
 											ClassTime: fb?.ClassTime ?? '',
 											LessonName: fb?.LessonName ?? '',
 											Rating: fb.Rating,
 											FeedbackLink: fb.FeedbackLink,
+											DocumentRate: fb?.DocumentRate,
+											InternetRate: fb?.InternetRate,
+											SatisfiedRate: fb?.SatisfiedRate,
+											PerformanceRate: fb?.PerformanceRate,
 										}}
+										t={t}
 										isLoading={isLoading}
 									/>
 								))
@@ -543,10 +513,5 @@ const StudentFeedback = ({ t }) => {
 // export default StudentFeedback;
 
 StudentFeedback.getLayout = getLayout;
-StudentFeedback.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
-RenderSummary.getInitialProps = async () => ({
-	namespacesRequired: ['common'],
-});
+
 export default withTranslation('common')(StudentFeedback, RenderSummary);

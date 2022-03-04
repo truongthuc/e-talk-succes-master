@@ -1,13 +1,35 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
+import { makeStyles } from '@material-ui/core/styles';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+const useStyles = makeStyles((theme) => ({
+	root: {
+		display: 'flex',
+		'& > * + *': {
+			marginLeft: theme.spacing(2),
+		},
+	},
+	styleLoading: {
+		width: '20px!important',
+		height: '20px!important',
+		color: 'white!important',
+		marginRight: '7px!important',
+	},
+}));
+
 const ActiveSlotModal = ({
 	data,
 	handleOpenSlot,
 	showModal = false,
 	closeModal,
 	openModal,
+	loadingSlot,
+	t,
 }) => {
 	const { date = '', start = '', end = '' } = data;
+	const classes = useStyles();
 	return (
 		<>
 			<Modal
@@ -19,14 +41,14 @@ const ActiveSlotModal = ({
 				animation={false}
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>Confirm active</Modal.Title>
+					<Modal.Title>{t('Confirm Active')}</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<p>Do you want open slot from:</p>
+					<p>{t('Do you want to open slot from')}?</p>
 					<div className="row">
 						<div className="col">
 							<p>
-								Start:{' '}
+								{t('Start')}:{' '}
 								<span className="tx-medium" id="js-start-time">
 									{start}
 								</span>
@@ -34,7 +56,7 @@ const ActiveSlotModal = ({
 						</div>
 						<div className="col">
 							<p>
-								End:{' '}
+								{t('End')}:{' '}
 								<span className="tx-medium" id="js-end-time">
 									{end}
 								</span>
@@ -48,14 +70,18 @@ const ActiveSlotModal = ({
 						className="btn btn-light btn-sm"
 						onClick={closeModal}
 					>
-						Close
+						{t('Close')}
 					</button>
 					<button
 						type="button"
 						className="btn btn-primary btn-sm tx-primary"
+						style={{ display: 'flex', alignItems: 'center' }}
 						onClick={handleOpenSlot}
 					>
-						Open slot
+						{loadingSlot && (
+							<CircularProgress className={classes.styleLoading} />
+						)}
+						{t('Open Slot')}
 					</button>
 				</Modal.Footer>
 			</Modal>
