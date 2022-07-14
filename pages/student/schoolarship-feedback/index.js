@@ -134,6 +134,19 @@ const LessonItem = ({
 		setShow(true);
 	};
 
+	const isEnableSubmit = () => {
+		if (
+			!!state?.internetRate &&
+			!!state?.documentRate &&
+			!!state?.performanceRate &&
+			!!state?.satisfiedRate
+		) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
 	const [dataUser, setDataUser] = useState();
 
 	console.log('Data Feed ID: ', feedbackID);
@@ -300,6 +313,7 @@ const LessonItem = ({
 							{t('Close')}
 						</Button>
 						<Button
+							disabled={!isEnableSubmit()}
 							className="btn  btn-icon btn-info mar-l-10"
 							onClick={_submitFeedback}
 						>
