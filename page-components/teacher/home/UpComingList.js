@@ -112,6 +112,7 @@ const UpComingList = ({ itemShow, t }) => {
 									<th>{t('course')}</th>
 									<th>{t('lesson')}</th>
 									<th>{t('your-time')}</th>
+									<th>{t('skype-id')}</th>
 									{/* <th>{t('student')}</th> */}
 									<th className="tx-right">{t('actions')}</th>
 								</tr>
@@ -173,6 +174,11 @@ const UpComingList = ({ itemShow, t }) => {
 													<td className="clr-lesson">
 														<div className="mg-b-5">
 															<span className="">{ls.TimeZoneName}</span>
+														</div>
+													</td>
+													<td className="clr-lesson">
+														<div className="mg-b-5">
+															<span className="">{ls.StudentSkype}</span>
 														</div>
 													</td>
 													{/* <td className="lg-valign-middle">
